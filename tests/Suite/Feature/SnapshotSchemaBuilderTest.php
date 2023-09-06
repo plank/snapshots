@@ -11,8 +11,12 @@ use function Pest\Laravel\assertDatabaseHas;
 describe('SnapshotMigrations are versioned', function () {
     beforeEach(function () {
         // Dump the shell's pwd
+        dump('Beep');
         dump(shell_exec('pwd'));
         dump(migrationPath('schema/create'));
+        dump('Boop');
+        dump('');
+        dump('');
         artisan('migrate', [
             '--path' => migrationPath('schema/create'),
             '--realpath' => true,
