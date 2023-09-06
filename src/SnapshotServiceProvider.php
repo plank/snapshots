@@ -52,20 +52,35 @@ class SnapshotServiceProvider extends PackageServiceProvider
             });
         }
 
-        $this->app->extend('db.schema', function (Builder $schema, Application $app) {
-            $app->scoped(SnapshotSchemaBuilder::class, function (Application $app) use ($schema) {
+        if (! $this->app->bound(SnapshotSchemaBuilder::class) && $this->app->bound('db.schema')) {
+            $this->app->scoped(SnapshotSchemaBuilder::class, function (Application $app) {
+                $schema = $app['db.schema'];
                 $connection = $schema->getConnection();
                 $driver = $connection->getDriverName();
 
-                dd($driver);
                 return new SnapshotSchemaBuilder(
                     $connection,
                     TableCopierFactory::forDriver($driver),
                     $app[ManagesVersions::class]
                 );
             });
+        }
 
-            return $schema;
+        $this->app->extend('db.schema', function (Builder $schema, Application $app) {
+            if (! $this->app->bound(SnapshotSchemaBuilder::class)) {
+                $app->scoped(SnapshotSchemaBuilder::class, function (Application $app) use ($schema) {
+                    $connection = $schema->getConnection();
+                    $driver = $connection->getDriverName();
+
+                    return new SnapshotSchemaBuilder(
+                        $connection,
+                        TableCopierFactory::forDriver($driver),
+                        $app[ManagesVersions::class]
+                    );
+                });
+
+                return $schema;
+            }
         });
 
         $this->app->extend('migrator', function (Migrator $migrator, Application $app) {
