@@ -7,6 +7,7 @@ return new class extends SnapshotMigration
 {
     public function up()
     {
+        dd('Bahahahahahhaha');
         $this->schema->create('documents', function (SnapshotBlueprint $table) {
             $table->id();
             $table->string('title');
