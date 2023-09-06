@@ -7,7 +7,7 @@
 <a href="https://codeclimate.com/github/plank/snapshots/maintainability"><img src="https://img.shields.io/codeclimate/maintainability/plank/snapshots?color=%23528cff&label=maintainablility&logo=code-climate&logoColor=%23fff" /></a>
 </p>
 
-# Snapshots
+# Laravel Snapshots
 
 Snapshots is a Laravel package that allows you to version the content of your site by replicating database tables and their content. Each snapshot represents a browesable version of your site's content at a specific point in time. By changing the active version of your site, you can view your site's content at a previous version.
 
