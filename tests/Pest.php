@@ -23,7 +23,7 @@ function setMigrationPath(string $path): void
  */
 function migrationPath(string $path = ''): string
 {
-    return realpath(__DIR__).'/database/migrations/'.str($path)->trim('/');
+    return realpath(__DIR__).'/Database/Migrations/'.str($path)->trim('/');
 }
 
 /**
