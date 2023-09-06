@@ -66,10 +66,6 @@ class SnapshotServiceProvider extends PackageServiceProvider
             });
         }
 
-        $this->app->extend('db.schema', function (Builder $schema, Application $app) {
-
-        });
-
         $this->app->extend('migrator', function (Migrator $migrator, Application $app) {
             return new SnapshotMigrator(
                 $app['migration.repository'],
