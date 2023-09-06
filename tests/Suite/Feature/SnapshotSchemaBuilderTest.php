@@ -10,10 +10,10 @@ use function Pest\Laravel\assertDatabaseHas;
 
 describe('SnapshotMigrations are versioned', function () {
     beforeEach(function () {
-        artisan('migrate', [
+        dump(artisan('migrate', [
             '--path' => migrationPath('schema/create'),
             '--realpath' => true,
-        ])->run();
+        ])->run());
     });
 
     it('migrates the declared table before the versions table has been migrated', function () {
