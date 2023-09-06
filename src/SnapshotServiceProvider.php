@@ -10,7 +10,6 @@ use Plank\Snapshots\Contracts\ManagesVersions;
 use Plank\Snapshots\Contracts\Version;
 use Plank\Snapshots\Events\VersionCreated;
 use Plank\Snapshots\Exceptions\VersionException;
-use Plank\Snapshots\Factories\TableCopierFactory;
 use Plank\Snapshots\Listeners\SnapshotDatabase;
 use Plank\Snapshots\Migrator\Copiers\SqliteTableCopier;
 use Plank\Snapshots\Migrator\SnapshotMigrator;
@@ -60,6 +59,7 @@ class SnapshotServiceProvider extends PackageServiceProvider
                     $driver = $connection->getDriverName();
 
                     dd($driver);
+
                     return new SnapshotSchemaBuilder(
                         $connection,
                         new SqliteTableCopier(),
