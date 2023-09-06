@@ -3,7 +3,6 @@
 namespace Plank\Snapshots;
 
 use Illuminate\Database\Migrations\Migrator;
-use Illuminate\Database\Schema\Builder;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Event;
 use Plank\Snapshots\Contracts\ManagesVersions;
@@ -52,8 +51,9 @@ class SnapshotServiceProvider extends PackageServiceProvider
             });
         }
 
-        $this->app->extend('db.schema', function (Builder $schema, Application $app) {
-            $app->scoped(SnapshotSchemaBuilder::class, function (Application $app) use ($schema) {
+        if (! $this->app->bound(SnapshotSchemaBuilder::class)) {
+            $this->app->scoped(SnapshotSchemaBuilder::class, function (Application $app) {
+                $schema = $this->app['db']->connection()->getSchemaBuilder();
                 $connection = $schema->getConnection();
                 $driver = $connection->getDriverName();
 
@@ -63,9 +63,7 @@ class SnapshotServiceProvider extends PackageServiceProvider
                     $app[ManagesVersions::class]
                 );
             });
-
-            return $schema;
-        });
+        }
 
         $this->app->extend('migrator', function (Migrator $migrator, Application $app) {
             return new SnapshotMigrator(
