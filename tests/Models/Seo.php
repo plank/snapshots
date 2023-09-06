@@ -11,8 +11,8 @@ use Plank\Snapshots\Tests\Database\Factories\SeoFactory;
 
 class Seo extends Model implements Versioned
 {
-    use HasFactory;
     use AsVersionedContent;
+    use HasFactory;
 
     protected $guarded = [];
 

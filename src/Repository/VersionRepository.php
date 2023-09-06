@@ -2,6 +2,7 @@
 
 namespace Plank\Snapshots\Repository;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Plank\Snapshots\Contracts\ManagesVersions;
 use Plank\Snapshots\Contracts\Version;
@@ -12,9 +13,15 @@ class VersionRepository implements ManagesVersions
     protected ?Version $active = null;
 
     /**
+     * Get an instance of the Model being used for versions.
+     */
+    public function model(): Version&Model
+    {
+        return new (config('snapshots.model') ?? VersionModel::class);
+    }
+
+    /**
      * {@inheritDoc}
-     *
-     * @param  VersionModel  $version
      */
     public function setActive(?Version $version): void
     {
@@ -31,55 +38,50 @@ class VersionRepository implements ManagesVersions
 
     /**
      * {@inheritDoc}
-     *
-     * @return VersionModel|null
      */
-    public function active(): ?Version
+    public function active(): (Version&Model)|null
     {
         return $this->active;
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @return VersionModel|null
      */
-    public function latest(): ?Version
+    public function latest(): (Version&Model)|null
     {
-        return VersionModel::query()
+        return $this->model()
+            ->query()
             ->latest()
             ->first();
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @return VersionModel|null
      */
-    public function find($key): ?Version
+    public function find($key): (Version&Model)|null
     {
-        return VersionModel::find($key);
+        return $this->model()
+            ->query()
+            ->whereKey($key)
+            ->first();
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @return VersionModel|null
      */
-    public function byNumber(string $number): ?Version
+    public function byNumber(string $number): (Version&Model)|null
     {
-        return VersionModel::query()
+        return $this->model()
+            ->query()
             ->where('number', $number)
             ->first();
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @return Collection<VersionModel>
      */
     public function all(): Collection
     {
-        return VersionModel::all();
+        return $this->model()->all();
     }
 }

@@ -19,7 +19,7 @@ class VersionNumber
             throw new \InvalidArgumentException('Invalid version number: '.$number);
         }
 
-        [ $major, $minor, $patch ] = explode('.', $number);
+        [$major, $minor, $patch] = explode('.', $number);
 
         return new static((int) $major, (int) $minor, (int) $patch);
     }

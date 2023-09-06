@@ -4,8 +4,8 @@ namespace Plank\Snapshots\Tests;
 
 use Carbon\Carbon;
 use Orchestra\Testbench\TestCase as Orchestra;
-use Plank\Snapshots\SnapshotServiceProvider;
 use Plank\Snapshots\Repository\VersionRepository;
+use Plank\Snapshots\SnapshotServiceProvider;
 
 class TestCase extends Orchestra
 {

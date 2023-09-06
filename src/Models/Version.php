@@ -19,8 +19,8 @@ use Plank\Snapshots\ValueObjects\VersionNumber;
  */
 class Version extends Model implements VersionContract
 {
-    use HasFactory;
     use AsVersion;
+    use HasFactory;
 
     public bool $releasing = false;
 

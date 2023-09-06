@@ -29,8 +29,8 @@ use Plank\Snapshots\Tests\Database\Factories\PostFactory;
  */
 class Post extends Model implements Versioned
 {
-    use HasFactory;
     use AsVersionedContent;
+    use HasFactory;
 
     protected $guarded = [];
 

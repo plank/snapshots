@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Event;
 use Plank\Snapshots\Contracts\ManagesVersions;
 use Plank\Snapshots\Contracts\Version;
 use Plank\Snapshots\Events\VersionCreated;
+use Plank\Snapshots\Exceptions\VersionException;
 use Plank\Snapshots\Factories\TableCopierFactory;
 use Plank\Snapshots\Listeners\SnapshotDatabase;
 use Plank\Snapshots\Migrator\SnapshotMigrator;
@@ -34,6 +35,10 @@ class SnapshotServiceProvider extends PackageServiceProvider
         if (! $this->app->bound(Version::class)) {
             $this->app->bind(Version::class, function (Application $app) {
                 $model = $app['config']->get('snapshots.model');
+
+                if (! is_a($model, Version::class, true)) {
+                    throw VersionException::create($model);
+                }
 
                 return new $model;
             });

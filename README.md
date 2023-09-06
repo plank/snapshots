@@ -1,84 +1,37 @@
-# Snapshot Laravel Models
+<p align="center"><img src="snapshots.jpg" width="100%"></p>
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/plank/snapshot.svg?style=flat-square)](https://packagist.org/packages/plank/snapshot)
-[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/plank/snapshot/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/plank/snapshot/actions?query=workflow%3Arun-tests+branch%3Amain)
-[![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/plank/snapshot/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/plank/snapshot/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
-[![Total Downloads](https://img.shields.io/packagist/dt/plank/snapshot.svg?style=flat-square)](https://packagist.org/packages/plank/snapshot)
+<p align="center">
+<img src="https://img.shields.io/packagist/php-v/plank/snapshots?color=%23fae370&label=php&logo=php&logoColor=%23fff" alt="PHP Version Support">
+<a href="https://github.com/plank/snapshots/actions?query=workflow%3Arun-tests"><img src="https://img.shields.io/github/actions/workflow/status/plank/snapshots/run-tests.yml?branch=main&&color=%23bfc9bd&label=run-tests&logo=github&logoColor=%23fff" alt="GitHub Workflow Status"></a>
+<a href="https://codeclimate.com/github/plank/snapshots/test_coverage"><img src="https://img.shields.io/codeclimate/coverage/plank/snapshots?color=%23ff9376&label=test%20coverage&logo=code-climate&logoColor=%23fff" /></a>
+<a href="https://codeclimate.com/github/plank/snapshots/maintainability"><img src="https://img.shields.io/codeclimate/maintainability/plank/snapshots?color=%23528cff&label=maintainablility&logo=code-climate&logoColor=%23fff" /></a>
+</p>
 
-This is where your description should go. Limit it to a paragraph or two. Consider adding a small example.
+# Snapshots
 
-## Support us
+Snapshots is a Laravel package that allows you to version the content of your site by replicating database tables and their content. Each snapshot represents a browesable version of your site's content at a specific point in time. By changing the active version of your site, you can view your site's content at a previous version.
 
-[<img src="https://github-ads.s3.eu-central-1.amazonaws.com/snapshot.jpg?t=1" width="419px" />](https://spatie.be/github-ad-click/snapshot)
-
-We invest a lot of resources into creating [best in class open source packages](https://spatie.be/open-source). You can support us by [buying one of our paid products](https://spatie.be/open-source/support-us).
-
-We highly appreciate you sending us a postcard from your hometown, mentioning which of our package(s) you are using. You'll find our address on [our contact page](https://spatie.be/about-us). We publish all received postcards on [our virtual postcard wall](https://spatie.be/open-source/postcards).
-
-## Installation
-
-You can install the package via composer:
-
-```bash
-composer require plank/snapshot
-```
-
-You can publish and run the migrations with:
-
-```bash
-php artisan vendor:publish --tag="snapshot-migrations"
-php artisan migrate
-```
-
-You can publish the config file with:
-
-```bash
-php artisan vendor:publish --tag="snapshot-config"
-```
-
-This is the contents of the published config file:
-
-```php
-return [
-];
-```
-
-Optionally, you can publish the views using
-
-```bash
-php artisan vendor:publish --tag="snapshot-views"
-```
-
-## Usage
-
-```php
-$snapshot = new Plank\Snapshots();
-echo $snapshot->echoPhrase('Hello, Plank!');
-```
-
-## Testing
-
-```bash
-composer test
-```
-
-## Changelog
-
-Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed recently.
+The main goal of this package is for it to perform robust versioning of your content, but stay out of your way. You should be able to use it without having to change your existing codebase. It should be easy to install and configure, and it should be easy to use.
 
 ## Contributing
 
 Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
 
-## Security Vulnerabilities
-
-Please review [our security policy](../../security/policy) on how to report security vulnerabilities.
+&nbsp;
 
 ## Credits
 
 - [Kurt Friars](https://github.com/kfriars)
 - [All Contributors](../../contributors)
 
+&nbsp;
+
 ## License
 
 The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
+
+&nbsp;
+
+## Security Vulnerabilities
+
+If you discover a security vulnerability within siren, please send an e-mail to security@plankdesign.com. All security vulnerabilities will be promptly addressed.
