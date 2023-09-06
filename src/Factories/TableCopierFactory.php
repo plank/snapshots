@@ -12,7 +12,6 @@ class TableCopierFactory
 {
     public static function forDriver(string $driver): CopiesTables
     {
-        dd($driver);
         switch ($driver) {
             case 'mysql':
                 return new MySqlTableCopier();
