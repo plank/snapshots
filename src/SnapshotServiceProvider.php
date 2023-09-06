@@ -12,7 +12,6 @@ use Plank\Snapshots\Events\VersionCreated;
 use Plank\Snapshots\Exceptions\VersionException;
 use Plank\Snapshots\Factories\TableCopierFactory;
 use Plank\Snapshots\Listeners\SnapshotDatabase;
-use Plank\Snapshots\Migrator\Copiers\SqliteTableCopier;
 use Plank\Snapshots\Migrator\SnapshotMigrator;
 use Plank\Snapshots\Migrator\SnapshotSchemaBuilder;
 use Spatie\LaravelPackageTools\Package;
@@ -59,10 +58,9 @@ class SnapshotServiceProvider extends PackageServiceProvider
                     $connection = $schema->getConnection();
                     $driver = $connection->getDriverName();
 
-                    dd($driver);
                     return new SnapshotSchemaBuilder(
                         $connection,
-                        new SqliteTableCopier(),
+                        TableCopierFactory::forDriver($driver),
                         $app[ManagesVersions::class]
                     );
                 });
