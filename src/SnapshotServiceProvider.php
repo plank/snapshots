@@ -54,7 +54,9 @@ class SnapshotServiceProvider extends PackageServiceProvider
 
         if (! $this->app->bound(SnapshotSchemaBuilder::class)) {
             $this->app->scoped(SnapshotSchemaBuilder::class, function (Application $app) {
-                dump($app->bound('db.schema'), $this->app->bound('db.schema'));
+                dump('beep');
+                dump($app->bound('db.schema') ? 'true' : 'false', $this->app->bound('db.schema') ? 'true' : 'false');
+                dump('bonk');
                 $schema = $this->app->make('db.schema');
                 $connection = $schema->getConnection();
                 $driver = $connection->getDriverName();
