@@ -58,6 +58,7 @@ class SnapshotServiceProvider extends PackageServiceProvider
                 $driver = $connection->getDriverName();
 
                 dd($driver);
+
                 return new SnapshotSchemaBuilder(
                     $connection,
                     TableCopierFactory::forDriver($driver),
