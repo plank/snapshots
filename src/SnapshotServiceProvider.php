@@ -3,7 +3,6 @@
 namespace Plank\Snapshots;
 
 use Illuminate\Database\Migrations\Migrator;
-use Illuminate\Database\Schema\Builder;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Event;
 use Plank\Snapshots\Contracts\ManagesVersions;
