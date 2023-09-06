@@ -12,6 +12,7 @@ use Plank\Snapshots\Events\VersionCreated;
 use Plank\Snapshots\Exceptions\VersionException;
 use Plank\Snapshots\Factories\TableCopierFactory;
 use Plank\Snapshots\Listeners\SnapshotDatabase;
+use Plank\Snapshots\Migrator\Copiers\SqliteTableCopier;
 use Plank\Snapshots\Migrator\SnapshotMigrator;
 use Plank\Snapshots\Migrator\SnapshotSchemaBuilder;
 use Spatie\LaravelPackageTools\Package;
@@ -52,29 +53,16 @@ class SnapshotServiceProvider extends PackageServiceProvider
             });
         }
 
-        if (! $this->app->bound(SnapshotSchemaBuilder::class) && $this->app->bound('db.schema')) {
-            $this->app->scoped(SnapshotSchemaBuilder::class, function (Application $app) {
-                $schema = $app->make('db.schema');
-                $connection = $schema->getConnection();
-                $driver = $connection->getDriverName();
-
-                return new SnapshotSchemaBuilder(
-                    $connection,
-                    TableCopierFactory::forDriver($driver),
-                    $app[ManagesVersions::class]
-                );
-            });
-        }
-
         $this->app->extend('db.schema', function (Builder $schema, Application $app) {
             if (! $this->app->bound(SnapshotSchemaBuilder::class)) {
                 $app->scoped(SnapshotSchemaBuilder::class, function (Application $app) use ($schema) {
                     $connection = $schema->getConnection();
                     $driver = $connection->getDriverName();
 
+                    dd($driver);
                     return new SnapshotSchemaBuilder(
                         $connection,
-                        TableCopierFactory::forDriver($driver),
+                        new SqliteTableCopier(),
                         $app[ManagesVersions::class]
                     );
                 });
