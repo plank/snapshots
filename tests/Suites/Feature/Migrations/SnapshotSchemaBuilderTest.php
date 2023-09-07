@@ -148,7 +148,7 @@ describe('SnapshotMigrations are versioned', function () {
         ]);
     });
 
-    it('drops columns on versioned tables', function () {
+    it('drops columns on the original tables', function () {
         SnapshotSchema::whenTableHasColumn('documents', 'released_at', function () {
             expect(SnapshotSchema::hasColumn('documents', 'released_at'))->toBeTrue();
             expect(SnapshotSchema::getColumnListing('documents'))->toBe(['id', 'title', 'text', 'released_at', 'created_at', 'updated_at']);
@@ -170,7 +170,31 @@ describe('SnapshotMigrations are versioned', function () {
         });
     });
 
-    it('renames versioned tables', function () {
+    it('drops columns on the versioned tables', function () {
+        versions()->setActive(createFirstVersion('schema/create'));
+
+        SnapshotSchema::whenTableHasColumn('documents', 'released_at', function () {
+            expect(SnapshotSchema::hasColumn('documents', 'released_at'))->toBeTrue();
+            expect(SnapshotSchema::getColumnListing('documents'))->toBe(['id', 'title', 'text', 'released_at', 'created_at', 'updated_at']);
+        });
+
+        artisan('migrate', [
+            '--path' => migrationPath('schema/drop_columns'),
+            '--realpath' => true,
+        ])->run();
+
+        assertDatabaseHas('migrations', [
+            'migration' => 'drop_columns_from_documents_table',
+            'batch' => 4,
+        ]);
+
+        SnapshotSchema::whenTableDoesntHaveColumn('documents', 'released_at', function () {
+            expect(SnapshotSchema::hasColumns('documents', ['released_at']))->toBeFalse();
+            expect(SnapshotSchema::getColumnListing('documents'))->toBe(['id', 'title', 'text', 'created_at', 'updated_at']);
+        });
+    });
+
+    it('renames the original tables', function () {
         expect(SnapshotSchema::hasTable('documents'))->toBeTrue();
         expect(SnapshotSchema::hasTable('files'))->toBeFalse();
 
@@ -182,6 +206,26 @@ describe('SnapshotMigrations are versioned', function () {
         assertDatabaseHas('migrations', [
             'migration' => 'rename_documents_table',
             'batch' => 3,
+        ]);
+
+        expect(SnapshotSchema::hasTable('documents'))->toBeFalse();
+        expect(SnapshotSchema::hasTable('files'))->toBeTrue();
+    });
+
+    it('renames the versioned tables', function () {
+        versions()->setActive(createFirstVersion('schema/create'));
+
+        expect(SnapshotSchema::hasTable('documents'))->toBeTrue();
+        expect(SnapshotSchema::hasTable('files'))->toBeFalse();
+
+        artisan('migrate', [
+            '--path' => migrationPath('schema/rename'),
+            '--realpath' => true,
+        ])->run();
+
+        assertDatabaseHas('migrations', [
+            'migration' => 'rename_documents_table',
+            'batch' => 4,
         ]);
 
         expect(SnapshotSchema::hasTable('documents'))->toBeFalse();

@@ -49,11 +49,7 @@ class SnapshotMigrator extends Migrator
 
                 $toRun = $toRun ? $toRun.'@version:' : null;
 
-                try {
-                    $versionModel = app()->make(Version::class);
-                } catch (BindingResolutionException $e) {
-                    return $toRun;
-                }
+                $versionModel = app()->make(Version::class);
 
                 if (! $versionModel->hasBeenMigrated()) {
                     return $toRun;
@@ -145,7 +141,7 @@ class SnapshotMigrator extends Migrator
      * @param  object  $migration
      * @return void
      */
-    protected function pretendToRunVersion(Version $version, SnapshotMigration $migration, string $method)
+    public function pretendToRunVersion(Version $version, SnapshotMigration $migration, string $method)
     {
         try {
             $name = get_class($migration);
@@ -164,8 +160,6 @@ class SnapshotMigrator extends Migrator
                 return $query['query'];
             }));
         } catch (SchemaException) {
-            $name = get_class($migration);
-
             $this->write(Error::class, sprintf(
                 '[%s] failed to dump queries. This may be due to changing database columns using Doctrine, which is not supported while pretending to run migrations.',
                 $name,
