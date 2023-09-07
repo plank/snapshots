@@ -14,7 +14,7 @@ describe('HasMany relationships use versioned tables correctly', function () {
     });
 
     it('selects the correct table when saving versioned models on non-versioned models', function () {
-        // In the working version create a user and attach a post
+        // In the original content create a user and attach a post
         $user = User::factory()
             ->create();
 
@@ -30,15 +30,16 @@ describe('HasMany relationships use versioned tables correctly', function () {
 
         versions()->clearActive();
 
-        // Go back to the working version and attach another post
+        // Go back to the original content and attach another post
         $user->posts()
             ->save(Post::factory()->make());
 
         expect($user->posts()->count())->toBe(2);
 
+        // Create a new version and verify the attached post matches the previous version 
         versions()->setActive(releaseAndCreateMinorVersion('query'));
 
-        expect($user->posts()->count())->toBe(2);
+        expect($user->posts()->count())->toBe(1);
 
         // Go back to the first version and ensure the post was not attached there
         versions()->setActive(versions()->byNumber('1.0.0'));

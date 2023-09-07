@@ -43,7 +43,7 @@ describe('Versioned models use the version prefixed table when interacting with 
         // Verify the post was saved to the correct table
         expect(Post::query()->where('title', 'Saved to v1.0.0')->exists())->toBeTrue();
 
-        // Switch back to the working version
+        // Switch back to the original content
         versions()->clearActive();
 
         // Verify the post was not saved to the incorrect table
@@ -66,7 +66,7 @@ describe('Versioned models use the version prefixed table when interacting with 
         // Verify the post was deleted from the correct table
         expect(Post::query()->where('title', 'Post 1')->exists())->toBeFalse();
 
-        // Switch back to the working version
+        // Switch back to the original content
         versions()->clearActive();
 
         // Verify the post was not deleted from the incorrect table
@@ -95,13 +95,13 @@ describe('Versioned models use the version prefixed table when interacting with 
         // Verify the query will be using the correct table
         expect($post->getTable())->toBe('v1_0_1_posts');
 
-        // Verify the post was is not in the new version, as it was updated in 1.0.0 only
-        expect(Post::query()->where('title', 'Updated in v1.0.0')->exists())->toBeFalse();
+        // Verify the post was carried over from the previous version
+        expect(Post::query()->where('title', 'Updated in v1.0.0')->exists())->toBeTrue();
 
-        // Switch back to the working version
+        // Switch back to the original content
         versions()->clearActive();
 
-        // Verify the post was not updated in the incorrect table
+        // Verify the post was not updated in the original table
         expect(Post::query()->where('title', 'Updated in v1.0.0')->exists())->toBeFalse();
     });
 });

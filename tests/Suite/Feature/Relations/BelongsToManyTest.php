@@ -79,7 +79,7 @@ describe('BelongsTo relationships use versioned tables when one of the models is
         expect($post1->related->pluck('title'))->not()->toContain('Post 2');
         expect($post1->related->pluck('title'))->toContain('Post 3');
 
-        // Ensure the posts are still related in the working version
+        // Ensure the posts are still related in the original content
         versions()->clearActive();
 
         $post1 = $post1->activeVersion();
@@ -112,7 +112,7 @@ describe('BelongsTo relationships use versioned tables when one of the models is
         expect($post1->related->pluck('title'))->toContain('Post 3');
         expect($post1->related->pluck('title'))->toContain('Post 4');
 
-        // Ensure the posts are still related in the working version
+        // Ensure the posts are still related in the original content
         versions()->clearActive();
 
         $post1 = $post1->activeVersion();
@@ -146,7 +146,7 @@ describe('BelongsTo relationships use versioned tables when one of the models is
         expect($post1->related->pluck('title'))->toContain('Post 3');
         expect($post1->related->pluck('title'))->toContain('Post 4');
 
-        // Ensure the posts are still related in the working version
+        // Ensure the posts are still related in the original content
         versions()->clearActive();
 
         $post1 = $post1->activeVersion();

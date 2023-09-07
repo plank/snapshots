@@ -25,7 +25,7 @@ class SnapshotSchemaBuilder extends Builder
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function create($table, Closure $callback): void
     {
@@ -37,6 +37,14 @@ class SnapshotSchemaBuilder extends Builder
 
         parent::create($table, $callback);
 
+        if ($active === null) {
+            return;
+        }
+
+        if ($active->previous) {
+            $original = $active->previous->addTablePrefix($original);
+        }
+
         if (parent::hasTable($original)) {
             $this->withoutForeignKeyConstraints(function () use ($table, $original) {
                 $this->tableCopier->copy($original, $table);
@@ -45,7 +53,7 @@ class SnapshotSchemaBuilder extends Builder
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function drop($table): void
     {
@@ -57,7 +65,7 @@ class SnapshotSchemaBuilder extends Builder
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function dropIfExists($table): void
     {
@@ -69,7 +77,7 @@ class SnapshotSchemaBuilder extends Builder
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function table($table, Closure $callback): void
     {
@@ -81,7 +89,7 @@ class SnapshotSchemaBuilder extends Builder
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function rename($from, $to): void
     {
@@ -94,7 +102,7 @@ class SnapshotSchemaBuilder extends Builder
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function hasTable($table): bool
     {
@@ -106,7 +114,7 @@ class SnapshotSchemaBuilder extends Builder
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function hasColumn($table, $column): bool
     {
@@ -118,7 +126,7 @@ class SnapshotSchemaBuilder extends Builder
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function hasColumns($table, array $columns): bool
     {
@@ -130,7 +138,7 @@ class SnapshotSchemaBuilder extends Builder
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function whenTableHasColumn(string $table, string $column, Closure $callback)
     {
@@ -140,7 +148,7 @@ class SnapshotSchemaBuilder extends Builder
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function whenTableDoesntHaveColumn(string $table, string $column, Closure $callback)
     {
@@ -150,7 +158,7 @@ class SnapshotSchemaBuilder extends Builder
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function dropColumns($table, $columns): void
     {
@@ -162,7 +170,7 @@ class SnapshotSchemaBuilder extends Builder
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getColumnType($table, $column)
     {
@@ -174,7 +182,7 @@ class SnapshotSchemaBuilder extends Builder
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function getColumnListing($table): array
     {
