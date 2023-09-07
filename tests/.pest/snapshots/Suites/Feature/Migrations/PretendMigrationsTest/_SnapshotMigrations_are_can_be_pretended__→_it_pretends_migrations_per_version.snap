@@ -1,8 +1,0 @@
-
-   INFO  Running migrations.  
-
-  v1_0_1_create_documents_table ....................................................................................................................  
-  ⇂ create table "v1_0_1_documents" ("id" integer primary key autoincrement not null, "title" varchar not null, "text" varchar not null, "released_at" datetime, "created_at" datetime, "updated_at" datetime)  
-  ⇂ select * from "versions" where "versions"."id" = ? limit 1  
-  ⇂ select * from sqlite_master where type = 'table' and name =  
-

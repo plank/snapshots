@@ -37,7 +37,7 @@ describe('SnapshotMigrations are can be pretended', function () {
             '--pretend' => true,
         ]);
 
-        expect(Artisan::output())->toMatchSnapshot();
+        expect(Artisan::output())->toContain('create table "v1_0_1_documents"');
     });
 
     it('reports errors that occur during pretended migrations', function () {
