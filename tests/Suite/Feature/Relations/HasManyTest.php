@@ -36,7 +36,7 @@ describe('HasMany relationships use versioned tables correctly', function () {
 
         expect($user->posts()->count())->toBe(2);
 
-        // Create a new version and verify the attached post matches the previous version 
+        // Create a new version and verify the attached post matches the previous version
         versions()->setActive(releaseAndCreateMinorVersion('query'));
 
         expect($user->posts()->count())->toBe(1);
