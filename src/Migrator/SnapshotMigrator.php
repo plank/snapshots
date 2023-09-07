@@ -6,7 +6,6 @@ use Doctrine\DBAL\Schema\SchemaException;
 use Illuminate\Console\View\Components\BulletList;
 use Illuminate\Console\View\Components\Task;
 use Illuminate\Console\View\Components\TwoColumnDetail;
-use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\Migrations\MigrationRepositoryInterface;

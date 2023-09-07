@@ -43,13 +43,8 @@ describe('SnapshotMigrations are can be pretended', function () {
     it('reports errors that occur during pretended migrations', function () {
         $version = createFirstVersion('schema/create');
 
-        $migrator = new class (
-            $this->app['migration.repository'],
-            $this->app['db'],
-            $this->app['files'],
-            $this->app['events'],
-            $this->app[ManagesVersions::class]
-        ) extends SnapshotMigrator {
+        $migrator = new class($this->app['migration.repository'], $this->app['db'], $this->app['files'], $this->app['events'], $this->app[ManagesVersions::class]) extends SnapshotMigrator
+        {
             public array $written = [];
 
             protected function getQueries($migration, $method)
@@ -66,7 +61,7 @@ describe('SnapshotMigrations are can be pretended', function () {
             }
         };
 
-        $migration = include (migrationPath('schema/create') . '/create_documents_table.php');
+        $migration = include migrationPath('schema/create').'/create_documents_table.php';
 
         $migrator->pretendToRunVersion($version, $migration, 'up');
 
