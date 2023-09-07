@@ -17,10 +17,10 @@
 >
     <testsuites>
         <testsuite name="Features Tests">
-            <directory>tests/Suite/Feature</directory>
+            <directory>tests/Suites/Feature</directory>
         </testsuite>
         <testsuite name="Unit Tests">
-            <directory>tests/Suite/Unit</directory>
+            <directory>tests/Suites/Unit</directory>
         </testsuite>
     </testsuites>
     <coverage>
