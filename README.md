@@ -1,4 +1,4 @@
-<p align="center"><a href="https://plank.co"><img src="snapshots.jpg" width="100%"></a></p>
+<p align="center"><a href="https://plank.co"><img src="snapshots.png" width="100%"></a></p>
 
 <p align="center">
 <img src="https://img.shields.io/packagist/php-v/plank/snapshots?color=%23fae370&label=php&logo=php&logoColor=%23fff" alt="PHP Version Support">
