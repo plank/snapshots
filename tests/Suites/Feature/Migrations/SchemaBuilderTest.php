@@ -10,7 +10,7 @@ use function Pest\Laravel\artisan;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\partialMock;
 
-describe('SnapshotMigrations are versioned', function () {
+describe('SnapshotMigrations use versions to run `up`', function () {
     beforeEach(function () {
         artisan('migrate', [
             '--path' => migrationPath('schema/create'),

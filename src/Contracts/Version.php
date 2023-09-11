@@ -21,6 +21,16 @@ interface Version
     public function addMigrationPrefix(string $name): string;
 
     /**
+     * Remove the prefix from a migration name.
+     */
+    public function stripMigrationPrefix(string $name): string;
+
+    /**
+     * Resolve a Version from a migration name.
+     */
+    public function resolveVersionFromMigrationName(string $name): ?self;
+
+    /**
      * Add a prefix for to the table names specified in SnapshotMigrations, and
      * also the Eloquent Models getTable() methods.
      */

@@ -15,4 +15,9 @@ return new class extends SnapshotMigration
             $table->timestamps();
         });
     }
+
+    public function down()
+    {
+        $this->schema->drop('documents');
+    }
 };

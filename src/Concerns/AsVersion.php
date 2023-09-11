@@ -3,6 +3,7 @@
 namespace Plank\Snapshots\Concerns;
 
 use Illuminate\Support\Facades\Schema;
+use Plank\Snapshots\Contracts\Version;
 
 /**
  * @mixin \Illuminate\Database\Eloquent\Model
@@ -25,6 +26,28 @@ trait AsVersion
     public function addMigrationPrefix(string $name): string
     {
         return 'v'.$this->number->snake().'_'.$name;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function stripMigrationPrefix(string $name): string
+    {
+        return str($name)->replaceMatches('/^v\d+_\d+_\d+_/', '')->__toString();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function resolveVersionFromMigrationName(string $name): ?Version
+    {
+        if ($prefix = str($name)->match('/^v\d+_\d+_\d+/', '')) {
+            $number = str($prefix)->replace('v', '')->replace('_', '.')->__toString();
+
+            return $this->newQuery()->where('number', $number)->first();
+        }
+
+        return null;
     }
 
     /**

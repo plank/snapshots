@@ -1,0 +1,14 @@
+[
+    {
+        "component": "Illuminate\\Console\\View\\Components\\TwoColumnDetail",
+        "arguments": [
+            "v1_0_0_create_documents_table"
+        ]
+    },
+    {
+        "component": "Plank\\Snapshots\\Migrator\\Error",
+        "arguments": [
+            "[v1_0_0_create_documents_table] failed to dump queries. This may be due to changing database columns using Doctrine, which is not supported while pretending to run migrations."
+        ]
+    }
+]
