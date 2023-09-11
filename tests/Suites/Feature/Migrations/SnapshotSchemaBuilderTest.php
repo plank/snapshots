@@ -3,10 +3,12 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Plank\Snapshots\Exceptions\MigrationFailedException;
 use Plank\Snapshots\Facades\SnapshotSchema;
 
 use function Pest\Laravel\artisan;
 use function Pest\Laravel\assertDatabaseHas;
+use function Pest\Laravel\partialMock;
 
 describe('SnapshotMigrations are versioned', function () {
     beforeEach(function () {
@@ -269,4 +271,12 @@ describe('SnapshotMigrations are versioned', function () {
 
         expect(SnapshotSchema::hasTable('documents'))->toBeFalse();
     });
+
+    it('throws an exception when the artisan command migrations fail on version release', function () {
+        partialMock(\Illuminate\Contracts\Console\Kernel::class, function ($mock) {
+            $mock->shouldReceive('call')->andReturn(1);
+        });
+
+        createFirstVersion('schema/create');
+    })->throws(MigrationFailedException::class);
 });

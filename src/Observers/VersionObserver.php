@@ -59,7 +59,7 @@ class VersionObserver
         }
 
         if ($version->released_at->isFuture()) {
-            throw new FutureReleaseException($version);
+            throw FutureReleaseException::create($version);
         }
 
         $version->beginRelease();

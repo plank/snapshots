@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Event;
+use Plank\Snapshots\Contracts\Version as VersionContract;
 use Plank\Snapshots\Events\ReleasingVersion;
 use Plank\Snapshots\Events\UnreleasingVersion;
 use Plank\Snapshots\Events\VersionReleased;
@@ -9,10 +10,17 @@ use Plank\Snapshots\Exceptions\AlreadyReleasedException;
 use Plank\Snapshots\Exceptions\FutureReleaseException;
 use Plank\Snapshots\Exceptions\MigrationInProgressException;
 use Plank\Snapshots\Exceptions\UnreleasedVersionException;
+use Plank\Snapshots\Exceptions\VersionException;
 use Plank\Snapshots\Models\Version;
 use Plank\Snapshots\ValueObjects\VersionNumber;
 
 describe('Versions are migrated and released correctly', function () {
+    it('throws an exception when you have the version configured incorrectly', function () {
+        config()->set('snapshots.model', null);
+
+        get_class(app()->make(VersionContract::class));
+    })->throws(VersionException::class);
+
     it('throws an exception when creating a new version before the previous version has been migrated', function () {
         Version::factory()->createQuietly([
             'number' => '1.0.0',
@@ -105,4 +113,10 @@ describe('Versions are migrated and released correctly', function () {
         $version->released_at = now()->subDay();
         $version->save();
     })->throws(AlreadyReleasedException::class);
+
+    it('throws an error when trying to cast the version number to a nonstring or value object', function () {
+        $version = createFirstVersion();
+
+        $version->number = 1;
+    })->throws(InvalidArgumentException::class);
 });

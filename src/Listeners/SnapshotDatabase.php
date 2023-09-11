@@ -20,7 +20,7 @@ class SnapshotDatabase
         }
 
         if (Artisan::call('migrate', $options) !== 0) {
-            throw new MigrationFailedException($event->version);
+            throw MigrationFailedException::create($event->version);
         }
 
         $version = $event->version;
