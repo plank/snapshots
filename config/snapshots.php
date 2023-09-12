@@ -49,4 +49,15 @@ return [
     | is created. If set to false, you will need to handle the migrations in your app code.
     */
     'auto_migrate' => true,
+
+    /*
+    |---------------------------------------------------------------------------
+    | Copy Tables on Creation
+    |--------------------------------------------------------------------------
+    |
+    | This option determines whether or not to copy the tables from the previous version
+    | when a new version is created. If set to false, you will need to handle the copying
+    | in your app code.
+    */
+    'auto_copy' => true,
 ];

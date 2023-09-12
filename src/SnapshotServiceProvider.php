@@ -7,9 +7,10 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Event;
 use Plank\Snapshots\Contracts\ManagesVersions;
 use Plank\Snapshots\Contracts\Version;
+use Plank\Snapshots\Events\TableCreated;
 use Plank\Snapshots\Events\VersionCreated;
 use Plank\Snapshots\Exceptions\VersionException;
-use Plank\Snapshots\Factories\TableCopierFactory;
+use Plank\Snapshots\Listeners\CopyTable;
 use Plank\Snapshots\Listeners\SnapshotDatabase;
 use Plank\Snapshots\Migrator\SnapshotMigrator;
 use Plank\Snapshots\Migrator\SnapshotSchemaBuilder;
@@ -55,11 +56,9 @@ class SnapshotServiceProvider extends PackageServiceProvider
             $this->app->scoped(SnapshotSchemaBuilder::class, function (Application $app) {
                 $schema = $this->app['db']->connection()->getSchemaBuilder();
                 $connection = $schema->getConnection();
-                $driver = $connection->getDriverName();
 
                 return new SnapshotSchemaBuilder(
                     $connection,
-                    TableCopierFactory::forDriver($driver),
                     $app[ManagesVersions::class]
                 );
             });
@@ -78,6 +77,10 @@ class SnapshotServiceProvider extends PackageServiceProvider
 
         if (config('snapshots.auto_migrate') === true) {
             Event::listen(VersionCreated::class, SnapshotDatabase::class);
+        }
+
+        if (config('snapshots.auto_copy') === true) {
+            Event::listen(TableCreated::class, CopyTable::class);
         }
     }
 }

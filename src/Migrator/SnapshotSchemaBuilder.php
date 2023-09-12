@@ -6,8 +6,9 @@ use Closure;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Builder;
-use Plank\Snapshots\Contracts\CopiesTables;
+use Illuminate\Support\Facades\Event;
 use Plank\Snapshots\Contracts\ManagesVersions;
+use Plank\Snapshots\Events\TableCreated;
 
 /**
  * @mixin Builder
@@ -16,7 +17,6 @@ class SnapshotSchemaBuilder extends Builder
 {
     public function __construct(
         Connection $connection,
-        protected CopiesTables $tableCopier,
         protected ManagesVersions $versions
     ) {
         parent::__construct($connection);
@@ -37,19 +37,9 @@ class SnapshotSchemaBuilder extends Builder
 
         parent::create($table, $callback);
 
-        if ($active === null) {
-            return;
-        }
-
-        if ($active->previous) {
-            $original = $active->previous->addTablePrefix($original);
-        }
-
-        if (parent::hasTable($original)) {
-            $this->withoutForeignKeyConstraints(function () use ($table, $original) {
-                $this->tableCopier->copy($original, $table);
-            });
-        }
+        $this->withoutForeignKeyConstraints(function () use ($active, $original) {
+            Event::dispatch(new TableCreated($original, $active));
+        });
     }
 
     /**
