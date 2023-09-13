@@ -34,4 +34,12 @@ trait AsVersionedPivot
 
         return $this->getPivotTable();
     }
+
+    /**
+     * Resolve the version repository instance.
+     */
+    public function getVersionRepository(): ManagesVersions
+    {
+        return app(ManagesVersions::class);
+    }
 }

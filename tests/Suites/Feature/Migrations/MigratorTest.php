@@ -77,6 +77,8 @@ describe('SnapshotMigrations use versions to run `down`', function () {
     });
 
     it('warns you when trying to rollback a versioned migration whose file no longer exists', function () {
+        app('migrator')->clearPaths();
+
         withoutMockingConsoleOutput();
         artisan('migrate:rollback');
         $output = Artisan::output();

@@ -278,4 +278,12 @@ class SnapshotMigrator extends Migrator
     {
         return (string) str()->before($file, '@version:');
     }
+
+    /**
+     * Clear all migration paths from the migrator
+     */
+    public function clearPaths(): void
+    {
+        $this->paths = [];
+    }
 }

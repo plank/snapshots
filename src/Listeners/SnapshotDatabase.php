@@ -10,16 +10,7 @@ class SnapshotDatabase
 {
     public function handle(VersionCreated $event)
     {
-        $options = [];
-
-        if ($path = config('snapshots.migration_path')) {
-            $options = [
-                '--path' => $path,
-                '--realpath' => true,
-            ];
-        }
-
-        if (Artisan::call('migrate', $options) !== 0) {
+        if (Artisan::call('migrate') !== 0) {
             throw MigrationFailedException::create($event->version);
         }
 
