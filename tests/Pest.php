@@ -15,7 +15,7 @@ function versions(): VersionRepository
 
 function setMigrationPath(string $path): void
 {
-    config()->set('snapshots.migration_path', migrationPath($path));
+    app('migrator')->path(migrationPath($path));
 }
 
 /**

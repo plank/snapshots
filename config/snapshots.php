@@ -29,19 +29,6 @@ return [
 
     /*
     |---------------------------------------------------------------------------
-    | Migrations Path
-    |--------------------------------------------------------------------------
-    |
-    | This is the path to your migrations directory. If you have your migrations in
-    | a non-default folder, specify the real path, to the folder
-    | ie: base_path('custom/migrations')
-    |
-    | If using the default migrations folder, leave this value null.
-    */
-    'migration_path' => null,
-
-    /*
-    |---------------------------------------------------------------------------
     | Migrate on Version Creation
     |--------------------------------------------------------------------------
     |
