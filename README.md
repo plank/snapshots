@@ -16,6 +16,7 @@ The main goal of this package is for it to perform robust versioning of your con
 ## Table of Contents
 
 - [Installation](#installation)
+- [Quick Start](#quick-start)
 - [Configuration](#configuration)
   - [Version Model](#version-model)
   - [Repository](#repository)
@@ -51,6 +52,50 @@ You can use the package's install command to complete the installation:
 ```bash
 php artisan snapshots:install
 ```
+
+## Quick Start
+
+Once the installation has completed, to begin using the package:
+
+1. Make all migrations for versioned content extend `Plank\Snapshots\Migrations\SnapshotMigration` instead of the framework's `Migration` class.
+2. Replace references to `Illuminate\Database\Schema\Builder` with `$this->schema` or `Plank\Snapshots\Facades\SnapshotSchema` in those migrations for the versioned content.
+3. Make all models representing versioned content implement `Plank\Snapshots\Contracts\Versioned` and use the `Plank\Snapshots\Concerns\AsVersionedContent` trait.
+4. Make all models that are not versioned, but have a relation to versioned content use the `Plank\Snapshots\Concerns\InteractsWithVersionedContent` trait.
+5. Create a middleware to set the active version of your app based on the request.
+
+Middleware example:
+    
+```php
+<?php
+
+namespace App\Http\Middleware;
+
+use Closure;
+use Plank\Snapshots\Contracts\ManagesVersions;
+
+class SetActiveVersion
+{
+    public function __construct(
+        protected ManagesVersions $versions
+    ) {
+    }
+
+    public function handle($request, Closure $next)
+    {
+        $version = $request->route('version');
+
+        if ($version = $this->versions->byNumber($version)) {
+            $this->versions->setActive($version);
+        }
+
+        return $next($request);
+    }
+}
+```
+
+Now, whenever you create a new version, the `SnapshotDatabase` listener will handle the `VersionCreated` event and run all of the migrations for the versioned content. It will also copy the content from the previous version of the table into the new version of the table.
+
+&nbsp;
 
 ## Configuration
 
