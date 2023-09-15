@@ -119,4 +119,10 @@ describe('Versions are migrated and released correctly', function () {
 
         $version->number = 1;
     })->throws(InvalidArgumentException::class);
+
+    it('returns null when it cannot resolve a version from a migration name', function () {
+        $version = createFirstVersion();
+
+        expect($version->resolveVersionFromMigrationName('invalid_migration_name'))->toBeNull();
+    });
 });

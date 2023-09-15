@@ -41,13 +41,15 @@ trait AsVersion
      */
     public function resolveVersionFromMigrationName(string $name): ?Version
     {
-        if ($prefix = str($name)->match('/^v\d+_\d+_\d+/', '')) {
-            $number = (string) str($prefix)->replace('v', '')->replace('_', '.');
+        $prefix = str($name)->match('/^v\d+_\d+_\d+/', '');
 
-            return $this->newQuery()->where('number', $number)->first();
+        if ($prefix->isEmpty()) {
+            return null;
         }
 
-        return null;
+        $number = (string) $prefix->replace('v', '')->replace('_', '.');
+
+        return $this->newQuery()->where('number', $number)->first();
     }
 
     /**
