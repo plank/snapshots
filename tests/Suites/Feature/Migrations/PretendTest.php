@@ -34,8 +34,8 @@ describe('SnapshotMigrations are can be pretended', function () {
             '--realpath' => true,
             '--pretend' => true,
         ])
-        ->expectsOutputToContain('create table "v1_0_1_documents"')
-        ->assertExitCode(0);
+            ->expectsOutputToContain('create table "v1_0_1_documents"')
+            ->assertExitCode(0);
     });
 
     it('pretends framework up migrations', function () {
@@ -44,8 +44,8 @@ describe('SnapshotMigrations are can be pretended', function () {
             '--realpath' => true,
             '--pretend' => true,
         ])
-        ->expectsOutputToContain('create table "files"')
-        ->assertExitCode(0);
+            ->expectsOutputToContain('create table "files"')
+            ->assertExitCode(0);
     });
 
     it('pretends snapshot down migrations', function () {
@@ -61,9 +61,9 @@ describe('SnapshotMigrations are can be pretended', function () {
             '--realpath' => true,
             '--pretend' => true,
         ])
-        ->expectsOutputToContain('drop table "v1_0_0_documents"')
-        ->expectsOutputToContain('drop table "documents"')
-        ->assertExitCode(0);
+            ->expectsOutputToContain('drop table "v1_0_0_documents"')
+            ->expectsOutputToContain('drop table "documents"')
+            ->assertExitCode(0);
     });
 
     it('pretends framework down migrations', function () {
@@ -77,8 +77,8 @@ describe('SnapshotMigrations are can be pretended', function () {
             '--realpath' => true,
             '--pretend' => true,
         ])
-        ->expectsOutputToContain('drop table "files"')
-        ->assertExitCode(0);
+            ->expectsOutputToContain('drop table "files"')
+            ->assertExitCode(0);
     });
 
     it('reports errors that occur during pretended migrations', function () {

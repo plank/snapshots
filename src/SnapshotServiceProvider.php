@@ -32,27 +32,27 @@ class SnapshotServiceProvider extends PackageServiceProvider
             ->hasMigrations([
                 'create_versions_table',
             ])
-            ->hasInstallCommand(function(InstallCommand $command) {
-                $command->startWith(function(InstallCommand $command) {
+            ->hasInstallCommand(function (InstallCommand $command) {
+                $command->startWith(function (InstallCommand $command) {
                     $command->info("📸  Laravel Snapshots Installer... \n");
 
-                    if ($command->confirm("Would you like to publish the config file?")) {
+                    if ($command->confirm('Would you like to publish the config file?')) {
                         $command->publishConfigFile();
                     }
-    
-                    if ($command->confirm("Would you like to publish the migrations?")) {
+
+                    if ($command->confirm('Would you like to publish the migrations?')) {
                         $command->publishMigrations();
                     }
-    
+
                     $command->askToRunMigrations();
                 });
 
-                $command->endWith(function(InstallCommand $command) {
+                $command->endWith(function (InstallCommand $command) {
                     $command->info('✅ Installation complete.');
 
                     $command->askToStarRepoOnGitHub('plank/snapshots');
                 });
-                   
+
             });
     }
 

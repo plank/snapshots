@@ -37,7 +37,7 @@ describe('The install command properly installs the package.', function () {
         $migrationsPath = database_path('migrations');
         $migrations = File::allFiles($migrationsPath);
         $migration = null;
-        
+
         if (count($migrations) > 0) {
             $migration = $migrations[0]->getPathname();
         } else {
@@ -63,7 +63,7 @@ describe('The install command properly installs the package.', function () {
         $migrationsPath = database_path('migrations');
         $migrations = File::allFiles($migrationsPath);
         $migration = null;
-        
+
         if (count($migrations) > 0) {
             $migration = $migrations[0]->getPathname();
         } else {
