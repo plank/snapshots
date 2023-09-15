@@ -205,6 +205,8 @@ You will also notice the `SnapshotBlueprint` class. This blueprint type exists t
 
 2. It is important to note that pivot tables where at least one of the related models is versioned, should also be versioned. This is because the pivot table will need to be copied for each version of the related model.
 
+3. It is also important to note that if you are using a versioned custom Pivot model, you cannot relate unversioned content to unversioned content through the pivot. So be especially careful with what you are relating through your custom polymorphic pivot models.
+
 &nbsp;
 
 #### SnapshotMigrator
