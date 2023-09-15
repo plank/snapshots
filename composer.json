@@ -1,12 +1,12 @@
 {
-    "name": "plank/snapshot",
+    "name": "plank/snapshots",
     "description": "Snapshot Laravel Models",
     "keywords": [
         "plank",
         "laravel",
         "snapshot"
     ],
-    "homepage": "https://github.com/plank/snapshot",
+    "homepage": "https://github.com/plank/snapshots",
     "license": "MIT",
     "authors": [
         {
