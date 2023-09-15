@@ -100,6 +100,11 @@ function releaseAndCreateMajorVersion(string $migrationPath = null): Version
     ]);
 }
 
+function setTestNow(Carbon $now)
+{
+    Carbon::setTestNow($now);
+}
+
 function moveAheadSeconds(int $seconds)
 {
     Carbon::setTestNow(Carbon::now()->addSeconds($seconds));
