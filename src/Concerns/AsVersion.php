@@ -33,7 +33,7 @@ trait AsVersion
      */
     public function stripMigrationPrefix(string $name): string
     {
-        return str($name)->replaceMatches('/^v\d+_\d+_\d+_/', '')->__toString();
+        return (string) str($name)->replaceMatches('/^v\d+_\d+_\d+_/', '');
     }
 
     /**
@@ -42,7 +42,7 @@ trait AsVersion
     public function resolveVersionFromMigrationName(string $name): ?Version
     {
         if ($prefix = str($name)->match('/^v\d+_\d+_\d+/', '')) {
-            $number = str($prefix)->replace('v', '')->replace('_', '.')->__toString();
+            $number = (string) str($prefix)->replace('v', '')->replace('_', '.');
 
             return $this->newQuery()->where('number', $number)->first();
         }
@@ -63,7 +63,7 @@ trait AsVersion
      */
     public function stripTablePrefix(string $table): string
     {
-        return str($table)->replaceMatches('/^v\d+_\d+_\d+_/', '')->__toString();
+        return (string) str($table)->replaceMatches('/^v\d+_\d+_\d+_/', '');
     }
 
     /**
