@@ -9,7 +9,7 @@ use Plank\Snapshots\Models\Version as VersionModel;
 use function Pest\Laravel\artisan;
 use function Pest\Laravel\assertDatabaseHas;
 
-describe('SnapshotMigrations are can be pretended', function () {
+describe('SnapshotMigrations can be pretended', function () {
     beforeEach(function () {
         artisan('migrate', [
             '--path' => migrationPath('schema/create'),
@@ -86,7 +86,7 @@ describe('SnapshotMigrations are can be pretended', function () {
 
         $migrator = new class($this->app['migration.repository'], $this->app['db'], $this->app['files'], $this->app['events'], $this->app[ManagesVersions::class], $this->app[Version::class]) extends SnapshotMigrator
         {
-            public array $written = [];
+            public string $written = '';
 
             protected function getQueries($migration, $method)
             {
@@ -95,10 +95,7 @@ describe('SnapshotMigrations are can be pretended', function () {
 
             protected function write($component, ...$arguments)
             {
-                $this->written[] = [
-                    'component' => $component,
-                    'arguments' => $arguments,
-                ];
+                $this->written .= implode("\n", $arguments);
             }
         };
 
@@ -106,6 +103,6 @@ describe('SnapshotMigrations are can be pretended', function () {
 
         $migrator->pretendToRunVersion($version, $migration, 'up');
 
-        expect($migrator->written)->toMatchSnapshot();
+        expect($migrator->written)->toContain('[v1_0_0_create_documents_table] failed to dump queries.');
     });
 });
