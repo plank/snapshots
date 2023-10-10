@@ -21,6 +21,7 @@ class SnapshotForeignIdColumnDefinition extends ForeignIdColumnDefinition
 
     /**
      * {@inheritDoc}
+     *
      * @return SnapshotForeignKeyDefinition
      */
     public function constrainedToSnapshot($table = null, $column = 'id', $indexName = null)
@@ -30,7 +31,6 @@ class SnapshotForeignIdColumnDefinition extends ForeignIdColumnDefinition
 
     /**
      * {@inheritDoc}
-     * @return SnapshotForeignKeyDefinition
      */
     public function references($column, $indexName = null): SnapshotForeignKeyDefinition
     {

@@ -8,6 +8,7 @@ class SnapshotBlueprint extends Blueprint
 {
     /**
      * {@inheritDoc}
+     *
      * @return SnapshotForeignKeyDefinition
      */
     public function foreign($columns, $name = null)
@@ -23,6 +24,7 @@ class SnapshotBlueprint extends Blueprint
 
     /**
      * {@inheritDoc}
+     *
      * @return SnapshotForeignIdColumnDefinition
      */
     public function foreignId($column)
@@ -37,6 +39,7 @@ class SnapshotBlueprint extends Blueprint
 
     /**
      * {@inheritDoc}
+     *
      * @return SnapshotForeignIdColumnDefinition
      */
     public function foreignUuid($column)
@@ -49,6 +52,7 @@ class SnapshotBlueprint extends Blueprint
 
     /**
      * {@inheritDoc}
+     *
      * @return SnapshotForeignIdColumnDefinition
      */
     public function foreignUlid($column, $length = 26)
