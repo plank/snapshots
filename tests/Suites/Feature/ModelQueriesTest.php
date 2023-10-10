@@ -18,7 +18,7 @@ describe('Versioned models use the version prefixed table when interacting with 
 
     it('can retrieve the correct version of a model', function () {
         // Verify the seeded post was found and has the correct data
-        expect(Post::find(1)->title)->toBe('Post 1');
+        expect(($post = Post::query()->where('title', 'Post 1')->first()))->not->toBeNull();
 
         // Create a new version and make it active
         versions()->setActive(createFirstVersion('query'));
@@ -27,7 +27,7 @@ describe('Versioned models use the version prefixed table when interacting with 
         expect((new Post)->getTable())->toBe('v1_0_0_posts');
 
         // Verify the post was copied over when migrating the version
-        expect(Post::find(1)->title)->toBe('Post 1');
+        expect(Post::find($post->uuid)->title)->toBe('Post 1');
     });
 
     it('can save a model to the correct version table', function () {
@@ -55,7 +55,7 @@ describe('Versioned models use the version prefixed table when interacting with 
         versions()->setActive(createFirstVersion('query'));
 
         // Find the first post
-        expect(($post = Post::find(1))->title)->toBe('Post 1');
+        expect(($post = Post::query()->where('title', 'Post 1')->first()))->not->toBeNull();
 
         // Verify the query will be using the correct table
         expect($post->getTable())->toBe('v1_0_0_posts');
@@ -78,7 +78,7 @@ describe('Versioned models use the version prefixed table when interacting with 
         versions()->setActive(createFirstVersion('query'));
 
         // Find the first post
-        expect(($post = Post::find(1))->title)->toBe('Post 1');
+        expect(($post = Post::query()->where('title', 'Post 1')->first()))->not->toBeNull();
 
         // Verify the query will be using the correct table
         expect($post->getTable())->toBe('v1_0_0_posts');

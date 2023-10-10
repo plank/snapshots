@@ -4,6 +4,7 @@ namespace Plank\Snapshots\Tests\Models;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -31,6 +32,9 @@ class Post extends Model implements Versioned
 {
     use AsVersionedContent;
     use HasFactory;
+    use HasUuids;
+
+    protected $primaryKey = 'uuid';
 
     protected $guarded = [];
 
@@ -51,7 +55,7 @@ class Post extends Model implements Versioned
 
     public function related(): BelongsToMany
     {
-        return $this->belongsToMany(Post::class, 'post_post', 'post_id', 'related_id');
+        return $this->belongsToMany(Post::class, 'post_post', 'post_id', 'related_id', 'uuid', 'uuid');
     }
 
     public function tags(): MorphToMany
@@ -61,11 +65,11 @@ class Post extends Model implements Versioned
 
     public function likes(): HasMany
     {
-        return $this->hasMany(Like::class);
+        return $this->hasMany(Like::class, 'post_id', 'uuid');
     }
 
     public function seos(): HasMany
     {
-        return $this->hasMany(Seo::class);
+        return $this->hasMany(Seo::class, 'post_id', 'uuid');
     }
 }

@@ -100,7 +100,7 @@ describe('MorphToMany relationships use versioned tables when one of the models 
         expect($post->tags->count())->toBe(3);
         expect($post->tags->pluck('id'))->not()->toContain($detaching->pluck('id'));
         expect($post->tags->pluck('id'))->toContain(...$toSync->pluck('id')->toArray());
-        expect($toSync->first()->posts->pluck('id'))->toContain($post->id);
+        expect($toSync->first()->posts->pluck('uuid'))->toContain($post->uuid);
 
         versions()->clearActive();
 

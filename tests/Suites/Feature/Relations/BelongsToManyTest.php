@@ -21,19 +21,19 @@ describe('BelongsTo relationships use versioned tables when one of the models is
         $post2 = Post::factory()->create();
 
         // Ensure the posts are not yet related to eachother
-        expect($post1->related->pluck('id'))->not()->toContain($post2->id);
+        expect($post1->related->pluck('uuid'))->not()->toContain($post2->uuid);
 
         // Relate the posts to eachother in the next version
         versions()->setActive(createFirstVersion('query'));
 
         $post1 = $post1->activeVersion();
         $post1->related()->attach($post2);
-        expect($post1->related->first()->id)->toBe($post2->id);
+        expect($post1->related->first()->uuid)->toBe($post2->uuid);
 
         // Ensure the posts are still not related in the working copy
         versions()->clearActive();
 
-        expect($post1->activeVersion()->related->pluck('id'))->not()->toContain($post2->id);
+        expect($post1->activeVersion()->related->pluck('uuid'))->not()->toContain($post2->uuid);
     });
 
     it('can detach versioned models to versioned models', function () {
@@ -104,7 +104,7 @@ describe('BelongsTo relationships use versioned tables when one of the models is
         ]);
 
         $post1 = $post1->activeVersion();
-        $post1->related()->sync($post1->related->pluck('id')->push($post4->id));
+        $post1->related()->sync($post1->related->pluck('uuid')->push($post4->uuid));
         $post1->unsetRelation('related');
 
         expect($post1->related)->toHaveCount(3);
@@ -138,7 +138,7 @@ describe('BelongsTo relationships use versioned tables when one of the models is
         ]);
 
         $post1 = $post1->activeVersion();
-        $post1->related()->syncWithoutDetaching($post1->related->pluck('id')->push($post4->id));
+        $post1->related()->syncWithoutDetaching($post1->related->pluck('uuid')->push($post4->uuid));
         $post1->unsetRelation('related');
 
         expect($post1->related)->toHaveCount(3);

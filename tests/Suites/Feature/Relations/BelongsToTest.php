@@ -47,9 +47,9 @@ describe('BelongsTo relationships use versioned tables when one of the models is
 
     it('can make a non versioned model belong to a versioned model', function () {
         $post = Post::factory()->create();
-        $like = Like::factory()->create(['post_id' => $post->id]);
+        $like = Like::factory()->create(['post_id' => $post->uuid]);
 
-        expect($like->post->id)->toBe($post->id);
+        expect($like->post->uuid)->toBe($post->uuid);
 
         versions()->setActive(createFirstVersion('query'));
 
@@ -64,11 +64,11 @@ describe('BelongsTo relationships use versioned tables when one of the models is
 
         $like = Like::factory()->create();
 
-        expect($like->post->id)->not()->toBe($post->id);
+        expect($like->post->uuid)->not()->toBe($post->uuid);
 
         $like->post()->associate($post)->save();
 
-        expect($like->post->id)->toBe($post->id);
+        expect($like->post->uuid)->toBe($post->uuid);
 
         versions()->setActive(createFirstVersion('query'));
 
@@ -79,7 +79,7 @@ describe('BelongsTo relationships use versioned tables when one of the models is
         $post = Post::factory()->create();
         $seo = $post->seos()->create(Seo::factory()->make()->toArray());
 
-        expect($seo->post->id)->toBe($post->id);
+        expect($seo->post->uuid)->toBe($post->uuid);
 
         versions()->setActive(createFirstVersion('query'));
 
@@ -93,11 +93,11 @@ describe('BelongsTo relationships use versioned tables when one of the models is
 
         $seo = Seo::factory()->create();
 
-        expect($seo->post->id)->not()->toBe($post->id);
+        expect($seo->post->uuid)->not()->toBe($post->uuid);
 
         $seo->post()->associate($post)->save();
 
-        expect($seo->post->id)->toBe($post->id);
+        expect($seo->post->uuid)->toBe($post->uuid);
 
         versions()->setActive(createFirstVersion('query'));
 
