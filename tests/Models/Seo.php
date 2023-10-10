@@ -28,6 +28,6 @@ class Seo extends Model implements Versioned
 
     public function post(): BelongsTo
     {
-        return $this->belongsTo(Post::class);
+        return $this->belongsTo(Post::class, 'post_id', 'uuid');
     }
 }

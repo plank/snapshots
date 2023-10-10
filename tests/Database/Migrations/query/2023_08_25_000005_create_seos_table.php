@@ -17,7 +17,7 @@ return new class extends SnapshotMigration
             $table->text('value');
             $table->timestamps();
 
-            $table->foreign('post_id')->references('id')->on('posts');
+            $table->foreign('post_id')->references('uuid')->on('posts');
         });
     }
 };

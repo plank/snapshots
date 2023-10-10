@@ -11,7 +11,7 @@ return new class extends SnapshotMigration
     public function up(): void
     {
         $this->schema->create('posts', function (SnapshotBlueprint $table) {
-            $table->id();
+            $table->uuid()->primary();
             $table->unsignedBigInteger('user_id');
             $table->string('slug');
             $table->string('title');

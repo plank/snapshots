@@ -434,7 +434,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
             ->first();
 
         $category->projects()->attach([
-            $downing->id,
+            $downing->ulid,
         ]);
 
         $projects = $category->projects()->get()->pluck('name');
@@ -471,7 +471,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
             Project::query()
                 ->where('name', 'Wellington St.')
                 ->first()
-                ->id,
+                ->ulid,
         ]);
 
         $projects = $category->projects()->get()->pluck('name');
@@ -541,7 +541,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
             ->first();
 
         $category->projects()->sync([
-            $downing->id,
+            $downing->ulid,
         ]);
 
         $projects = $category->projects()->get()->pluck('name');
@@ -579,7 +579,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
             ->first();
 
         $category->projects()->syncWithoutDetaching([
-            $downing->id,
+            $downing->ulid,
         ]);
 
         $projects = $category->projects()->get()->pluck('name');

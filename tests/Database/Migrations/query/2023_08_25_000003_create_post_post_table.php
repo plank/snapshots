@@ -11,20 +11,11 @@ return new class extends SnapshotMigration
     public function up(): void
     {
         $this->schema->create('post_post', function (SnapshotBlueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('post_id');
-            $table->unsignedBigInteger('related_id');
+            $table->foreignUuid('post_id')->constrainedToSnapshot('posts', 'uuid')->cascadeOnDelete();
+            $table->foreignUuid('related_id')->constrainedToSnapshot('posts', 'uuid')->cascadeOnDelete();
             $table->timestamps();
 
-            $table->foreign('post_id')
-                ->references('id')
-                ->onSnapshot('posts')
-                ->cascadeOnDelete();
-
-            $table->foreign('related_id')
-                ->references('id')
-                ->onSnapshot('posts')
-                ->cascadeOnDelete();
+            $table->primary(['post_id', 'related_id']);
         });
     }
 };

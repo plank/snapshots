@@ -464,7 +464,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
             ->where('name', 'Pennsylvania Ave.')
             ->first();
 
-        $can->projects()->attach($pennsylvania->id);
+        $can->projects()->attach($pennsylvania->ulid);
 
         $projects = $can->projects()->get()->pluck('name');
 
@@ -498,7 +498,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
             ->where('name', 'Wellington St.')
             ->first();
 
-        $can->projects()->detach($wellington->id);
+        $can->projects()->detach($wellington->ulid);
 
         $projects = $can->projects()->get()->pluck('name');
 
@@ -571,8 +571,8 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
             ->first();
 
         $can->projects()->sync([
-            $pennsylvania->id,
-            $downing->id,
+            $pennsylvania->ulid,
+            $downing->ulid,
         ]);
 
         $projects = $can->projects()->get()->pluck('name');
@@ -612,8 +612,8 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
             ->first();
 
         $can->projects()->syncWithoutDetaching([
-            $pennsylvania->id,
-            $downing->id,
+            $pennsylvania->ulid,
+            $downing->ulid,
         ]);
 
         $projects = $can->projects()->get()->pluck('name');

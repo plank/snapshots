@@ -5,11 +5,13 @@ namespace Plank\Snapshots\Tests\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Plank\Snapshots\Concerns\InteractsWithVersionedContent;
 use Plank\Snapshots\Tests\Database\Factories\LikeFactory;
 
 class Like extends Model
 {
     use HasFactory;
+    use InteractsWithVersionedContent;
 
     protected $guarded = [];
 
@@ -30,6 +32,6 @@ class Like extends Model
 
     public function post(): BelongsTo
     {
-        return $this->belongsTo(Post::class);
+        return $this->belongsTo(Post::class, 'post_id', 'uuid');
     }
 }
