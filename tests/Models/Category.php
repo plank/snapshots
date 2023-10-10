@@ -27,7 +27,7 @@ class Category extends Model
 
     public function projects(): BelongsToMany
     {
-        return $this->belongsToMany(Project::class)
+        return $this->belongsToMany(Project::class, 'category_project', 'category_id', 'project_id', 'id', 'ulid')
             ->using(CategorizedProject::class);
     }
 }

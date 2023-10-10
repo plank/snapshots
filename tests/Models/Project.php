@@ -2,6 +2,7 @@
 
 namespace Plank\Snapshots\Tests\Models;
 
+use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -14,8 +15,11 @@ class Project extends Model implements Versioned
 {
     use AsVersionedContent;
     use HasFactory;
+    use HasUlids;
 
     protected $guarded = [];
+
+    protected $primaryKey = 'ulid';
 
     /**
      * Create a new factory instance for the model.
@@ -29,13 +33,13 @@ class Project extends Model implements Versioned
 
     public function categories(): BelongsToMany
     {
-        return $this->belongsToMany(Category::class)
+        return $this->belongsToMany(Category::class, 'category_project', 'project_id', 'category_id', 'ulid', 'id')
             ->using(CategorizedProject::class);
     }
 
     public function products(): BelongsToMany
     {
-        return $this->belongsToMany(Product::class)
+        return $this->belongsToMany(Product::class, 'product_project', 'project_id', 'product_id', 'ulid', 'id')
             ->using(PurchasedProduct::class)
             ->withPivot('quantity');
     }

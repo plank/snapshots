@@ -44,7 +44,7 @@ class MorphPivotSeeder extends Seeder
         ]);
 
         $installFurnace = Task::factory()->create([
-            'project_id' => $wellington->id,
+            'project_id' => $wellington->ulid,
             'name' => 'Install new Furnace',
         ]);
 
@@ -65,7 +65,7 @@ class MorphPivotSeeder extends Seeder
         ]);
 
         $installLightbulb = Task::factory()->create([
-            'project_id' => $pennsylvania->id,
+            'project_id' => $pennsylvania->ulid,
             'name' => 'Install new Lightbulb',
         ]);
 
@@ -86,7 +86,7 @@ class MorphPivotSeeder extends Seeder
         ]);
 
         $installToilet = Task::factory()->create([
-            'project_id' => $downing->id,
+            'project_id' => $downing->ulid,
             'name' => 'Install new Toilet',
         ]);
 
