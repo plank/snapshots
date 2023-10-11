@@ -17,7 +17,7 @@ return [
     | Version Factory
     |--------------------------------------------------------------------------
     |
-    | This is the factory which will be used to generate new versions for 
+    | This is the factory which will be used to generate new versions for
     | tests and seeders.
     |
     */
