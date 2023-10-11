@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Plank\Snapshots\Concerns\AsVersion;
 use Plank\Snapshots\Contracts\Version as VersionContract;
-use Plank\Snapshots\Database\Factories\VersionFactory;
 use Plank\Snapshots\Observers\VersionObserver;
 use Plank\Snapshots\ValueObjects\VersionNumber;
 
@@ -45,7 +44,7 @@ class Version extends Model implements VersionContract
      */
     protected static function newFactory()
     {
-        return VersionFactory::new();
+        return config('snapshots.factory')::new();
     }
 
     /**

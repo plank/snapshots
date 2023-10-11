@@ -14,6 +14,17 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Version Factory
+    |--------------------------------------------------------------------------
+    |
+    | This is the factory which will be used to generate new versions for
+    | tests and seeders.
+    |
+    */
+    'factory' => \Plank\Snapshots\Factories\VersionFactory::class,
+
+    /*
+    |--------------------------------------------------------------------------
     | Version Repository
     |--------------------------------------------------------------------------
     |
