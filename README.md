@@ -109,6 +109,10 @@ php artisan vendor:publish --provider="Plank\Snapshots\SnapshotsServiceProvider"
 
 The `model` option is the fully qualified class name of the model that will be used to store the versions of your app. The default value is `Plank\Snapshots\Models\Version`. Any model provided must implement the `Plank\Snapshots\Contracts\Version` interface.
 
+### Version Factory
+
+The `factory` option is the fully qualified class name of the model factory that will be used to generate Version instances for testing and seeding your application. The default value is `Plank\Snapshots\Factories\VersionFactory`.
+
 ### Repository
 
 The `repository` option is the fully qualified class name of the repository that will be used to retrieve the versions of your app. The default value is `Plank\Snapshots\Repository\VersionRepository`. Any repository provided must implement the `Plank\Snapshots\Contracts\ManagesVersions` interface.
