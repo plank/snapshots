@@ -31,7 +31,7 @@ trait AsVersion
     /**
      * {@inheritDoc}
      */
-    public function stripMigrationPrefix(string $name): string
+    public static function stripMigrationPrefix(string $name): string
     {
         return (string) str($name)->replaceMatches('/^v\d+_\d+_\d+_/', '');
     }

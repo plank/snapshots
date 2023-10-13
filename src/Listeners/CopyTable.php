@@ -18,10 +18,6 @@ class CopyTable
         $from = $event->table;
         $to = $version->addTablePrefix($from);
 
-        if ($version->previous) {
-            $from = $version->previous->addTablePrefix($from);
-        }
-
         DB::statement("INSERT INTO `$to` SELECT * FROM `$from`");
     }
 }

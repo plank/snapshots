@@ -32,7 +32,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
         expect($plans)->not->toContain('Plumbing Blueprint');
         expect($plans)->not->toContain('Networking Blueprint');
 
-        versions()->setActive(releaseAndCreateMinorVersion('pivot'));
+        versions()->setActive(createMinorVersion('pivot'));
 
         $networkingPlan = Plan::query()
             ->where('name', 'Networking Blueprint')
@@ -73,7 +73,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
         expect($plans)->not->toContain('Plumbing Blueprint');
         expect($plans)->not->toContain('Networking Blueprint');
 
-        versions()->setActive(releaseAndCreateMinorVersion('pivot'));
+        versions()->setActive(createMinorVersion('pivot'));
 
         $hvacPlan = Plan::query()
             ->where('name', 'HVAC Blueprint')
@@ -112,7 +112,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
         expect($plans)->not->toContain('Plumbing Blueprint');
         expect($plans)->not->toContain('Networking Blueprint');
 
-        versions()->setActive(releaseAndCreateMinorVersion('pivot'));
+        versions()->setActive(createMinorVersion('pivot'));
 
         $hvacPlan = Plan::query()
             ->where('name', 'HVAC Blueprint')
@@ -151,7 +151,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
         expect($plans)->not->toContain('Plumbing Blueprint');
         expect($plans)->not->toContain('Networking Blueprint');
 
-        versions()->setActive(releaseAndCreateMinorVersion('pivot'));
+        versions()->setActive(createMinorVersion('pivot'));
 
         $electricalPlan = Plan::query()
             ->where('name', 'Electrical Blueprint')
@@ -208,7 +208,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
         expect($plans)->not->toContain('Plumbing Blueprint');
         expect($plans)->not->toContain('Networking Blueprint');
 
-        versions()->setActive(releaseAndCreateMinorVersion('pivot'));
+        versions()->setActive(createMinorVersion('pivot'));
 
         $electricalPlan = Plan::query()
             ->where('name', 'Electrical Blueprint')
@@ -264,7 +264,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
         expect($contractors)->not->toContain('Americorp');
         expect($contractors)->not->toContain('Anglocorp');
 
-        versions()->setActive(releaseAndCreateMinorVersion('pivot'));
+        versions()->setActive(createMinorVersion('pivot'));
 
         $mega = Contractor::factory()->create([
             'name' => 'Mega Canacorp',
@@ -302,7 +302,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
         expect($contractors)->not->toContain('Americorp');
         expect($contractors)->not->toContain('Anglocorp');
 
-        versions()->setActive(releaseAndCreateMinorVersion('pivot'));
+        versions()->setActive(createMinorVersion('pivot'));
 
         $canacorp = Contractor::query()
             ->where('name', 'Canacorp')
@@ -338,7 +338,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
         expect($contractors)->not->toContain('Americorp');
         expect($contractors)->not->toContain('Anglocorp');
 
-        versions()->setActive(releaseAndCreateMinorVersion('pivot'));
+        versions()->setActive(createMinorVersion('pivot'));
 
         $canacorp = Contractor::query()
             ->where('name', 'Canacorp')
@@ -374,7 +374,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
         expect($contractors)->not->toContain('Americorp');
         expect($contractors)->not->toContain('Anglocorp');
 
-        versions()->setActive(releaseAndCreateMinorVersion('pivot'));
+        versions()->setActive(createMinorVersion('pivot'));
 
         $americorp = Contractor::query()
             ->where('name', 'Americorp')
@@ -417,7 +417,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
         expect($contractors)->not->toContain('Americorp');
         expect($contractors)->not->toContain('Anglocorp');
 
-        versions()->setActive(releaseAndCreateMinorVersion('pivot'));
+        versions()->setActive(createMinorVersion('pivot'));
 
         $americorp = Contractor::query()
             ->where('name', 'Americorp')
@@ -458,7 +458,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
         expect($projects)->not->toContain('Pennsylvania Ave.');
         expect($projects)->not->toContain('Downing St.');
 
-        versions()->setActive(releaseAndCreateMajorVersion('pivot'));
+        versions()->setActive(createMajorVersion('pivot'));
 
         $pennsylvania = Project::query()
             ->where('name', 'Pennsylvania Ave.')
@@ -492,7 +492,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
         expect($projects)->not->toContain('Pennsylvania Ave.');
         expect($projects)->not->toContain('Downing St.');
 
-        versions()->setActive(releaseAndCreateMajorVersion('pivot'));
+        versions()->setActive(createMajorVersion('pivot'));
 
         $wellington = Project::query()
             ->where('name', 'Wellington St.')
@@ -526,7 +526,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
         expect($projects)->not->toContain('Pennsylvania Ave.');
         expect($projects)->not->toContain('Downing St.');
 
-        versions()->setActive(releaseAndCreateMajorVersion('pivot'));
+        versions()->setActive(createMajorVersion('pivot'));
 
         $wellington = Project::query()
             ->where('name', 'Wellington St.')
@@ -560,7 +560,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
         expect($projects)->not->toContain('Pennsylvania Ave.');
         expect($projects)->not->toContain('Downing St.');
 
-        versions()->setActive(releaseAndCreateMajorVersion('pivot'));
+        versions()->setActive(createMajorVersion('pivot'));
 
         $pennsylvania = Project::query()
             ->where('name', 'Pennsylvania Ave.')
@@ -601,7 +601,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
         expect($projects)->not->toContain('Pennsylvania Ave.');
         expect($projects)->not->toContain('Downing St.');
 
-        versions()->setActive(releaseAndCreateMajorVersion('pivot'));
+        versions()->setActive(createMajorVersion('pivot'));
 
         $pennsylvania = Project::query()
             ->where('name', 'Pennsylvania Ave.')

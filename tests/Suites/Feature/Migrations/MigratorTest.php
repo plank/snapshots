@@ -16,9 +16,9 @@ describe('SnapshotMigrations use versions to run `down`', function () {
         ])->run();
 
         versions()->setActive(createFirstVersion('schema/create'));
-        versions()->setActive(releaseAndCreateMinorVersion('schema/create'));
-        versions()->setActive(releaseAndCreatePatchVersion('schema/create'));
-        versions()->setActive(releaseAndCreateMajorVersion('schema/create'));
+        versions()->setActive(createMinorVersion('schema/create'));
+        versions()->setActive(createPatchVersion('schema/create'));
+        versions()->setActive(createMajorVersion('schema/create'));
     });
 
     it('runs snapshot migrations when new versions are created', function () {

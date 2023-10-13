@@ -83,25 +83,31 @@ describe('Versioned models use the version prefixed table when interacting with 
         // Verify the query will be using the correct table
         expect($post->getTable())->toBe('v1_0_0_posts');
 
+        // Fix some errate in the first version
+        $post->update(['title' => 'Fixed Errata in v1.0.0']);
+
+        // Ensure the post was updated
+        expect(($post = Post::query()->where('title', 'Fixed Errata in v1.0.0')->first()))->not->toBeNull();
+
+        // Fo back to the working version
+        versions()->clearActive();
+
+        // Ensure we are back in the working version
+        expect($post->getTable())->toBe('posts');
+
         // Update the post
-        $post->update(['title' => 'Updated in v1.0.0']);
+        $post->update(['title' => 'Updated for v1.0.0']);
 
         // Verify the post was updated in the correct table
-        expect(Post::query()->where('title', 'Updated in v1.0.0')->exists())->toBeTrue();
+        expect(Post::query()->where('title', 'Updated for v1.0.0')->exists())->toBeTrue();
 
         // Create a new version and make it active
-        versions()->setActive(releaseAndCreatePatchVersion('query'));
+        versions()->setActive(createPatchVersion('query'));
 
         // Verify the query will be using the correct table
         expect($post->getTable())->toBe('v1_0_1_posts');
 
-        // Verify the post was carried over from the previous version
-        expect(Post::query()->where('title', 'Updated in v1.0.0')->exists())->toBeTrue();
-
-        // Switch back to the original content
-        versions()->clearActive();
-
-        // Verify the post was not updated in the original table
-        expect(Post::query()->where('title', 'Updated in v1.0.0')->exists())->toBeFalse();
+        // Verify the post was carried over from the working version
+        expect(Post::query()->where('title', 'Updated for v1.0.0')->exists())->toBeTrue();
     });
 });

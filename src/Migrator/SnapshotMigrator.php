@@ -137,6 +137,7 @@ class SnapshotMigrator extends Migrator
      */
     protected function rollbackMigrations(array $migrations, $paths, array $options)
     {
+        $version = app(Version::class);
         $rolledBack = [];
 
         $this->requireFiles($files = $this->getMigrationFiles($paths));
@@ -154,7 +155,7 @@ class SnapshotMigrator extends Migrator
         // Next we will run through all of the migrations and call the "down" method
         // which will reverse each migration in order.
         foreach ($migrations as $migration) {
-            if (! $file = Arr::get($files, $this->version->stripMigrationPrefix($migration->migration))) {
+            if (! $file = Arr::get($files, $version::stripMigrationPrefix($migration->migration))) {
                 $this->write(TwoColumnDetail::class, $migration->migration, '<fg=yellow;options=bold>Migration not found</>');
 
                 continue;
@@ -174,14 +175,16 @@ class SnapshotMigrator extends Migrator
 
     protected function includingPreviousBatches(array $migrations, array $ran): array
     {
+        $version = app(Version::class);
+
         $stripped = collect($migrations)
             ->map(fn ($migration) => (object) $migration)
-            ->map(fn ($migration) => $this->version->stripMigrationPrefix($migration->migration))
+            ->map(fn ($migration) => $version::stripMigrationPrefix($migration->migration))
             ->unique();
 
         return collect($ran)
             ->map(fn ($migration) => (object) $migration)
-            ->filter(fn ($migration) => $stripped->contains($this->version->stripMigrationPrefix($migration->migration)))
+            ->filter(fn ($migration) => $stripped->contains($version::stripMigrationPrefix($migration->migration)))
             ->sortByDesc('batch')
             ->groupBy('batch')
             ->map(fn ($migrations) => $migrations->sortByDesc(fn ($migration) => $migration->id ?? $migration->migration))

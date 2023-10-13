@@ -23,7 +23,7 @@ interface Version
     /**
      * Remove the prefix from a migration name.
      */
-    public function stripMigrationPrefix(string $name): string;
+    public static function stripMigrationPrefix(string $name): string;
 
     /**
      * Resolve a Version from a migration name.

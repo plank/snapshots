@@ -32,7 +32,7 @@ describe('The install command properly installs the package.', function () {
     });
 
     it('publishes the migrations file when not confirmed', function () {
-        setTestNow($now = now());
+        $now = now();
 
         $migrationsPath = database_path('migrations');
         $migrations = File::allFiles($migrationsPath);
@@ -58,7 +58,7 @@ describe('The install command properly installs the package.', function () {
     });
 
     it('doesnt publish the migrations file when not confirmed', function () {
-        setTestNow($now = now());
+        $now = now();
 
         $migrationsPath = database_path('migrations');
         $migrations = File::allFiles($migrationsPath);

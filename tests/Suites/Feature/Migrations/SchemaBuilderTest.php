@@ -74,7 +74,7 @@ describe('SnapshotMigrations use versions to run `up`', function () {
             'batch' => 3,
         ]);
 
-        releaseAndCreateMinorVersion('schema/create');
+        createMinorVersion('schema/create');
 
         assertDatabaseHas('migrations', [
             'migration' => 'v1_1_0_create_documents_table',
@@ -137,7 +137,7 @@ describe('SnapshotMigrations use versions to run `up`', function () {
             'batch' => 3,
         ]);
 
-        versions()->setActive(releaseAndCreateMajorVersion('schema/create'));
+        versions()->setActive(createMajorVersion('schema/create'));
 
         artisan('migrate', [
             '--path' => migrationPath('schema/drop'),
@@ -272,7 +272,7 @@ describe('SnapshotMigrations use versions to run `up`', function () {
         expect(SnapshotSchema::hasTable('documents'))->toBeFalse();
     });
 
-    it('throws an exception when the artisan command migrations fail on version release', function () {
+    it('throws an exception when the artisan command migrations fail when auto-migrating', function () {
         partialMock(\Illuminate\Contracts\Console\Kernel::class, function ($mock) {
             $mock->shouldReceive('call')->andReturn(1);
         });

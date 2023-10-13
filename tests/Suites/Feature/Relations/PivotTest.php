@@ -31,7 +31,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
         expect($products)->toContain('Fan');
         expect($products)->not()->toContain('Heat Pump');
 
-        versions()->setActive(releaseAndCreatePatchVersion('pivot'));
+        versions()->setActive(createPatchVersion('pivot'));
 
         $heatPump = Product::query()
             ->where('name', 'Heat Pump')
@@ -71,7 +71,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
         expect($products)->toContain('Outlet');
         expect($products)->not()->toContain('Switch');
 
-        versions()->setActive(releaseAndCreatePatchVersion('pivot'));
+        versions()->setActive(createPatchVersion('pivot'));
 
         $project->products()->detach([
             Product::query()
@@ -108,7 +108,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
         expect($products)->not()->toContain('Sink');
         expect($products)->not()->toContain('Shower');
 
-        versions()->setActive(releaseAndCreatePatchVersion('pivot'));
+        versions()->setActive(createPatchVersion('pivot'));
 
         $project->products()->where('name', 'Toilet')->first()->pivot->delete();
 
@@ -148,7 +148,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
 
         expect($pivot->quantity)->toBe(2);
 
-        versions()->setActive(releaseAndCreatePatchVersion('pivot'));
+        versions()->setActive(createPatchVersion('pivot'));
 
         $furnace = Product::query()
             ->where('name', 'Furnace')
@@ -204,7 +204,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
         expect($products)->toContain('Outlet');
         expect($products)->not()->toContain('Switch');
 
-        versions()->setActive(releaseAndCreatePatchVersion('pivot'));
+        versions()->setActive(createPatchVersion('pivot'));
 
         $switch = Product::query()
             ->where('name', 'Switch')
@@ -244,7 +244,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
         expect($products)->not()->toContain('Electrical');
         expect($products)->not()->toContain('Plumbing');
 
-        versions()->setActive(releaseAndCreatePatchVersion('pivot'));
+        versions()->setActive(createPatchVersion('pivot'));
 
         $electrical = Category::query()
             ->where('name', 'Electrical')
@@ -282,7 +282,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
         expect($products)->toContain('Electrical');
         expect($products)->not()->toContain('Plumbing');
 
-        versions()->setActive(releaseAndCreatePatchVersion('pivot'));
+        versions()->setActive(createPatchVersion('pivot'));
 
         $project->categories()->detach([
             Category::query()
@@ -319,7 +319,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
         expect($products)->not()->toContain('Electrical');
         expect($products)->toContain('Plumbing');
 
-        versions()->setActive(releaseAndCreatePatchVersion('pivot'));
+        versions()->setActive(createPatchVersion('pivot'));
 
         $project->categories()->where('name', 'Plumbing')->first()->pivot->delete();
 
@@ -351,7 +351,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
         expect($products)->not()->toContain('Electrical');
         expect($products)->not()->toContain('Plumbing');
 
-        versions()->setActive(releaseAndCreatePatchVersion('pivot'));
+        versions()->setActive(createPatchVersion('pivot'));
 
         $electrical = Category::query()
             ->where('name', 'Electrical')
@@ -389,7 +389,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
         expect($products)->toContain('Electrical');
         expect($products)->not()->toContain('Plumbing');
 
-        versions()->setActive(releaseAndCreatePatchVersion('pivot'));
+        versions()->setActive(createPatchVersion('pivot'));
 
         $mechanical = Category::query()
             ->where('name', 'Mechanical')
@@ -427,7 +427,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
         expect($projects)->not()->toContain('Pennsylvania Ave.');
         expect($projects)->not()->toContain('Downing St.');
 
-        versions()->setActive(releaseAndCreatePatchVersion('pivot'));
+        versions()->setActive(createPatchVersion('pivot'));
 
         $downing = Project::query()
             ->where('name', 'Downing St.')
@@ -465,7 +465,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
         expect($projects)->not()->toContain('Pennsylvania Ave.');
         expect($projects)->not()->toContain('Downing St.');
 
-        versions()->setActive(releaseAndCreatePatchVersion('pivot'));
+        versions()->setActive(createPatchVersion('pivot'));
 
         $category->projects()->detach([
             Project::query()
@@ -502,7 +502,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
         expect($projects)->not()->toContain('Pennsylvania Ave.');
         expect($projects)->not()->toContain('Downing St.');
 
-        versions()->setActive(releaseAndCreatePatchVersion('pivot'));
+        versions()->setActive(createPatchVersion('pivot'));
 
         $category->projects()->where('name', 'Wellington St.')->first()->pivot->delete();
 
@@ -534,7 +534,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
         expect($projects)->not()->toContain('Pennsylvania Ave.');
         expect($projects)->not()->toContain('Downing St.');
 
-        versions()->setActive(releaseAndCreatePatchVersion('pivot'));
+        versions()->setActive(createPatchVersion('pivot'));
 
         $downing = Project::query()
             ->where('name', 'Downing St.')
@@ -572,7 +572,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
         expect($projects)->not()->toContain('Pennsylvania Ave.');
         expect($projects)->not()->toContain('Downing St.');
 
-        versions()->setActive(releaseAndCreatePatchVersion('pivot'));
+        versions()->setActive(createPatchVersion('pivot'));
 
         $downing = Project::query()
             ->where('name', 'Downing St.')

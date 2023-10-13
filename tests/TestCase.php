@@ -11,8 +11,6 @@ class TestCase extends Orchestra
 {
     public ?VersionRepository $versions = null;
 
-    public ?Carbon $now = null;
-
     protected function setUp(): void
     {
         parent::setUp();
@@ -22,8 +20,7 @@ class TestCase extends Orchestra
             '--realpath' => true,
         ])->run();
 
-        $this->now = Carbon::now();
-        Carbon::setTestNow($this->now);
+        $this->travelTo(Carbon::now());
     }
 
     protected function getPackageProviders($app)

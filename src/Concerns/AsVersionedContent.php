@@ -3,6 +3,8 @@
 namespace Plank\Snapshots\Concerns;
 
 use Plank\Snapshots\Contracts\ManagesVersions;
+use Plank\Snapshots\Contracts\Version as VersionContract;
+use Plank\Snapshots\Models\Version;
 
 /**
  * @mixin \Illuminate\Database\Eloquent\Model
@@ -28,10 +30,13 @@ trait AsVersionedContent
      */
     public function getTable()
     {
-        $table = parent::getTable();
+        $version = app(VersionContract::class);
+
+        // Ensure we are starting from the user/framework defined table name
+        $table = $version::stripMigrationPrefix(parent::getTable());
 
         if ($version = $this->versions->active()) {
-            return $version->addTablePrefix($table);
+            $table = $version->addTablePrefix($table);
         }
 
         return $table;

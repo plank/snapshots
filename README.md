@@ -148,10 +148,6 @@ In applications that use this package, requests should generally specify an "act
 - `Plank\Events\VersionCreated`
   - Fired after a new version model is created
   - Hooked on to by the package to run all the versioned migrations, but can be disabled by setting [`auto_migrate`](#auto-migration) to `false`
-- `Plank\Events\VersionReleasing`
-  - Fired when a Version model is about to be "released".
-- `Plank\Events\VersionReleased`
-  - Fired after a Version model has been "released".
 
 #### Repository
 

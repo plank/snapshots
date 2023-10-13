@@ -27,7 +27,6 @@ class VersionFactory extends Factory
             'previous_version_id' => $previousId,
             'number' => $next,
             'migrated' => false,
-            'released_at' => null,
         ];
     }
 }

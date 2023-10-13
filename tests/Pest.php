@@ -1,10 +1,11 @@
 <?php
 
-use Carbon\Carbon;
 use Plank\Snapshots\Contracts\ManagesVersions;
 use Plank\Snapshots\Models\Version;
 use Plank\Snapshots\Repository\VersionRepository;
 use Plank\Snapshots\Tests\TestCase;
+
+use function Pest\Laravel\travel;
 
 uses(TestCase::class)->in(__DIR__);
 
@@ -27,7 +28,7 @@ function migrationPath(string $path = ''): string
 }
 
 /**
- * Release the latest Version and return the next Patch Version
+ * Create the first Version
  */
 function createFirstVersion(string $migrationPath = null): Version
 {
@@ -41,9 +42,9 @@ function createFirstVersion(string $migrationPath = null): Version
 }
 
 /**
- * Release the latest Version and return the next Patch Version
+ * Create the next Patch Version
  */
-function releaseAndCreatePatchVersion(string $migrationPath = null): Version
+function createPatchVersion(string $migrationPath = null): Version
 {
     if ($migrationPath) {
         setMigrationPath($migrationPath);
@@ -51,9 +52,7 @@ function releaseAndCreatePatchVersion(string $migrationPath = null): Version
 
     /** @var Version $latest */
     $latest = versions()->latest();
-    $latest->release();
-
-    moveAheadMinutes(1);
+    travel(1)->minute();
 
     return Version::factory()->create([
         'number' => $latest->number->nextPatch(),
@@ -61,9 +60,9 @@ function releaseAndCreatePatchVersion(string $migrationPath = null): Version
 }
 
 /**
- * Release the latest Version and return the next Minor Version
+ * Create the next Minor Version
  */
-function releaseAndCreateMinorVersion(string $migrationPath = null): Version
+function createMinorVersion(string $migrationPath = null): Version
 {
     if ($migrationPath) {
         setMigrationPath($migrationPath);
@@ -71,9 +70,7 @@ function releaseAndCreateMinorVersion(string $migrationPath = null): Version
 
     /** @var Version $latest */
     $latest = versions()->latest();
-    $latest->release();
-
-    moveAheadMinutes(1);
+    travel(1)->minute();
 
     return Version::factory()->create([
         'number' => $latest->number->nextMinor(),
@@ -81,9 +78,9 @@ function releaseAndCreateMinorVersion(string $migrationPath = null): Version
 }
 
 /**
- * Release the latest Version and return the next Major Version
+ * Create the next Major Version
  */
-function releaseAndCreateMajorVersion(string $migrationPath = null): Version
+function createMajorVersion(string $migrationPath = null): Version
 {
     if ($migrationPath) {
         setMigrationPath($migrationPath);
@@ -91,31 +88,9 @@ function releaseAndCreateMajorVersion(string $migrationPath = null): Version
 
     /** @var Version $latest */
     $latest = versions()->latest();
-    $latest->release();
-
-    moveAheadMinutes(1);
+    travel(1)->minute();
 
     return Version::factory()->create([
         'number' => $latest->number->nextMajor(),
     ]);
-}
-
-function setTestNow(Carbon $now)
-{
-    Carbon::setTestNow($now);
-}
-
-function moveAheadSeconds(int $seconds)
-{
-    Carbon::setTestNow(Carbon::now()->addSeconds($seconds));
-}
-
-function moveAheadMinutes(int $minutes)
-{
-    Carbon::setTestNow(Carbon::now()->addMinutes($minutes));
-}
-
-function moveAheadHours(int $hours)
-{
-    Carbon::setTestNow(Carbon::now()->addHours($hours));
 }
