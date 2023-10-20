@@ -131,12 +131,12 @@ class SnapshotServiceProvider extends PackageServiceProvider
 
     protected function listenToEvents(): self
     {
-        if (config('snapshots.auto_migrate') === true) {
-            Event::listen(VersionCreated::class, SnapshotDatabase::class);
+        if ($migrator = config('snapshots.auto_migrator')) {
+            Event::listen(VersionCreated::class, $migrator);
         }
 
-        if (config('snapshots.auto_copy') === true) {
-            Event::listen(TableCreated::class, CopyTable::class);
+        if ($copier = config('snapshots.auto_copier')) {
+            Event::listen(TableCreated::class, $copier);
         }
 
         return $this;

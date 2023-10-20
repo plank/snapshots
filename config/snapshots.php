@@ -46,7 +46,7 @@ return [
     | This option determines whether or not to run the migrations when a new version
     | is created. If set to false, you will need to handle the migrations in your app code.
     */
-    'auto_migrate' => true,
+    'auto_migrator' => \Plank\Snapshots\Listeners\SnapshotDatabase::class,
 
     /*
     |---------------------------------------------------------------------------
@@ -57,5 +57,5 @@ return [
     | when a new version is created. If set to false, you will need to handle the copying
     | in your app code.
     */
-    'auto_copy' => true,
+    'auto_copier' => \Plank\Snapshots\Listeners\CopyTable::class,
 ];
