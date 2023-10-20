@@ -36,6 +36,8 @@ function createFirstVersion(string $migrationPath = null): Version
         setMigrationPath($migrationPath);
     }
 
+    travel(1)->minute();
+
     return Version::factory()->create([
         'number' => '1.0.0',
     ]);

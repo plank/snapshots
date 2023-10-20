@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Plank\Snapshots\Exceptions\MigrationFailedException;
 use Plank\Snapshots\Facades\SnapshotSchema;
+use Plank\Snapshots\Tests\Models\Document;
 
 use function Pest\Laravel\artisan;
 use function Pest\Laravel\assertDatabaseHas;
@@ -82,6 +83,32 @@ describe('SnapshotMigrations use versions to run `up`', function () {
         ]);
     });
 
+    it('creates new tables for models for new versions', function () {
+        createFirstVersion('schema/create_for_model');
+
+        assertDatabaseHas('migrations', [
+            'migration' => 'v1_0_0_create_documents_table',
+            'batch' => 3,
+        ]);
+
+        expect(Schema::hasTable('v1_0_0_documents'))->toBeTrue();
+
+        createMinorVersion('schema/create_for_model');
+
+        assertDatabaseHas('migrations', [
+            'migration' => 'v1_1_0_create_documents_table',
+            'batch' => 4,
+        ]);
+
+        expect(Schema::hasTable('v1_1_0_documents'))->toBeTrue();
+    });
+
+    it('throws an error when you pass an improper class string to createForModel', function () {
+        SnapshotSchema::createForModel('documents', function ($table) {
+            // The error will already be triggered
+        });
+    })->throws(InvalidArgumentException::class);
+
     it('drops versioned tables', function () {
         createFirstVersion('schema/create');
 
@@ -95,6 +122,16 @@ describe('SnapshotMigrations use versions to run `up`', function () {
             'batch' => 4,
         ]);
     });
+
+    it('drops versioned tables for models', function () {
+        SnapshotSchema::dropForModel(Document::class);
+
+        expect(Schema::hasTable('documents'))->toBeFalse();
+    });
+
+    it('throws an error when you pass an improper class string to dropForModel', function () {
+        SnapshotSchema::dropForModel('documents');
+    })->throws(InvalidArgumentException::class);
 
     it('drops versioned tables if they exist when they exist', function () {
         createFirstVersion('schema/create');
