@@ -2,8 +2,6 @@
 
 namespace Plank\Snapshots\Exceptions;
 
-use Plank\Snapshots\Contracts\Version;
-
 class SchemaModelException extends SnapshotsException
 {
     public static function create(string $table): self

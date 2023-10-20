@@ -11,7 +11,7 @@ class TableCreated
     use SerializesModels;
 
     /**
-     * @param class-string<Model>|null  $model
+     * @param  class-string<Model>|null  $model
      */
     public function __construct(
         public string $table,

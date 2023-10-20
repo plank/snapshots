@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Plank\Snapshots\Events\TableCreated;
 use Plank\Snapshots\Exceptions\SchemaModelException;
@@ -22,7 +21,7 @@ describe('The CopyModels listener correctly copies data', function () {
 
     it('copies model data correctly for new versions', function () {
         $documents = Document::factory()->count(3)->create();
-        
+
         versions()->setActive(createFirstVersion('schema/create_for_model'));
 
         expect((new Document)->getTable())->toBe('v1_0_0_documents');

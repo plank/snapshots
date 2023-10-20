@@ -14,7 +14,7 @@ describe('The CopyTables listener correctly copies data', function () {
 
     it('copies table data correctly for new versions', function () {
         $documents = Document::factory()->count(3)->create();
-        
+
         versions()->setActive(createFirstVersion('schema/create'));
 
         expect((new Document)->getTable())->toBe('v1_0_0_documents');

@@ -50,15 +50,13 @@ class SnapshotSchemaBuilder extends Builder
      * Create a new table on the schema.
      *
      * @param  class-string<Model>  $model
-     * @param  \Closure  $callback
-     * @return void
      */
     public function createForModel(string $model, Closure $callback): void
     {
-        if (! is_a($model, Model::class, true) || !is_a($model, Versioned::class, true)) {
+        if (! is_a($model, Model::class, true) || ! is_a($model, Versioned::class, true)) {
             throw new InvalidArgumentException('Models for snapshotted tables must implement '.Versioned::class.' and extend '.Model::class.'.');
         }
-        
+
         $active = $this->versions->active();
         $table = (new $model)->getTable();
         $original = app(Version::class)::stripMigrationPrefix($table);
@@ -87,11 +85,10 @@ class SnapshotSchemaBuilder extends Builder
      *
      * @param  class-string<Model>  $model
      * @param  \Closure  $callback
-     * @return void
      */
     public function dropForModel($model): void
     {
-        if (! is_a($model, Model::class, true) || !is_a($model, Versioned::class, true)) {
+        if (! is_a($model, Model::class, true) || ! is_a($model, Versioned::class, true)) {
             throw new InvalidArgumentException('Models for snapshotted tables must implement '.Versioned::class.' and extend '.Model::class.'.');
         }
 

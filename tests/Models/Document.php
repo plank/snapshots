@@ -10,8 +10,8 @@ use Plank\Snapshots\Tests\Database\Factories\DocumentFactory;
 
 class Document extends Model implements Versioned
 {
-    use HasFactory;
     use AsVersionedContent;
+    use HasFactory;
 
     protected $guarded = [];
 

@@ -21,7 +21,7 @@ class CopyModels
         if ($event->model === null) {
             throw SchemaModelException::create($event->table);
         }
-        
+
         if ($event->version === null) {
             return;
         }
