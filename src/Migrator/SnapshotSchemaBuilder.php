@@ -4,10 +4,14 @@ namespace Plank\Snapshots\Migrator;
 
 use Closure;
 use Illuminate\Database\Connection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Builder;
 use Illuminate\Support\Facades\Event;
+use InvalidArgumentException;
 use Plank\Snapshots\Contracts\ManagesVersions;
+use Plank\Snapshots\Contracts\Version;
+use Plank\Snapshots\Contracts\Versioned;
 use Plank\Snapshots\Events\TableCreated;
 
 /**
@@ -43,6 +47,30 @@ class SnapshotSchemaBuilder extends Builder
     }
 
     /**
+     * Create a new table on the schema.
+     *
+     * @param  class-string<Model>  $model
+     * @param  \Closure  $callback
+     * @return void
+     */
+    public function createForModel(string $model, Closure $callback): void
+    {
+        if (! is_a($model, Model::class, true) || !is_a($model, Versioned::class, true)) {
+            throw new InvalidArgumentException('Models for snapshotted tables must implement '.Versioned::class.' and extend '.Model::class.'.');
+        }
+        
+        $active = $this->versions->active();
+        $table = (new $model)->getTable();
+        $original = app(Version::class)::stripMigrationPrefix($table);
+
+        parent::create($table, $callback);
+
+        $this->withoutForeignKeyConstraints(function () use ($original, $active, $model) {
+            Event::dispatch(new TableCreated($original, $active, $model));
+        });
+    }
+
+    /**
      * {@inheritDoc}
      */
     public function drop($table): void
@@ -50,6 +78,24 @@ class SnapshotSchemaBuilder extends Builder
         if ($active = $this->versions->active()) {
             $table = $active->addTablePrefix($table);
         }
+
+        parent::drop($table);
+    }
+
+    /**
+     * Create a new table on the schema.
+     *
+     * @param  class-string<Model>  $model
+     * @param  \Closure  $callback
+     * @return void
+     */
+    public function dropForModel($model): void
+    {
+        if (! is_a($model, Model::class, true) || !is_a($model, Versioned::class, true)) {
+            throw new InvalidArgumentException('Models for snapshotted tables must implement '.Versioned::class.' and extend '.Model::class.'.');
+        }
+
+        $table = (new $model)->getTable();
 
         parent::drop($table);
     }

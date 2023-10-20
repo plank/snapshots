@@ -3,6 +3,7 @@
 namespace Plank\Snapshots\Listeners;
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Plank\Snapshots\Events\TableCreated;
 
 class CopyTable
@@ -18,6 +19,8 @@ class CopyTable
         $from = $event->table;
         $to = $version->addTablePrefix($from);
 
-        DB::statement("INSERT INTO `$to` SELECT * FROM `$from`");
+        Schema::withoutForeignKeyConstraints(function () use ($from, $to) {
+            DB::statement("INSERT INTO `$to` SELECT * FROM `$from`");
+        });
     }
 }
