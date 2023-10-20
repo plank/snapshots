@@ -10,8 +10,6 @@ use Plank\Snapshots\Contracts\Version;
 use Plank\Snapshots\Events\TableCreated;
 use Plank\Snapshots\Events\VersionCreated;
 use Plank\Snapshots\Exceptions\VersionException;
-use Plank\Snapshots\Listeners\CopyTable;
-use Plank\Snapshots\Listeners\SnapshotDatabase;
 use Plank\Snapshots\Migrator\SnapshotMigrator;
 use Plank\Snapshots\Migrator\SnapshotSchemaBuilder;
 use Spatie\LaravelPackageTools\Commands\InstallCommand;
@@ -131,12 +129,12 @@ class SnapshotServiceProvider extends PackageServiceProvider
 
     protected function listenToEvents(): self
     {
-        if (config('snapshots.auto_migrate') === true) {
-            Event::listen(VersionCreated::class, SnapshotDatabase::class);
+        if ($migrator = config('snapshots.auto_migrator')) {
+            Event::listen(VersionCreated::class, $migrator);
         }
 
-        if (config('snapshots.auto_copy') === true) {
-            Event::listen(TableCreated::class, CopyTable::class);
+        if ($copier = config('snapshots.auto_copier')) {
+            Event::listen(TableCreated::class, $copier);
         }
 
         return $this;

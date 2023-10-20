@@ -119,17 +119,17 @@ The `repository` option is the fully qualified class name of the repository that
 
 ### Auto Migration
 
-The `auto_migrate` option determines whether or not the package will automatically create new tables for all of the versioned content when a new version model is created. The default value is `true`.
-
-If you wish to handle the logic for this yourself, you can set the flag to false and listen to the `Plank\Events\VersionCreated` event which is fired after a new version model is created.
+The `auto_migrate` option determines whether or not the package will automatically create new tables for all of the versioned content when a new version model is created. The package provides the default implementation of `Plank\Snapshots\Listeners\SnapshotDatabase`, but you can provide your own implementation.
 
 ### Auto Copy
 
-The `auto_copy` option determines whether or not the package will automatically copy the content of the versioned tables when a new version model is created. The default value is `true`.
+The `auto_copy` option determines whether or not the package will automatically copy content to the newly versioned tables when a new version model is created. 
 
-When `true` the default behavior is that the package will copy the content from the previous version of the table into the new version of the table. If no previous version is available, the package will copy the content from the original table into the new version of the table.
+The package provides the default implementation of `Plank\Snapshots\Listeners\CopyTable`, where the data is copied over at the database level.
 
-If you wish to handle the logic for this yourself, you can set the flag to false and listen to the `Plank\Events\TableCreated` event which is fired after each new table is created for versioned content.
+The package also ships with `Plank\Snapshots\Listeners\CopyModels`, where the data is copied over at the model level. This is useful if you have custom logic in your models that needs to be run when the data is copied over.
+
+You can also provide your own implementation by setting it in the configuration file.
 
 &nbsp;
 
