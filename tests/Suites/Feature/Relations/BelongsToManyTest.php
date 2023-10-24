@@ -6,7 +6,7 @@ use Plank\Snapshots\Tests\Models\Post;
 use function Pest\Laravel\artisan;
 use function Pest\Laravel\seed;
 
-describe('BelongsTo relationships use versioned tables when one of the models is versioned', function () {
+describe('BelongsToMany relationships use versioned tables when one of the models is versioned', function () {
     beforeEach(function () {
         artisan('migrate', [
             '--path' => migrationPath('query'),
