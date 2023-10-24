@@ -22,7 +22,7 @@ describe('SnapshotMigrations can be pretended', function () {
 
         assertDatabaseHas('migrations', [
             'migration' => 'v1_0_0_create_documents_table',
-            'batch' => 3,
+            'batch' => 4,
         ]);
 
         VersionModel::factory()->createQuietly([
@@ -53,7 +53,7 @@ describe('SnapshotMigrations can be pretended', function () {
 
         assertDatabaseHas('migrations', [
             'migration' => 'v1_0_0_create_documents_table',
-            'batch' => 3,
+            'batch' => 4,
         ]);
 
         artisan('migrate:rollback', [
