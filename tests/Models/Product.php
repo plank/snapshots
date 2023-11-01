@@ -7,10 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Plank\Snapshots\Concerns\AsVersionedContent;
+use Plank\Snapshots\Contracts\Trackable;
 use Plank\Snapshots\Contracts\Versioned;
 use Plank\Snapshots\Tests\Database\Factories\ProductFactory;
 
-class Product extends Model implements Versioned
+class Product extends Model implements Trackable, Versioned
 {
     use AsVersionedContent;
     use HasFactory;

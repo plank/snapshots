@@ -6,9 +6,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Plank\Snapshots\Concerns\InteractsWithVersionedContent;
+use Plank\Snapshots\Contracts\CausesChanges;
 use Plank\Snapshots\Tests\Database\Factories\UserFactory;
 
-class User extends Authenticatable
+class User extends Authenticatable implements CausesChanges
 {
     use HasFactory;
     use InteractsWithVersionedContent;

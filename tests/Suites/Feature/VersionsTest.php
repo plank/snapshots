@@ -8,7 +8,7 @@ use Plank\Snapshots\ValueObjects\VersionNumber;
 
 describe('Versions are migrated correctly', function () {
     it('throws an exception when you have the version configured incorrectly', function () {
-        config()->set('snapshots.model', null);
+        config()->set('snapshots.models.version', null);
 
         get_class(app()->make(VersionContract::class));
     })->throws(VersionException::class);

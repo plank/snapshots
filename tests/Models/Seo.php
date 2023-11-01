@@ -6,10 +6,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Plank\Snapshots\Concerns\AsVersionedContent;
+use Plank\Snapshots\Contracts\Trackable;
 use Plank\Snapshots\Contracts\Versioned;
 use Plank\Snapshots\Tests\Database\Factories\SeoFactory;
 
-class Seo extends Model implements Versioned
+class Seo extends Model implements Trackable, Versioned
 {
     use AsVersionedContent;
     use HasFactory;

@@ -4,16 +4,19 @@ namespace Plank\Snapshots\Tests\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Plank\Snapshots\Concerns\AsVersionedContent;
+use Plank\Snapshots\Concerns\HasHistory;
 use Plank\Snapshots\Contracts\Trackable;
 use Plank\Snapshots\Contracts\Versioned;
-use Plank\Snapshots\Tests\Database\Factories\PlanFactory;
+use Plank\Snapshots\Tests\Database\Factories\FlagFactory;
 
-class Plan extends Model implements Trackable, Versioned
+class Flag extends Model implements Trackable, Versioned
 {
     use AsVersionedContent;
     use HasFactory;
+    use HasHistory;
+    use SoftDeletes;
 
     protected $guarded = [];
 
@@ -24,13 +27,6 @@ class Plan extends Model implements Trackable, Versioned
      */
     protected static function newFactory()
     {
-        return PlanFactory::new();
-    }
-
-    public function projects(): BelongsToMany
-    {
-        return $this->belongsToMany(Project::class)
-            ->using(AssignedPlan::class)
-            ->withPivot('accepted');
+        return FlagFactory::new();
     }
 }

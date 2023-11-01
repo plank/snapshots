@@ -45,5 +45,6 @@ class TestCase extends Orchestra
     public function getEnvironmentSetUp($app)
     {
         $app['config']->set('database.default', 'testing');
+        $app['config']->set('snapshots.history', null);
     }
 }

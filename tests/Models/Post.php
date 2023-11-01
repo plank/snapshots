@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Plank\Snapshots\Concerns\AsVersionedContent;
+use Plank\Snapshots\Contracts\Trackable;
 use Plank\Snapshots\Contracts\Versioned;
 use Plank\Snapshots\Tests\Database\Factories\PostFactory;
 
@@ -28,7 +29,7 @@ use Plank\Snapshots\Tests\Database\Factories\PostFactory;
  * @property-read Collection<Like> $likes
  * @property-read Collection<Seo> $seos
  */
-class Post extends Model implements Versioned
+class Post extends Model implements Trackable, Versioned
 {
     use AsVersionedContent;
     use HasFactory;
