@@ -17,7 +17,7 @@ class VersionRepository implements ManagesVersions
      */
     public function model(): Version&Model
     {
-        return new (config('snapshots.model') ?? VersionModel::class);
+        return new (config('snapshots.models.version') ?? VersionModel::class);
     }
 
     /**

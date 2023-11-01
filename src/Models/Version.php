@@ -4,6 +4,7 @@ namespace Plank\Snapshots\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Plank\Snapshots\Casts\AsVersionNumber;
 use Plank\Snapshots\Concerns\AsVersion;
 use Plank\Snapshots\Contracts\Version as VersionContract;
 use Plank\Snapshots\Observers\VersionObserver;
@@ -22,7 +23,7 @@ class Version extends Model implements VersionContract
     protected $guarded = [];
 
     protected $casts = [
-        'number' => \Plank\Snapshots\Casts\VersionNumber::class,
+        'number' => AsVersionNumber::class,
     ];
 
     public static function boot(): void
@@ -39,7 +40,7 @@ class Version extends Model implements VersionContract
      */
     protected static function newFactory()
     {
-        return config('snapshots.factory')::new();
+        return config('snapshots.factories.version')::new();
     }
 
     public function uriKey(): string

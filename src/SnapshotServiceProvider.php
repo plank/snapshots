@@ -6,7 +6,9 @@ use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Event;
 use Plank\Snapshots\Contracts\ManagesVersions;
+use Plank\Snapshots\Contracts\ResolvesCauser;
 use Plank\Snapshots\Contracts\Version;
+use Plank\Snapshots\Events\TableCopied;
 use Plank\Snapshots\Events\TableCreated;
 use Plank\Snapshots\Events\VersionCreated;
 use Plank\Snapshots\Exceptions\VersionException;
@@ -28,6 +30,7 @@ class SnapshotServiceProvider extends PackageServiceProvider
         $package->name('snapshots')
             ->hasConfigFile()
             ->hasMigrations([
+                // 'create_history_table',
                 'create_versions_table',
             ])
             ->hasInstallCommand(function (InstallCommand $command) {
@@ -50,14 +53,13 @@ class SnapshotServiceProvider extends PackageServiceProvider
 
                     $command->askToStarRepoOnGitHub('plank/snapshots');
                 });
-
             });
     }
 
     public function bootingPackage()
     {
         $this->bindVersion()
-            ->bindRepository()
+            ->bindRepositories()
             ->bindSchemaBuilder()
             ->bindMigrator();
 
@@ -68,7 +70,7 @@ class SnapshotServiceProvider extends PackageServiceProvider
     {
         if (! $this->app->bound(Version::class)) {
             $this->app->bind(Version::class, function (Application $app) {
-                $model = $app['config']->get('snapshots.model');
+                $model = $app['config']->get('snapshots.models.version');
 
                 if (! is_a($model, Version::class, true)) {
                     throw VersionException::create($model);
@@ -81,11 +83,19 @@ class SnapshotServiceProvider extends PackageServiceProvider
         return $this;
     }
 
-    protected function bindRepository(): self
+    protected function bindRepositories(): self
     {
         if (! $this->app->bound(ManagesVersions::class)) {
             $this->app->scoped(ManagesVersions::class, function (Application $app) {
-                $repo = $app['config']->get('snapshots.repository');
+                $repo = $app['config']->get('snapshots.repositories.version');
+
+                return new $repo;
+            });
+        }
+
+        if (! $this->app->bound(ResolvesCauser::class)) {
+            $this->app->scoped(ResolvesCauser::class, function (Application $app) {
+                $repo = $app['config']->get('snapshots.repositories.causer');
 
                 return new $repo;
             });
@@ -135,6 +145,10 @@ class SnapshotServiceProvider extends PackageServiceProvider
 
         if ($copier = config('snapshots.auto_copier')) {
             Event::listen(TableCreated::class, $copier);
+        }
+
+        if ($labler = config('snapshots.history.labler')) {
+            Event::listen(TableCopied::class, $labler);
         }
 
         return $this;
