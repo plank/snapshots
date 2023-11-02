@@ -24,22 +24,22 @@ describe('SnapshotMigrations use versions to run `down`', function () {
     it('runs snapshot migrations when new versions are created', function () {
         assertDatabaseHas('migrations', [
             'migration' => 'v1_0_0_create_documents_table',
-            'batch' => 4,
+            'batch' => 3,
         ]);
 
         assertDatabaseHas('migrations', [
             'migration' => 'v1_1_0_create_documents_table',
-            'batch' => 5,
+            'batch' => 4,
         ]);
 
         assertDatabaseHas('migrations', [
             'migration' => 'v1_1_1_create_documents_table',
-            'batch' => 6,
+            'batch' => 5,
         ]);
 
         assertDatabaseHas('migrations', [
             'migration' => 'v2_0_0_create_documents_table',
-            'batch' => 7,
+            'batch' => 6,
         ]);
     });
 
@@ -51,22 +51,22 @@ describe('SnapshotMigrations use versions to run `down`', function () {
 
         assertDatabaseMissing('migrations', [
             'migration' => 'v1_0_0_create_documents_table',
-            'batch' => 4,
+            'batch' => 3,
         ]);
 
         assertDatabaseMissing('migrations', [
             'migration' => 'v1_1_0_create_documents_table',
-            'batch' => 5,
+            'batch' => 4,
         ]);
 
         assertDatabaseMissing('migrations', [
             'migration' => 'v1_1_1_create_documents_table',
-            'batch' => 6,
+            'batch' => 5,
         ]);
 
         assertDatabaseMissing('migrations', [
             'migration' => 'v2_0_0_create_documents_table',
-            'batch' => 7,
+            'batch' => 6,
         ]);
 
         expect(Schema::hasTable('documents'))->toBeFalse();
