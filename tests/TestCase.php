@@ -42,10 +42,10 @@ class TestCase extends Orchestra
         $app['config']->set('database.default', 'testing');
         $app['config']->set('snapshots.history', null);
 
-        $migration = include (realpath(__DIR__.'/..').'/database/migrations/create_versions_table.php.stub');
+        $migration = include realpath(__DIR__.'/..').'/database/migrations/create_versions_table.php.stub';
         $migration->up();
 
-        $migration = include (realpath(__DIR__.'/..').'/database/migrations/create_history_table.php.stub');
+        $migration = include realpath(__DIR__.'/..').'/database/migrations/create_history_table.php.stub';
         $migration->up();
     }
 }
