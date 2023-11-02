@@ -9,6 +9,8 @@
 
 # Laravel Snapshots
 
+:warning: This package is currently under active development and is not ready for production until version 1.0.0 is published. :warning:
+
 Snapshots is a Laravel package that allows you to version the content of your app by replicating database tables and their content. Each snapshot represents a browesable version of your app's content at a specific point in time. By changing the active version of your app, you can view your app's content at a previous version.
 
 The main goal of this package is for it to perform robust versioning of your content, but stay out of your way. You should be able to use it without having to change your existing codebase. It should be easy to install and configure, and it should be easy to use.
