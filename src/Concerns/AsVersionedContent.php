@@ -86,14 +86,25 @@ trait AsVersionedContent
             ->get()
             ->groupBy('version_id')
             ->map(function (Collection $items) {
+                // For visiblity we are only concerned with the most recent history item
+                // from the version. Ie: We only want to see the last thing that happened
+                // to that Model in that version.
                 $item = $items->sortByDesc('created_at')->first();
 
+                // Since we need the trackable model from the version the history item is in, we run
+                // the query in that version so it is referencing the correct table.
+                //
+                // We also need to remove the global scopes since in thsi context, we want the models
+                // regradless of any other criteria.
                 $trackable = static::withVersionActive($item->version, function (Builder $query) use ($item) {
                     return $query->withoutGlobalScopes()
                         ->whereKey($item->trackable_id)
                         ->first();
                 });
 
+                // We set the relation manually to the correct version is persisted on the item. If
+                // we did not do this, and the trackable was resolved later, it would resort back 
+                // to whatever the active version is.
                 $item->setRelation('trackable', $trackable);
 
                 return $item;
