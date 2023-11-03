@@ -103,7 +103,7 @@ trait AsVersionedContent
                 });
 
                 // We set the relation manually to the correct version is persisted on the item. If
-                // we did not do this, and the trackable was resolved later, it would resort back 
+                // we did not do this, and the trackable was resolved later, it would resort back
                 // to whatever the active version is.
                 $item->setRelation('trackable', $trackable);
 
