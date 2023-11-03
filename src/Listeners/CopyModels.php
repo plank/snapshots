@@ -63,7 +63,8 @@ class CopyModels
         Schema::disableForeignKeyConstraints();
 
         $model::withoutTimestamps(function () use ($model, $callback) {
-            if (config('snapshots.history') && in_array(HushesHandlers::class, class_uses_recursive($model))) {
+            $hushed = config('snapshots.history') && in_array(HushesHandlers::class, class_uses_recursive($model))
+            if ($hushed) {
                 $model::withoutObserver(config('snapshots.history.observer'), $callback);
             } else {
                 $callback();
