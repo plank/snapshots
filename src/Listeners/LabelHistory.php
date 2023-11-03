@@ -10,6 +10,7 @@ use Plank\Snapshots\Contracts\Trackable;
 use Plank\Snapshots\Contracts\Versioned;
 use Plank\Snapshots\Enums\Operation;
 use Plank\Snapshots\Events\TableCopied;
+use Plank\Snapshots\Exceptions\LabelingException;
 use Plank\Snapshots\Exceptions\SchemaModelException;
 use Plank\Snapshots\Models\History;
 
@@ -18,11 +19,11 @@ class LabelHistory
     public function handle(TableCopied $event)
     {
         if ($event->model === null) {
-            throw SchemaModelException::wrongCreateMethod($event->table);
+            throw SchemaModelException::create($event->table);
         }
 
         if (! is_a($event->model, Versioned::class, true)) {
-            throw SchemaModelException::notVersioned($event->model);
+            throw LabelingException::create($event->model);
         }
 
         History::query()

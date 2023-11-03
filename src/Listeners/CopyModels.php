@@ -23,7 +23,7 @@ class CopyModels
     public function handle(TableCreated $event)
     {
         if ($event->model === null) {
-            throw SchemaModelException::wrongCreateMethod($event->table);
+            throw SchemaModelException::create($event->table);
         }
 
         if ($event->version === null) {
