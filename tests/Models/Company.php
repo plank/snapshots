@@ -4,16 +4,16 @@ namespace Plank\Snapshots\Tests\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Plank\Snapshots\Concerns\AsVersionedContent;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Plank\Snapshots\Concerns\HasHistory;
 use Plank\Snapshots\Contracts\Trackable;
-use Plank\Snapshots\Contracts\Versioned;
-use Plank\Snapshots\Tests\Database\Factories\SeoFactory;
+use Plank\Snapshots\Tests\Database\Factories\CompanyFactory;
 
-class Seo extends Model implements Trackable, Versioned
+class Company extends Model implements Trackable
 {
-    use AsVersionedContent;
     use HasFactory;
+    use HasHistory;
+    use SoftDeletes;
 
     protected $guarded = [];
 
@@ -24,11 +24,6 @@ class Seo extends Model implements Trackable, Versioned
      */
     protected static function newFactory()
     {
-        return SeoFactory::new();
-    }
-
-    public function post(): BelongsTo
-    {
-        return $this->belongsTo(Post::class, 'post_id', 'uuid');
+        return CompanyFactory::new();
     }
 }

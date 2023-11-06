@@ -5,7 +5,7 @@ namespace Plank\Snapshots\Casts;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Plank\Snapshots\ValueObjects\VersionNumber as VersionNumberValueObject;
 
-class VersionNumber implements CastsAttributes
+class AsVersionNumber implements CastsAttributes
 {
     public function get($model, string $key, $value, array $attributes)
     {

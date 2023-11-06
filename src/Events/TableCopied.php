@@ -6,17 +6,23 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\SerializesModels;
 use Plank\Snapshots\Contracts\Version;
 
-class TableCreated
+class TableCopied
 {
     use SerializesModels;
 
-    /**
-     * @param  class-string<Model>|null  $model
-     */
     public function __construct(
         public string $table,
         public (Version&Model)|null $version,
         public ?string $model = null,
     ) {
+    }
+
+    public static function fromCreated(TableCreated $event): self
+    {
+        return new static(
+            table: $event->table,
+            version: $event->version,
+            model: $event->model,
+        );
     }
 }

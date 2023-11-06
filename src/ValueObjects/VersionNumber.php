@@ -69,29 +69,48 @@ class VersionNumber
         return $this->major.'-'.$this->minor.'-'.$this->patch;
     }
 
-    public function isGreaterThan(self $other): bool
+    public function isGreaterThan(VersionNumber|string $other): bool
     {
+        $other = static::wrap($other);
+
         return $this->compare($other) > 0;
     }
 
-    public function isGreaterThanOrEqualTo(self $other): bool
+    public function isGreaterThanOrEqualTo(VersionNumber|string $other): bool
     {
+        $other = static::wrap($other);
+
         return $this->compare($other) >= 0;
     }
 
-    public function isLessThan(self $other): bool
+    public function isLessThan(VersionNumber|string $other): bool
     {
+        $other = static::wrap($other);
+
         return $this->compare($other) < 0;
     }
 
-    public function isLessThanOrEqualTo(self $other): bool
+    public function isLessThanOrEqualTo(VersionNumber|string $other): bool
     {
+        $other = static::wrap($other);
+
         return $this->compare($other) <= 0;
     }
 
-    public function isEqualTo(self $other): bool
+    public function isEqualTo(VersionNumber|string $other): bool
     {
+        $other = static::wrap($other);
+
         return $this->compare($other) === 0;
+    }
+
+    public static function wrap(string|VersionNumber $version): self
+    {
+        if ($version instanceof VersionNumber) {
+            return $version;
+        }
+
+        return static::fromVersionString($version);
     }
 
     protected function compare(self $other): int

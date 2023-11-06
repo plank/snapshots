@@ -50,21 +50,21 @@ describe('SnapshotMigrations use versions to run `up`', function () {
 
         assertDatabaseHas('migrations', [
             'migration' => 'v1_0_0_create_documents_table',
-            'batch' => 3,
+            'batch' => 4,
         ]);
     });
 
     it('does does not re-run evoloving migrations for versions', function () {
         createFirstVersion('schema/create');
 
-        expect(DB::table('migrations')->count())->toBe(3);
+        expect(DB::table('migrations')->count())->toBe(5);
 
         artisan('migrate', [
             '--path' => migrationPath('schema/create'),
             '--realpath' => true,
         ])->run();
 
-        expect(DB::table('migrations')->count())->toBe(3);
+        expect(DB::table('migrations')->count())->toBe(5);
     });
 
     it('creates new tables for new versions', function () {
@@ -72,14 +72,14 @@ describe('SnapshotMigrations use versions to run `up`', function () {
 
         assertDatabaseHas('migrations', [
             'migration' => 'v1_0_0_create_documents_table',
-            'batch' => 3,
+            'batch' => 4,
         ]);
 
         createMinorVersion('schema/create');
 
         assertDatabaseHas('migrations', [
             'migration' => 'v1_1_0_create_documents_table',
-            'batch' => 4,
+            'batch' => 5,
         ]);
     });
 
@@ -88,7 +88,7 @@ describe('SnapshotMigrations use versions to run `up`', function () {
 
         assertDatabaseHas('migrations', [
             'migration' => 'v1_0_0_create_documents_table',
-            'batch' => 3,
+            'batch' => 4,
         ]);
 
         expect(Schema::hasTable('v1_0_0_documents'))->toBeTrue();
@@ -97,7 +97,7 @@ describe('SnapshotMigrations use versions to run `up`', function () {
 
         assertDatabaseHas('migrations', [
             'migration' => 'v1_1_0_create_documents_table',
-            'batch' => 4,
+            'batch' => 5,
         ]);
 
         expect(Schema::hasTable('v1_1_0_documents'))->toBeTrue();
@@ -119,7 +119,7 @@ describe('SnapshotMigrations use versions to run `up`', function () {
 
         assertDatabaseHas('migrations', [
             'migration' => 'v1_0_0_drop_documents_table',
-            'batch' => 4,
+            'batch' => 5,
         ]);
     });
 
@@ -143,7 +143,7 @@ describe('SnapshotMigrations use versions to run `up`', function () {
 
         assertDatabaseHas('migrations', [
             'migration' => 'v1_0_0_drop_documents_table_if_it_exists',
-            'batch' => 4,
+            'batch' => 5,
         ]);
     });
 
@@ -162,7 +162,7 @@ describe('SnapshotMigrations use versions to run `up`', function () {
 
         assertDatabaseHas('migrations', [
             'migration' => 'v1_0_0_drop_documents_table_if_it_exists',
-            'batch' => 5,
+            'batch' => 6,
         ]);
     });
 
@@ -171,7 +171,7 @@ describe('SnapshotMigrations use versions to run `up`', function () {
 
         assertDatabaseHas('migrations', [
             'migration' => 'v1_0_0_create_documents_table',
-            'batch' => 3,
+            'batch' => 4,
         ]);
 
         versions()->setActive(createMajorVersion('schema/create'));
@@ -183,7 +183,7 @@ describe('SnapshotMigrations use versions to run `up`', function () {
 
         assertDatabaseHas('migrations', [
             'migration' => 'v2_0_0_drop_documents_table',
-            'batch' => 5,
+            'batch' => 6,
         ]);
     });
 
@@ -200,7 +200,7 @@ describe('SnapshotMigrations use versions to run `up`', function () {
 
         assertDatabaseHas('migrations', [
             'migration' => 'drop_columns_from_documents_table',
-            'batch' => 3,
+            'batch' => 4,
         ]);
 
         SnapshotSchema::whenTableDoesntHaveColumn('documents', 'released_at', function () {
@@ -224,7 +224,7 @@ describe('SnapshotMigrations use versions to run `up`', function () {
 
         assertDatabaseHas('migrations', [
             'migration' => 'drop_columns_from_documents_table',
-            'batch' => 4,
+            'batch' => 5,
         ]);
 
         SnapshotSchema::whenTableDoesntHaveColumn('documents', 'released_at', function () {
@@ -244,7 +244,7 @@ describe('SnapshotMigrations use versions to run `up`', function () {
 
         assertDatabaseHas('migrations', [
             'migration' => 'rename_documents_table',
-            'batch' => 3,
+            'batch' => 4,
         ]);
 
         expect(SnapshotSchema::hasTable('documents'))->toBeFalse();
@@ -264,7 +264,7 @@ describe('SnapshotMigrations use versions to run `up`', function () {
 
         assertDatabaseHas('migrations', [
             'migration' => 'rename_documents_table',
-            'batch' => 4,
+            'batch' => 5,
         ]);
 
         expect(SnapshotSchema::hasTable('documents'))->toBeFalse();
@@ -284,7 +284,7 @@ describe('SnapshotMigrations use versions to run `up`', function () {
 
         assertDatabaseHas('migrations', [
             'migration' => 'v1_0_0_change_documents_table',
-            'batch' => 4,
+            'batch' => 5,
         ]);
 
         expect(SnapshotSchema::getColumnType('documents', 'title'))->toBe('string');
@@ -303,7 +303,7 @@ describe('SnapshotMigrations use versions to run `up`', function () {
 
         assertDatabaseHas('migrations', [
             'migration' => 'v1_0_0_drop_without_fk_constraints',
-            'batch' => 4,
+            'batch' => 5,
         ]);
 
         expect(SnapshotSchema::hasTable('documents'))->toBeFalse();

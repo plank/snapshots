@@ -205,13 +205,13 @@ class SnapshotSchemaBuilder extends Builder
     /**
      * {@inheritDoc}
      */
-    public function getColumnType($table, $column)
+    public function getColumnType($table, $column, $fullDefinition = false)
     {
         if ($active = $this->versions->active()) {
             $table = $active->addTablePrefix($table);
         }
 
-        return parent::getColumnType($table, $column);
+        return parent::getColumnType($table, $column, $fullDefinition);
     }
 
     /**
