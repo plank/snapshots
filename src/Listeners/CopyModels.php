@@ -11,7 +11,6 @@ use Plank\Snapshots\Contracts\ManagesVersions;
 use Plank\Snapshots\Contracts\Versioned;
 use Plank\Snapshots\Events\TableCopied;
 use Plank\Snapshots\Events\TableCreated;
-use Plank\Snapshots\Exceptions\SchemaModelException;
 
 class CopyModels
 {
@@ -23,7 +22,12 @@ class CopyModels
     public function handle(TableCreated $event)
     {
         if ($event->model === null) {
-            throw SchemaModelException::create($event->table);
+            // In the event a model isn't provided, like for pivot tables we will need to fall back
+            // to the CopyTable behavior.
+            $tableCopier = new CopyTable($this->versions);
+            $tableCopier->handle($event);
+
+            return;
         }
 
         if ($event->version === null) {
