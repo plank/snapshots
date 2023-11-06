@@ -22,7 +22,7 @@ class CopyModels
     public function handle(TableCreated $event)
     {
         if ($event->model === null) {
-            // In the event a model isn't provided, like for pivot tables we will need to fall back 
+            // In the event a model isn't provided, like for pivot tables we will need to fall back
             // to the CopyTable behavior.
             $tableCopier = new CopyTable($this->versions);
             $tableCopier->handle($event);
