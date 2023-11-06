@@ -7,10 +7,13 @@ use Plank\Snapshots\Models\Version;
 use Plank\Snapshots\ValueObjects\VersionNumber;
 
 describe('Versions are migrated correctly', function () {
+
     it('throws an exception when you have the version configured incorrectly', function () {
+        expect(app()->make(VersionContract::class))->toBeInstanceOf(Version::class);
+
         config()->set('snapshots.models.version', null);
 
-        get_class(app()->make(VersionContract::class));
+        app()->make(VersionContract::class);
     })->throws(VersionException::class);
 
     it('throws an exception when creating a new version before the previous version has been migrated', function () {
@@ -21,7 +24,6 @@ describe('Versions are migrated correctly', function () {
         Version::factory()->create([
             'number' => '1.0.1',
         ]);
-
     })->throws(MigrationInProgressException::class);
 
     it('allows you to create a new Version when the previous Version has been migrated', function () {

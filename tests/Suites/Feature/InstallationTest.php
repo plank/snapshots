@@ -5,6 +5,16 @@ use Illuminate\Support\Facades\File;
 use function Pest\Laravel\artisan;
 
 describe('The install command properly installs the package.', function () {
+    afterEach(function () {
+        if (File::exists(config_path('snapshots.php'))) {
+            File::delete(config_path('snapshots.php'));
+        }
+
+        foreach (File::allFiles(database_path('migrations')) as $file) {
+            File::delete($file->getPathname());
+        }
+    });
+
     it('publishes the config file when confirmed', function () {
         File::delete(config_path('snapshots.php'));
         expect(file_exists(config_path('snapshots.php')))->toBeFalse();
@@ -41,7 +51,7 @@ describe('The install command properly installs the package.', function () {
         if (count($migrations) > 0) {
             $migration = $migrations[0]->getPathname();
         } else {
-            $migration = $migrationsPath.'/'.$now->addSecond()->format('Y_m_d_His').'_create_versions_table.php';
+            $migration = $migrationsPath.'/'.$now->addSeconds(2)->format('Y_m_d_His').'_create_versions_table.php';
         }
 
         File::delete($migration);
