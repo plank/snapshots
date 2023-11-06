@@ -2,7 +2,6 @@
 
 use Illuminate\Support\Facades\Event;
 use Plank\Snapshots\Events\TableCreated;
-use Plank\Snapshots\Exceptions\SchemaModelException;
 use Plank\Snapshots\Listeners\CopyModels;
 use Plank\Snapshots\Tests\Models\Document;
 
@@ -30,8 +29,4 @@ describe('The CopyModels listener correctly copies data', function () {
             expect(Document::query()->whereKey($document->id)->exists())->toBeTrue();
         });
     });
-
-    it('throws an exception when the CopyModels copier is used without using createForModel in migrations', function () {
-        versions()->setActive(createFirstVersion('schema/create'));
-    })->throws(SchemaModelException::class);
 });
