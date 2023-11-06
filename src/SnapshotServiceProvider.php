@@ -30,7 +30,7 @@ class SnapshotServiceProvider extends PackageServiceProvider
         $package->name('snapshots')
             ->hasConfigFile()
             ->hasMigrations([
-                // 'create_history_table',
+                'create_history_table',
                 'create_versions_table',
             ])
             ->hasInstallCommand(function (InstallCommand $command) {
