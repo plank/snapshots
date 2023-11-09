@@ -40,7 +40,10 @@ class HistoryObserver
             return;
         }
 
-        History::create([
+        /** @var class-string<History>|null $history */
+        $history = config('snapshots.models.history');
+
+        $history::create([
             'operation' => Operation::Created,
             'causer_id' => $this->causer?->getKey(),
             'causer_type' => $this->causer?->getMorphClass(),
@@ -69,7 +72,10 @@ class HistoryObserver
             }
         }
 
-        History::create([
+        /** @var class-string<History>|null $history */
+        $history = config('snapshots.models.history');
+
+        $history::create([
             'operation' => Operation::Updated,
             'causer_id' => $this->causer?->getKey(),
             'causer_type' => $this->causer?->getMorphClass(),
@@ -89,7 +95,10 @@ class HistoryObserver
             return;
         }
 
-        History::create([
+        /** @var class-string<History>|null $history */
+        $history = config('snapshots.models.history');
+
+        $history::create([
             'operation' => $softDeletes ? Operation::SoftDeleted : Operation::Deleted,
             'causer_id' => $this->causer?->getKey(),
             'causer_type' => $this->causer?->getMorphClass(),
@@ -103,7 +112,10 @@ class HistoryObserver
 
     public function restored(Model&Trackable $model)
     {
-        History::create([
+        /** @var class-string<History>|null $history */
+        $history = config('snapshots.models.history');
+
+        $history::create([
             'operation' => Operation::Restored,
             'causer_id' => $this->causer?->getKey(),
             'causer_type' => $this->causer?->getMorphClass(),
@@ -117,7 +129,10 @@ class HistoryObserver
 
     public function forceDeleted(Model&Trackable $model)
     {
-        History::create([
+        /** @var class-string<History>|null $history */
+        $history = config('snapshots.models.history');
+
+        $history::create([
             'operation' => Operation::Deleted,
             'causer_id' => $this->causer?->getKey(),
             'causer_type' => $this->causer?->getMorphClass(),

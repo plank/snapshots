@@ -25,7 +25,10 @@ class LabelHistory
             throw LabelingException::create($event->model);
         }
 
-        History::query()
+        /** @var class-string<History>|null */
+        $history = config('snapshots.models.history');
+
+        $history::query()
             ->where('trackable_type', $event->model)
             ->whereNull('version_id')
             ->cursor()
@@ -65,7 +68,10 @@ class LabelHistory
         /** @var CausesChanges|null $causer */
         $causer = app(ResolvesCauser::class)->active();
 
-        History::create([
+        /** @var class-string<History>|null $history */
+        $history = config('snapshots.models.history');
+
+        $history::create([
             'operation' => Operation::Snapshotted,
             'causer_id' => $causer?->getKey(),
             'causer_type' => $causer?->getMorphClass(),
