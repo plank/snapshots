@@ -284,7 +284,7 @@ describe('Versioned Content has its History tracked correctly without Model Even
 
         $document = Document::factory()->create();
         $document->update(['title' => $document->title.' – Updated']);
-        
+
         expect(History::query()->where('operation', Operation::Updated)->count())->toBe(1);
 
         /** @var History $item */
@@ -383,7 +383,7 @@ describe('Versioned Content has its History tracked correctly without Model Even
     it('tracks SoftDeleted Operations for SoftDeleting models when a model is created as deleted', function () {
         $flag = Flag::factory()->create(['deleted_at' => now()]);
 
-        expect (History::query()->where('operation', Operation::Created)->first())->toBeNull();
+        expect(History::query()->where('operation', Operation::Created)->first())->toBeNull();
 
         $delated = History::query()
             ->where('operation', Operation::SoftDeleted)
@@ -397,7 +397,7 @@ describe('Versioned Content has its History tracked correctly without Model Even
         $flag = Flag::factory()->create();
         $flag->update(['deleted_at' => now()]);
 
-        expect (History::query()->where('operation', Operation::Updated)->first())->toBeNull();
+        expect(History::query()->where('operation', Operation::Updated)->first())->toBeNull();
 
         $delated = History::query()
             ->where('operation', Operation::SoftDeleted)
@@ -549,7 +549,7 @@ describe('Trackable models have a correct hidden property', function () {
         $image = Image::factory()->create();
 
         expect($image->hidden)->toBeFalse();
-        
+
         $image->delete();
 
         expect($image->hidden)->toBeTrue();
@@ -559,7 +559,7 @@ describe('Trackable models have a correct hidden property', function () {
         $company = Company::factory()->create();
 
         expect($company->hidden)->toBeFalse();
-        
+
         $company->delete();
 
         expect($company->hidden)->toBeTrue();

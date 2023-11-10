@@ -21,7 +21,7 @@ class CompanyFactory extends Factory
     {
         return [
             'name' => $this->faker->company,
-            'secret' => $this->faker->password
+            'secret' => $this->faker->password,
         ];
     }
 }
