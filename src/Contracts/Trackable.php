@@ -11,7 +11,7 @@ use Plank\Snapshots\ValueObjects\Revision;
 /**
  * @property-read Collection<History> $history
  * @property-read Collection<Revision> $visibility
- * @property-read bool $isHidden
+ * @property-read bool $hidden
  */
 interface Trackable
 {
@@ -23,7 +23,7 @@ interface Trackable
     /**
      * Determine if the model exists but is soft deleted
      */
-    public function isHidden(): Attribute;
+    public function hidden(): Attribute;
 
     /**
      * Get the class name for polymorphic relations.

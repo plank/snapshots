@@ -3,14 +3,14 @@
 namespace Plank\Snapshots\Tests\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Plank\Snapshots\Tests\Models\Company;
+use Plank\Snapshots\Tests\Models\Item;
 
 /**
- * @extends Factory<Company>
+ * @extends Factory<Item>
  */
-class CompanyFactory extends Factory
+class ItemFactory extends Factory
 {
-    protected $model = Company::class;
+    protected $model = Item::class;
 
     /**
      * Define the model's default state.
@@ -20,8 +20,8 @@ class CompanyFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => $this->faker->company,
-            'secret' => $this->faker->password
+            'name' => $this->faker->words(3, true),
+            'complete' => $this->faker->boolean,
         ];
     }
 }

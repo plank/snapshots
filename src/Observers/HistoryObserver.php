@@ -17,16 +17,15 @@ class HistoryObserver
 {
     protected ?Version $active = null;
 
+    protected ?ManagesVersions $versions = null;
+
     protected ?CausesChanges $causer = null;
 
     public function __construct(
         ManagesVersions $versions,
         ResolvesCauser $causers
     ) {
-        if (is_a(static::class, Versioned::class, true)) {
-            $this->active = $versions->active();
-        }
-
+        $this->versions = $versions;
         $this->causer = $causers->active();
     }
 
@@ -47,7 +46,7 @@ class HistoryObserver
             'operation' => Operation::Created,
             'causer_id' => $this->causer?->getKey(),
             'causer_type' => $this->causer?->getMorphClass(),
-            'version_id' => $this->active?->getKey(),
+            'version_id' => $this->activeVersionId($model),
             'trackable_id' => $model->getKey(),
             'trackable_type' => $model->getMorphClass(),
             'from' => null,
@@ -79,7 +78,7 @@ class HistoryObserver
             'operation' => Operation::Updated,
             'causer_id' => $this->causer?->getKey(),
             'causer_type' => $this->causer?->getMorphClass(),
-            'version_id' => $this->active?->getKey(),
+            'version_id' => $this->activeVersionId($model),
             'trackable_id' => $model->getKey(),
             'trackable_type' => $model->getMorphClass(),
             'from' => $this->getLoggableOriginal($model),
@@ -102,7 +101,7 @@ class HistoryObserver
             'operation' => $softDeletes ? Operation::SoftDeleted : Operation::Deleted,
             'causer_id' => $this->causer?->getKey(),
             'causer_type' => $this->causer?->getMorphClass(),
-            'version_id' => $this->active?->getKey(),
+            'version_id' => $this->activeVersionId($model),
             'trackable_id' => $model->getKey(),
             'trackable_type' => $model->getMorphClass(),
             'from' => $this->getLoggableOriginal($model),
@@ -119,7 +118,7 @@ class HistoryObserver
             'operation' => Operation::Restored,
             'causer_id' => $this->causer?->getKey(),
             'causer_type' => $this->causer?->getMorphClass(),
-            'version_id' => $this->active?->getKey(),
+            'version_id' => $this->activeVersionId($model),
             'trackable_id' => $model->getKey(),
             'trackable_type' => $model->getMorphClass(),
             'from' => $this->getLoggableOriginal($model),
@@ -136,12 +135,21 @@ class HistoryObserver
             'operation' => Operation::Deleted,
             'causer_id' => $this->causer?->getKey(),
             'causer_type' => $this->causer?->getMorphClass(),
-            'version_id' => $this->active?->getKey(),
+            'version_id' => $this->activeVersionId($model),
             'trackable_id' => $model->getKey(),
             'trackable_type' => $model->getMorphClass(),
             'from' => $this->getLoggableOriginal($model),
             'to' => null,
         ]);
+    }
+
+    protected function activeVersionId(Model&Trackable $model): int|string|null
+    {
+        if ($model instanceof Versioned) {
+            return $this->versions->active()?->getKey();
+        }
+
+        return null;
     }
 
     protected function getLoggableAttributes(Model&Trackable $model): array

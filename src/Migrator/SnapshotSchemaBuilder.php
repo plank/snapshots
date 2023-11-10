@@ -7,8 +7,8 @@ use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Builder;
-use Illuminate\Support\Facades\Event;
 use InvalidArgumentException;
+use Plank\Snapshots\Contracts\ManagesCreatedTables;
 use Plank\Snapshots\Contracts\ManagesVersions;
 use Plank\Snapshots\Contracts\Version;
 use Plank\Snapshots\Contracts\Versioned;
@@ -21,7 +21,8 @@ class SnapshotSchemaBuilder extends Builder
 {
     public function __construct(
         Connection $connection,
-        protected ManagesVersions $versions
+        protected ManagesVersions $versions,
+        protected ManagesCreatedTables $tables
     ) {
         parent::__construct($connection);
 
@@ -41,9 +42,7 @@ class SnapshotSchemaBuilder extends Builder
 
         parent::create($table, $callback);
 
-        $this->withoutForeignKeyConstraints(function () use ($active, $original) {
-            Event::dispatch(new TableCreated($original, $active));
-        });
+        $this->tables->queue(new TableCreated($original, $active));
     }
 
     /**
@@ -63,9 +62,7 @@ class SnapshotSchemaBuilder extends Builder
 
         parent::create($table, $callback);
 
-        $this->withoutForeignKeyConstraints(function () use ($original, $active, $model) {
-            Event::dispatch(new TableCreated($original, $active, $model));
-        });
+        $this->tables->queue(new TableCreated($original, $active, $model));
     }
 
     /**

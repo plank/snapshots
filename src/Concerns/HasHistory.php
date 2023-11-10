@@ -12,7 +12,7 @@ use Plank\Snapshots\Models\History;
  * @mixin \Illuminate\Database\Eloquent\Model
  *
  * @property-read Collection<History> $history
- * @property-read bool $isHidden
+ * @property-read bool $hidden
  */
 trait HasHistory
 {
@@ -28,16 +28,16 @@ trait HasHistory
         return $this->morphMany(config('snapshots.models.history'), 'trackable');
     }
 
-    public function isHidden(): Attribute
+    public function hidden(): Attribute
     {
         return Attribute::make(
             get: function () {
                 if (! in_array(SoftDeletes::class, class_uses_recursive($this))) {
-                    return false;
+                    return ! $this->exists;
                 }
 
                 return $this->trashed();
             }
-        )->shouldCache();
+        );
     }
 }

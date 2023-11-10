@@ -54,6 +54,7 @@ return [
     'repositories' => [
         'version' => \Plank\Snapshots\Repository\VersionRepository::class,
         'causer' => \Plank\Snapshots\Repository\CauserRepository::class,
+        'table' => \Plank\Snapshots\Repository\TableRepository::class,
     ],
 
     /*
@@ -68,14 +69,21 @@ return [
 
     /*
     |---------------------------------------------------------------------------
-    | Copy Tables on Creation
+    | Table Data Copying
     |--------------------------------------------------------------------------
     |
-    | This option determines whether or not to copy the tables from the previous version
-    | when a new version is created. If set to false, you will need to handle the copying
-    | in your app code.
+    | handler
+    | When provided, the class will be used to automatically copy data from the the working
+    | version to the newly created versions.
+    |
+    | model_events
+    | When enabled, the copier will use the underlying models for each table to copy the data,
+    | which will trigger any model events that are configured.
     */
-    'auto_copier' => \Plank\Snapshots\Listeners\CopyTable::class,
+    'copier' => [
+        'handler' => \Plank\Snapshots\Listeners\Copier::class,
+        'model_events' => false,
+    ],
 
     /*
     |---------------------------------------------------------------------------

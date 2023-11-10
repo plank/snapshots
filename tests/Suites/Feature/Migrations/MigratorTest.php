@@ -2,23 +2,24 @@
 
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schema;
+use Plank\Snapshots\Tests\Models\Item;
 
 use function Pest\Laravel\artisan;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\assertDatabaseMissing;
 use function Pest\Laravel\withoutMockingConsoleOutput;
 
-describe('SnapshotMigrations use versions to run `down`', function () {
+describe('SnapshotMigrations use versions to run up and down', function () {
     beforeEach(function () {
         artisan('migrate', [
             '--path' => migrationPath('schema/create'),
             '--realpath' => true,
         ])->run();
 
-        versions()->setActive(createFirstVersion('schema/create'));
-        versions()->setActive(createMinorVersion('schema/create'));
-        versions()->setActive(createPatchVersion('schema/create'));
-        versions()->setActive(createMajorVersion('schema/create'));
+        createFirstVersion('schema/create');
+        createMinorVersion('schema/create');
+        createPatchVersion('schema/create');
+        createMajorVersion('schema/create');
     });
 
     it('runs snapshot migrations when new versions are created', function () {
@@ -41,6 +42,21 @@ describe('SnapshotMigrations use versions to run `down`', function () {
             'migration' => 'v2_0_0_create_documents_table',
             'batch' => 7,
         ]);
+    });
+
+    it('tables can be altered after they have been created', function () {
+        artisan('migrate', [
+            '--path' => migrationPath('schema/alter'),
+            '--realpath' => true,
+        ])->run();
+
+        $items = Item::factory()->count(3)->create();
+
+        versions()->setActive(createPatchVersion('schema/alter'));
+
+        foreach ($items as $item) {
+            expect(Item::query()->whereKey($item->id)->exists())->toBeTrue();
+        }
     });
 
     it('rolls back all versions of a snapshot migration when it is included in a rollback', function () {

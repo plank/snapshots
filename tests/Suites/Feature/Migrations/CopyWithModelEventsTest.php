@@ -1,16 +1,12 @@
 <?php
 
-use Illuminate\Support\Facades\Event;
-use Plank\Snapshots\Events\TableCreated;
-use Plank\Snapshots\Listeners\CopyModels;
 use Plank\Snapshots\Tests\Models\Document;
 
 use function Pest\Laravel\artisan;
 
-describe('The CopyModels listener correctly copies data', function () {
+describe('The Copier correctly copies data with Model Events', function () {
     beforeEach(function () {
-        Event::forget(TableCreated::class);
-        Event::listen(TableCreated::class, CopyModels::class);
+        config()->set('snapshots.copier.model_events', true);
 
         artisan('migrate', [
             '--path' => migrationPath('schema/create_for_model'),

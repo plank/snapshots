@@ -2,14 +2,15 @@
 
 namespace Plank\Snapshots;
 
+use Illuminate\Database\Events\MigrationsEnded;
 use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Event;
+use Plank\Snapshots\Contracts\ManagesCreatedTables;
 use Plank\Snapshots\Contracts\ManagesVersions;
 use Plank\Snapshots\Contracts\ResolvesCauser;
 use Plank\Snapshots\Contracts\Version;
 use Plank\Snapshots\Events\TableCopied;
-use Plank\Snapshots\Events\TableCreated;
 use Plank\Snapshots\Events\VersionCreated;
 use Plank\Snapshots\Exceptions\VersionException;
 use Plank\Snapshots\Migrator\SnapshotMigrator;
@@ -101,6 +102,14 @@ class SnapshotServiceProvider extends PackageServiceProvider
             });
         }
 
+        if (! $this->app->bound(ManagesCreatedTables::class)) {
+            $this->app->scoped(ManagesCreatedTables::class, function (Application $app) {
+                $repo = $app['config']->get('snapshots.repositories.table');
+
+                return new $repo;
+            });
+        }
+
         return $this;
     }
 
@@ -113,7 +122,8 @@ class SnapshotServiceProvider extends PackageServiceProvider
 
                 return new SnapshotSchemaBuilder(
                     $connection,
-                    $app[ManagesVersions::class]
+                    $app[ManagesVersions::class],
+                    $app[ManagesCreatedTables::class]
                 );
             });
         }
@@ -130,6 +140,7 @@ class SnapshotServiceProvider extends PackageServiceProvider
                 $app['files'],
                 $app['events'],
                 $app[ManagesVersions::class],
+                $app[ManagesCreatedTables::class],
                 $app[Version::class]
             );
         });
@@ -143,8 +154,8 @@ class SnapshotServiceProvider extends PackageServiceProvider
             Event::listen(VersionCreated::class, $migrator);
         }
 
-        if ($copier = config('snapshots.auto_copier')) {
-            Event::listen(TableCreated::class, $copier);
+        if ($copier = config('snapshots.copier.handler')) {
+            Event::listen(MigrationsEnded::class, $copier);
         }
 
         if ($labler = config('snapshots.history.labler')) {
