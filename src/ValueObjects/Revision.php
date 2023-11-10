@@ -21,7 +21,7 @@ class Revision
         return new self(
             version: $history->version,
             content: $history->trackable,
-            hidden: $history->trackable->isHidden
+            hidden: $history->trackable->hidden
         );
     }
 

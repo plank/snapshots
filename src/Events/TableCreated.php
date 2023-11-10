@@ -10,9 +10,6 @@ class TableCreated
 {
     use SerializesModels;
 
-    /**
-     * @param  class-string<Model>|null  $model
-     */
     public function __construct(
         public string $table,
         public (Version&Model)|null $version,

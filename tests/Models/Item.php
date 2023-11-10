@@ -4,22 +4,16 @@ namespace Plank\Snapshots\Tests\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Plank\Snapshots\Concerns\HasHistory;
-use Plank\Snapshots\Contracts\Trackable;
-use Plank\Snapshots\Tests\Database\Factories\CompanyFactory;
+use Plank\Snapshots\Concerns\AsVersionedContent;
+use Plank\Snapshots\Contracts\Versioned;
+use Plank\Snapshots\Tests\Database\Factories\ItemFactory;
 
-class Company extends Model implements Trackable
+class Item extends Model implements Versioned
 {
+    use AsVersionedContent;
     use HasFactory;
-    use HasHistory;
-    use SoftDeletes;
 
     protected $guarded = [];
-
-    protected $hidden = [
-        'secret',
-    ];
 
     /**
      * Create a new factory instance for the model.
@@ -28,6 +22,6 @@ class Company extends Model implements Trackable
      */
     protected static function newFactory()
     {
-        return CompanyFactory::new();
+        return ItemFactory::new();
     }
 }

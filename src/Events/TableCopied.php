@@ -17,12 +17,12 @@ class TableCopied
     ) {
     }
 
-    public static function fromCreated(TableCreated $event): self
+    public static function fromCreated(TableCreated $created): self
     {
         return new static(
-            table: $event->table,
-            version: $event->version,
-            model: $event->model,
+            table: $created->table,
+            version: $created->version,
+            model: $created->model,
         );
     }
 }

@@ -15,6 +15,7 @@ use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Plank\Snapshots\Contracts\ManagesCreatedTables;
 use Plank\Snapshots\Contracts\ManagesVersions;
 use Plank\Snapshots\Contracts\Version;
 use ReflectionClass;
@@ -22,6 +23,8 @@ use ReflectionClass;
 class SnapshotMigrator extends Migrator
 {
     public ManagesVersions $versions;
+
+    public ManagesCreatedTables $tables;
 
     public Version $version;
 
@@ -31,11 +34,13 @@ class SnapshotMigrator extends Migrator
         Filesystem $files,
         Dispatcher $dispatcher = null,
         ManagesVersions $versions,
+        ManagesCreatedTables $tables,
         Version $version
     ) {
         parent::__construct($repository, $resolver, $files, $dispatcher);
 
         $this->versions = $versions;
+        $this->tables = $tables;
         $this->version = $version;
     }
 
@@ -260,12 +265,27 @@ class SnapshotMigrator extends Migrator
             $this->write(BulletList::class, collect($this->getQueries($migration, $method))->map(function ($query) {
                 return $query['query'];
             }));
+
+            $this->tables->flush();
         } catch (SchemaException) {
             $this->write(Error::class, sprintf(
                 '[%s] failed to dump queries. This may be due to changing database columns using Doctrine, which is not supported while pretending to run migrations.',
                 $name,
             ));
         }
+    }
+
+    /**
+     * Pretend to run the migrations.
+     *
+     * @param  object  $migration
+     * @param  string  $method
+     * @return void
+     */
+    protected function pretendToRun($migration, $method)
+    {
+        parent::pretendToRun($migration, $method);
+        $this->tables->flush();
     }
 
     protected function versionedFile(?string $file, Version $version = null): ?string
