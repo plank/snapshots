@@ -358,10 +358,10 @@ If you discover a security vulnerability within siren, please send an e-mail to 
 
 ## Check Us Out!
 
-<a href="https://plank.co/open-source/link">
+<a href="https://plank.co/open-source/learn-more-image">
     <img src="https://plank.co/open-source/banner">
 </a>
 
 &nbsp;
 
-Plank focuses on impactful solutions that deliver engaging experiences to our clients and their users. We're committed to innovation, inclusivity, and sustainability in the digital space. [Learn more](https://plank.co/open-source/link) about our mission to improve the web.
+Plank focuses on impactful solutions that deliver engaging experiences to our clients and their users. We're committed to innovation, inclusivity, and sustainability in the digital space. [Learn more](https://plank.co/open-source/learn-more-link) about our mission to improve the web.
