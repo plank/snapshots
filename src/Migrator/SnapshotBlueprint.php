@@ -72,7 +72,9 @@ class SnapshotBlueprint extends Blueprint
      */
     protected function dropIndexCommand($command, $type, $index)
     {
-        $index = Versions::active()?->addMigrationPrefix($index);
+        if ($version = Versions::active()) {
+            $index = $version->addMigrationPrefix($index);
+        }
         return parent::dropIndexCommand($command, $type, $index);
     }
 }
