@@ -13,6 +13,9 @@ return new class extends SnapshotMigration
             $table->string('text');
             $table->timestamp('released_at')->nullable();
             $table->timestamps();
+
+            $table->index('title', 'idx_title');
+            $table->index('released_at');
         });
     }
 

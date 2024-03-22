@@ -8,13 +8,13 @@ use Plank\Snapshots\Contracts\ManagesVersions;
 use Plank\Snapshots\Contracts\Version;
 
 /**
- * @method void setActive(?Version $version)
- * @method void clearActive()
- * @method Version|null active()
- * @method Version|null latest()
- * @method Version|null find($key)
- * @method Version|null byNumber(string $number)
- * @method Collection all()
+ * @method static void setActive(?Version $version)
+ * @method static void clearActive()
+ * @method static Version|null active()
+ * @method static Version|null latest()
+ * @method static Version|null find($key)
+ * @method static Version|null byNumber(string $number)
+ * @method static Collection all()
  */
 class Versions extends Facade
 {
