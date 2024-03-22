@@ -3,6 +3,7 @@
 namespace Plank\Snapshots\Migrator;
 
 use Illuminate\Database\Schema\Blueprint;
+use Plank\Snapshots\Facades\Versions;
 
 class SnapshotBlueprint extends Blueprint
 {
@@ -62,5 +63,16 @@ class SnapshotBlueprint extends Blueprint
             'name' => $column,
             'length' => $length,
         ]));
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @return \Illuminate\Support\Fluent
+     */
+    protected function dropIndexCommand($command, $type, $index)
+    {
+        $index = Versions::active()?->addMigrationPrefix($index);
+        return parent::dropIndexCommand($command, $type, $index);
     }
 }
