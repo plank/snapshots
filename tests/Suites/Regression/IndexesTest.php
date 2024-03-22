@@ -47,7 +47,6 @@ describe('SnapshotBlueprint uses versions for named indexes', function () {
     });
 });
 
-
 describe('SnapshotBlueprint uses versions for computed indexes', function () {
     beforeEach(function () {
         artisan('migrate', [

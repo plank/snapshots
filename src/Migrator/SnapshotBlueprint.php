@@ -81,7 +81,7 @@ class SnapshotBlueprint extends Blueprint
             $index = $version->stripMigrationPrefix($index);
             $index = $version->addMigrationPrefix($index);
         }
-        
+
         return $this->addCommand(
             $type, compact('index', 'columns', 'algorithm')
         );
