@@ -75,6 +75,7 @@ class SnapshotBlueprint extends Blueprint
         if ($version = Versions::active()) {
             $index = $version->addMigrationPrefix($index);
         }
+
         return parent::dropIndexCommand($command, $type, $index);
     }
 }
