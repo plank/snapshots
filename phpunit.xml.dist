@@ -22,6 +22,9 @@
         <testsuite name="Unit Tests">
             <directory>tests/Suites/Unit</directory>
         </testsuite>
+        <testsuite name="Regression">
+            <directory>tests/Suites/Regression</directory>
+        </testsuite>
     </testsuites>
     <coverage>
         <report>
