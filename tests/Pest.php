@@ -36,7 +36,7 @@ function migrationPath(string $path = ''): string
 /**
  * Create the first Version
  */
-function createFirstVersion(string $migrationPath = null): Version
+function createFirstVersion(?string $migrationPath = null): Version
 {
     if ($migrationPath) {
         setMigrationPath($migrationPath);
@@ -52,7 +52,7 @@ function createFirstVersion(string $migrationPath = null): Version
 /**
  * Create the next Patch Version
  */
-function createPatchVersion(string $migrationPath = null): Version
+function createPatchVersion(?string $migrationPath = null): Version
 {
     if ($migrationPath) {
         setMigrationPath($migrationPath);
@@ -74,7 +74,7 @@ function createPatchVersion(string $migrationPath = null): Version
 /**
  * Create the next Minor Version
  */
-function createMinorVersion(string $migrationPath = null): Version
+function createMinorVersion(?string $migrationPath = null): Version
 {
     if ($migrationPath) {
         setMigrationPath($migrationPath);
@@ -96,7 +96,7 @@ function createMinorVersion(string $migrationPath = null): Version
 /**
  * Create the next Major Version
  */
-function createMajorVersion(string $migrationPath = null): Version
+function createMajorVersion(?string $migrationPath = null): Version
 {
     if ($migrationPath) {
         setMigrationPath($migrationPath);

@@ -2,9 +2,20 @@
 
 namespace Plank\Snapshots\Facades;
 
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Facade;
 use Plank\Snapshots\Contracts\ManagesVersions;
+use Plank\Snapshots\Contracts\Version;
 
+/**
+ * @method static void setActive(?Version $version)
+ * @method static void clearActive()
+ * @method static Version|null active()
+ * @method static Version|null latest()
+ * @method static Version|null find($key)
+ * @method static Version|null byNumber(string $number)
+ * @method static Collection all()
+ */
 class Versions extends Facade
 {
     /**

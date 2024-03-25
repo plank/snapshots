@@ -32,7 +32,7 @@ class SnapshotMigrator extends Migrator
         MigrationRepositoryInterface $repository,
         ConnectionResolverInterface $resolver,
         Filesystem $files,
-        Dispatcher $dispatcher = null,
+        ?Dispatcher $dispatcher,
         ManagesVersions $versions,
         ManagesCreatedTables $tables,
         Version $version
@@ -288,7 +288,7 @@ class SnapshotMigrator extends Migrator
         $this->tables->flush();
     }
 
-    protected function versionedFile(?string $file, Version $version = null): ?string
+    protected function versionedFile(?string $file, ?Version $version = null): ?string
     {
         if ($file === null) {
             return null;
