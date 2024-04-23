@@ -274,8 +274,8 @@ describe('SnapshotMigrations use versions to run `up`', function () {
     it('changes columns on versioned tables', function () {
         versions()->setActive(createFirstVersion('schema/create'));
 
-        expect(SnapshotSchema::getColumnType('documents', 'title'))->toBe('string');
-        expect(SnapshotSchema::getColumnType('documents', 'text'))->toBe('string');
+        expect(SnapshotSchema::getColumnType('documents', 'title'))->toBe(varcharColumn());
+        expect(SnapshotSchema::getColumnType('documents', 'text'))->toBe(varcharColumn());
 
         artisan('migrate', [
             '--path' => migrationPath('schema/table'),
@@ -287,7 +287,7 @@ describe('SnapshotMigrations use versions to run `up`', function () {
             'batch' => 5,
         ]);
 
-        expect(SnapshotSchema::getColumnType('documents', 'title'))->toBe('string');
+        expect(SnapshotSchema::getColumnType('documents', 'title'))->toBe(varcharColumn());
         expect(SnapshotSchema::getColumnType('documents', 'text'))->toBe('text');
     });
 
