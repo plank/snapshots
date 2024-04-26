@@ -114,3 +114,12 @@ function createMajorVersion(?string $migrationPath = null): Version
 
     return $created;
 }
+
+function varcharColumn(): string
+{
+    if (version_compare(app()->version(), '11.0.0', '>=')) {
+        return 'varchar';
+    }
+
+    return 'string';
+}
