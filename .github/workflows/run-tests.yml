@@ -8,10 +8,10 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        os: [windows-latest]
-        php: [8.3]
-        laravel: [11.*]
-        stability: [prefer-stable]
+        os: [ubuntu-latest, windows-latest]
+        php: [8.2, 8.3]
+        laravel: [10.*, 11.*]
+        stability: [prefer-lowest, prefer-stable]
 
     name: P${{ matrix.php }} - ${{ matrix.stability }} - ${{ matrix.os }} - Laravel ${{ matrix.laravel }}
 
@@ -44,3 +44,50 @@ jobs:
 
       - name: Execute tests
         run: vendor/bin/pest
+
+  coverage:
+    needs: [ test ]
+    name: coverage
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        php: [8.3]
+        laravel: [11.*]
+        stability: [prefer-stable]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.composer/cache/files
+          key: dependencies-laravel-${{ matrix.laravel }}-php-${{ matrix.php }}-composer-${{ hashFiles('composer.json') }}
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick, fileinfo
+          coverage: xdebug
+
+      - name: Setup problem matchers
+        run: |
+          echo "::add-matcher::${{ runner.tool_cache }}/php.json"
+          echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
+
+      - name: Install dependencies
+        run: |
+          composer require "laravel/framework:${{ matrix.laravel }}" --no-interaction --no-update
+          composer update --${{ matrix.stability }} --prefer-dist --no-interaction
+
+      - name: Test & publish code coverage
+        uses: paambaati/codeclimate-action@v5.0.0
+        env:
+          CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
+        with:
+          coverageCommand: composer test-coverage
+          coverageLocations: |
+            ${{github.workspace}}/build/logs/clover.xml:clover
