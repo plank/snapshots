@@ -1,8 +1,7 @@
 <?php
 
-use Plank\Snapshots\Tests\Models\Document;
-
 use function Pest\Laravel\artisan;
+use Plank\Snapshots\Tests\Models\Document;
 
 describe('The Copier correctly copies data with Model Events', function () {
     beforeEach(function () {

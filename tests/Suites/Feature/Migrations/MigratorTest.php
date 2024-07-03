@@ -2,12 +2,11 @@
 
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schema;
-use Plank\Snapshots\Tests\Models\Item;
-
 use function Pest\Laravel\artisan;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\assertDatabaseMissing;
 use function Pest\Laravel\withoutMockingConsoleOutput;
+use Plank\Snapshots\Tests\Models\Item;
 
 describe('SnapshotMigrations use versions to run up and down', function () {
     beforeEach(function () {

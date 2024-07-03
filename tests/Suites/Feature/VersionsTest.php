@@ -7,7 +7,6 @@ use Plank\Snapshots\Models\Version;
 use Plank\Snapshots\ValueObjects\VersionNumber;
 
 describe('Versions are migrated correctly', function () {
-
     it('throws an exception when you have the version configured incorrectly', function () {
         expect(app()->make(VersionContract::class))->toBeInstanceOf(Version::class);
 

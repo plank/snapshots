@@ -1,12 +1,11 @@
 <?php
 
+use function Pest\Laravel\travel;
 use Plank\Snapshots\Contracts\ManagesVersions;
 use Plank\Snapshots\Models\Version;
 use Plank\Snapshots\Repository\VersionRepository;
 use Plank\Snapshots\Tests\TestCase;
 use Plank\Snapshots\ValueObjects\VersionNumber;
-
-use function Pest\Laravel\travel;
 
 uses(TestCase::class)->in(__DIR__);
 

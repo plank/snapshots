@@ -3,13 +3,12 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use Plank\Snapshots\Exceptions\MigrationFailedException;
-use Plank\Snapshots\Facades\SnapshotSchema;
-use Plank\Snapshots\Tests\Models\Document;
-
 use function Pest\Laravel\artisan;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\partialMock;
+use Plank\Snapshots\Exceptions\MigrationFailedException;
+use Plank\Snapshots\Facades\SnapshotSchema;
+use Plank\Snapshots\Tests\Models\Document;
 
 describe('SnapshotMigrations use versions to run `up`', function () {
     beforeEach(function () {

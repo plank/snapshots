@@ -1,12 +1,11 @@
 <?php
 
+use function Pest\Laravel\artisan;
+use function Pest\Laravel\seed;
 use Plank\Snapshots\Tests\Database\Seeders\Relation\MorphPivotSeeder;
 use Plank\Snapshots\Tests\Models\Contractor;
 use Plank\Snapshots\Tests\Models\Plan;
 use Plank\Snapshots\Tests\Models\Project;
-
-use function Pest\Laravel\artisan;
-use function Pest\Laravel\seed;
 
 describe('Custom versioned MorphPivot classes use versioned tables correctly', function () {
     beforeEach(function () {

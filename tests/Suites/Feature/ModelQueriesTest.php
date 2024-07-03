@@ -1,10 +1,9 @@
 <?php
 
-use Plank\Snapshots\Tests\Database\Seeders\Model\PostSeeder;
-use Plank\Snapshots\Tests\Models\Post;
-
 use function Pest\Laravel\artisan;
 use function Pest\Laravel\seed;
+use Plank\Snapshots\Tests\Database\Seeders\Model\PostSeeder;
+use Plank\Snapshots\Tests\Models\Post;
 
 describe('Versioned models use the version prefixed table when interacting with the database', function () {
     beforeEach(function () {
