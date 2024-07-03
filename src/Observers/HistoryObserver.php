@@ -40,7 +40,7 @@ class HistoryObserver
         }
 
         /** @var class-string<History>|null $history */
-        $history = config('snapshots.models.history');
+        $history = config()->get('snapshots.models.history');
 
         $history::create([
             'operation' => Operation::Created,
@@ -72,7 +72,7 @@ class HistoryObserver
         }
 
         /** @var class-string<History>|null $history */
-        $history = config('snapshots.models.history');
+        $history = config()->get('snapshots.models.history');
 
         $history::create([
             'operation' => Operation::Updated,
@@ -95,7 +95,7 @@ class HistoryObserver
         }
 
         /** @var class-string<History>|null $history */
-        $history = config('snapshots.models.history');
+        $history = config()->get('snapshots.models.history');
 
         $history::create([
             'operation' => $softDeletes ? Operation::SoftDeleted : Operation::Deleted,
@@ -112,7 +112,7 @@ class HistoryObserver
     public function restored(Model&Trackable $model)
     {
         /** @var class-string<History>|null $history */
-        $history = config('snapshots.models.history');
+        $history = config()->get('snapshots.models.history');
 
         $history::create([
             'operation' => Operation::Restored,
@@ -129,7 +129,7 @@ class HistoryObserver
     public function forceDeleted(Model&Trackable $model)
     {
         /** @var class-string<History>|null $history */
-        $history = config('snapshots.models.history');
+        $history = config()->get('snapshots.models.history');
 
         $history::create([
             'operation' => Operation::Deleted,

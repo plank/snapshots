@@ -33,7 +33,7 @@ class Copier
                 continue;
             }
 
-            if (config('snapshots.copier.model_events') && $created->model) {
+            if (config()->get('snapshots.copier.model_events') && $created->model) {
                 $this->copyModel($created);
             } else {
                 $this->copyTable($created);
@@ -92,11 +92,11 @@ class Copier
         Schema::disableForeignKeyConstraints();
 
         $model::withoutTimestamps(function () use ($model, $callback) {
-            $historyEnabled = config('snapshots.history');
+            $historyEnabled = config()->get('snapshots.history');
             $hushed = in_array(HushesHandlers::class, class_uses_recursive($model));
 
             if ($historyEnabled && $hushed) {
-                $model::withoutObserver(config('snapshots.history.observer'), $callback);
+                $model::withoutObserver(config()->get('snapshots.history.observer'), $callback);
             } else {
                 $callback();
             }

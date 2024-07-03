@@ -52,6 +52,6 @@ class History extends MorphPivot
      */
     public function version(): BelongsTo
     {
-        return $this->belongsTo(config('snapshots.models.version'));
+        return $this->belongsTo(config()->get('snapshots.models.version'));
     }
 }

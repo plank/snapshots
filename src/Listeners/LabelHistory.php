@@ -26,7 +26,7 @@ class LabelHistory
         }
 
         /** @var class-string<History>|null */
-        $history = config('snapshots.models.history');
+        $history = config()->get('snapshots.models.history');
 
         $history::query()
             ->where('trackable_type', $event->model)
@@ -69,7 +69,7 @@ class LabelHistory
         $causer = app(ResolvesCauser::class)->active();
 
         /** @var class-string<History>|null $history */
-        $history = config('snapshots.models.history');
+        $history = config()->get('snapshots.models.history');
 
         $history::create([
             'operation' => Operation::Snapshotted,

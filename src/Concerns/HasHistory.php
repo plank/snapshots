@@ -18,7 +18,7 @@ trait HasHistory
 {
     public static function bootHasHistory(): void
     {
-        if ($observer = config('snapshots.history.observer')) {
+        if ($observer = config()->get('snapshots.history.observer')) {
             static::observe($observer);
         }
     }

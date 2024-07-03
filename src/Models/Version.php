@@ -40,7 +40,7 @@ class Version extends Model implements VersionContract
      */
     protected static function newFactory()
     {
-        return config('snapshots.factories.version')::new();
+        return config()->get('snapshots.factories.version')::new();
     }
 
     public function uriKey(): string
