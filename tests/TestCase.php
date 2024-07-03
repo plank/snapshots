@@ -3,6 +3,7 @@
 namespace Plank\Snapshots\Tests;
 
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Auth;
 use Orchestra\Testbench\TestCase as Orchestra;
 use Plank\Snapshots\Repository\VersionRepository;
@@ -17,6 +18,10 @@ class TestCase extends Orchestra
     protected function setUp(): void
     {
         parent::setUp();
+
+        Factory::guessFactoryNamesUsing(function (string $modelName) {
+            return 'Plank\\Snapshots\\Tests\\Database\\Factories\\'.class_basename($modelName).'Factory';
+        });
 
         $this->artisan('migrate', [
             '--path' => realpath(__DIR__.'/..').'/database/migrations',
