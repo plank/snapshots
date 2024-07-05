@@ -16,6 +16,6 @@ class TagSeeder extends Seeder
             ->where('title', 'Post 1')
             ->first()
             ->tags()
-            ->attach($tags->take(3)->pluck('id')->toArray());
+            ->attach($tags->take(3));
     }
 }

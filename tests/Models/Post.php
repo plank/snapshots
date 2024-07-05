@@ -12,6 +12,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Plank\Snapshots\Concerns\AsVersionedContent;
+use Plank\Snapshots\Concerns\IdentifiesContent;
+use Plank\Snapshots\Contracts\Identifying;
 use Plank\Snapshots\Contracts\Trackable;
 use Plank\Snapshots\Contracts\Versioned;
 
@@ -28,15 +30,22 @@ use Plank\Snapshots\Contracts\Versioned;
  * @property-read Collection<Like> $likes
  * @property-read Collection<Seo> $seos
  */
-class Post extends Model implements Trackable, Versioned
+class Post extends Model implements Trackable, Identifying, Versioned
 {
     use AsVersionedContent;
     use HasFactory;
     use HasUuids;
+    use IdentifiesContent;
 
     protected $primaryKey = 'uuid';
 
     protected $guarded = [];
+
+    protected static array $identifyingRelationships = ['tags', 'related', 'videos'];
+
+    protected static array $identifiesRelationships = ['associated'];
+
+    protected static array $nonIdentifyingAttributes = ['updated_at'];
 
     public function user(): BelongsTo
     {
@@ -45,12 +54,17 @@ class Post extends Model implements Trackable, Versioned
 
     public function related(): BelongsToMany
     {
-        return $this->belongsToMany(Post::class, 'post_post', 'post_id', 'related_id', 'uuid', 'uuid');
+        return $this->identifyingBelongsToMany(Post::class, 'post_post', 'post_id', 'related_id', 'uuid', 'uuid');
+    }
+
+    public function associated(): BelongsToMany
+    {
+        return $this->identifyingBelongsToMany(Post::class, null, 'related_id', 'post_id', 'uuid', 'uuid');
     }
 
     public function tags(): MorphToMany
     {
-        return $this->morphToMany(Tag::class, 'taggable');
+        return $this->identifyingMorphToMany(Tag::class, 'taggable');
     }
 
     public function likes(): HasMany
@@ -61,5 +75,10 @@ class Post extends Model implements Trackable, Versioned
     public function seos(): HasMany
     {
         return $this->hasMany(Seo::class, 'post_id', 'uuid');
+    }
+
+    public function videos(): HasMany
+    {
+        return $this->hasMany(Video::class, 'post_id', 'uuid');
     }
 }

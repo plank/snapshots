@@ -16,6 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('post_id');
             $table->string('name');
             $table->timestamps();
+            $table->timestamp('deleted_at')->nullable();
 
             $table->foreign('post_id')->references('uuid')->on('posts');
         });

@@ -2,11 +2,13 @@
 
 namespace Plank\Snapshots\Repository;
 
+use Closure;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Plank\Snapshots\Contracts\ManagesVersions;
 use Plank\Snapshots\Contracts\Version;
 use Plank\Snapshots\Models\Version as VersionModel;
+use Plank\Snapshots\ValueObjects\VersionNumber;
 
 class VersionRepository implements ManagesVersions
 {
@@ -39,15 +41,33 @@ class VersionRepository implements ManagesVersions
     /**
      * {@inheritDoc}
      */
-    public function active(): (Version&Model)|null
+    public function active(): (Version&Model) | null
     {
         return $this->active;
     }
 
     /**
+     * @param callable(?Version $version = null) $callback
+     */
+    public function withVersionActive(string|VersionNumber|Version $version, Closure $callback): mixed
+    {
+        $active = $this->active();
+
+        $this->setActive($version);
+
+        try {
+            $result = $callback($version);
+        } finally {
+            $this->setActive($active);
+        }
+
+        return $result;
+    }
+
+    /**
      * {@inheritDoc}
      */
-    public function latest(): (Version&Model)|null
+    public function latest(): (Version&Model) | null
     {
         return $this->model()
             ->query()
@@ -58,7 +78,7 @@ class VersionRepository implements ManagesVersions
     /**
      * {@inheritDoc}
      */
-    public function find($key): (Version&Model)|null
+    public function find($key): (Version&Model) | null
     {
         return $this->model()
             ->query()
@@ -69,7 +89,7 @@ class VersionRepository implements ManagesVersions
     /**
      * {@inheritDoc}
      */
-    public function byNumber(string $number): (Version&Model)|null
+    public function byNumber(string $number): (Version&Model) | null
     {
         return $this->model()
             ->query()

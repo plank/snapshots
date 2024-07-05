@@ -33,16 +33,6 @@ class Version extends Model implements VersionContract
         static::observe(VersionObserver::class);
     }
 
-    /**
-     * Create a new factory instance for the model.
-     *
-     * @return \Illuminate\Database\Eloquent\Factories\Factory<static>
-     */
-    protected static function newFactory()
-    {
-        return config()->get('snapshots.factories.version')::new();
-    }
-
     public function uriKey(): string
     {
         return (string) $this->number;

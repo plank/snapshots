@@ -6,6 +6,7 @@ use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Plank\Snapshots\Contracts\ManagesVersions;
 use Plank\Snapshots\Contracts\Versioned;
+use Plank\Snapshots\Facades\Versions;
 
 /**
  * @mixin \Illuminate\Database\Eloquent\Model
@@ -13,11 +14,6 @@ use Plank\Snapshots\Contracts\Versioned;
 trait InteractsWithVersionedContent
 {
     protected ManagesVersions $versions;
-
-    public function initializeInteractsWithVersionedContent()
-    {
-        $this->versions = $this->getVersionRepository();
-    }
 
     protected function newBelongsToMany(
         Builder $query,
@@ -29,7 +25,7 @@ trait InteractsWithVersionedContent
         $relatedKey,
         $relationName = null
     ) {
-        if (($this instanceof Versioned || $query->getModel() instanceof Versioned) && $active = $this->versions->active()) {
+        if (($this instanceof Versioned || $query->getModel() instanceof Versioned) && $active = Versions::active()) {
             $table = $active->addTablePrefix($table);
         }
 
@@ -60,7 +56,7 @@ trait InteractsWithVersionedContent
         $relationName = null,
         $inverse = false
     ) {
-        if (($this instanceof Versioned || $query->getModel() instanceof Versioned) && $active = $this->versions->active()) {
+        if (($this instanceof Versioned || $query->getModel() instanceof Versioned) && $active = Versions::active()) {
             $table = $active->addTablePrefix($table);
         }
 
@@ -76,13 +72,5 @@ trait InteractsWithVersionedContent
             $relationName,
             $inverse
         );
-    }
-
-    /**
-     * Resolve the version repository instance.
-     */
-    public function getVersionRepository(): ManagesVersions
-    {
-        return app(ManagesVersions::class);
     }
 }

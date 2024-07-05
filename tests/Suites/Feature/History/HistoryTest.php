@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Event;
 use function Pest\Laravel\artisan;
 use Plank\Snapshots\Enums\Operation;
 use Plank\Snapshots\Events\TableCopied;
@@ -17,9 +16,6 @@ use Plank\Snapshots\Tests\Models\Image;
 
 beforeEach(function () {
     config()->set('snapshots.history.observer', HistoryObserver::class);
-    config()->set('snapshots.history.labler', LabelHistory::class);
-
-    Event::listen(TableCopied::class, LabelHistory::class);
 });
 
 describe('Versioned Content has its History tracked correctly without Model Events', function () {

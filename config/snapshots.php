@@ -20,20 +20,6 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Factories
-    |--------------------------------------------------------------------------
-    |
-    | These are the factories which will be used to generate new instances for
-    | tests and seeders.
-    |
-    */
-    'factories' => [
-        'version' => \Plank\Snapshots\Factories\VersionFactory::class,
-        'history' => \Plank\Snapshots\Factories\HistoryFactory::class,
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
     | Repositories
     |--------------------------------------------------------------------------
     |
@@ -104,6 +90,7 @@ return [
     */
     'history' => [
         'observer' => \Plank\Snapshots\Observers\HistoryObserver::class,
+        'identity' => \Plank\Snapshots\Observers\IdentityObserver::class,
         'labler' => \Plank\Snapshots\Listeners\LabelHistory::class,
     ],
 ];

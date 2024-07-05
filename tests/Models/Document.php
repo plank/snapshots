@@ -16,4 +16,15 @@ class Document extends Model implements Trackable, Versioned
     use HasHistory;
 
     protected $guarded = [];
+
+    /**
+     * The attributes that should be visible in serialization.
+     *
+     * @var array<string>
+     */
+    protected $visible = [
+        'title',
+        'text',
+        'released_at',
+    ];
 }

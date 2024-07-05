@@ -71,7 +71,6 @@ class Copier
                 $replicated->save();
             });
         });
-
     }
 
     protected function copyTable(TableCreated $created): void
@@ -92,10 +91,10 @@ class Copier
         Schema::disableForeignKeyConstraints();
 
         $model::withoutTimestamps(function () use ($model, $callback) {
-            $historyEnabled = config()->get('snapshots.history');
+            $observer = config()->get('snapshots.history.observer');
             $hushed = in_array(HushesHandlers::class, class_uses_recursive($model));
 
-            if ($historyEnabled && $hushed) {
+            if ($observer && $hushed) {
                 $model::withoutObserver(config()->get('snapshots.history.observer'), $callback);
             } else {
                 $callback();
