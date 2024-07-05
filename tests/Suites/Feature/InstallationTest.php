@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\File;
+
 use function Pest\Laravel\artisan;
 
 describe('The install command properly installs the package.', function () {

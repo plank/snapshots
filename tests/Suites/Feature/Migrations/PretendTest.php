@@ -1,13 +1,14 @@
 <?php
 
 use Doctrine\DBAL\Schema\SchemaException;
-use function Pest\Laravel\artisan;
-use function Pest\Laravel\assertDatabaseHas;
 use Plank\Snapshots\Contracts\ManagesCreatedTables;
 use Plank\Snapshots\Contracts\ManagesVersions;
 use Plank\Snapshots\Contracts\Version;
 use Plank\Snapshots\Migrator\SnapshotMigrator;
 use Plank\Snapshots\Models\Version as VersionModel;
+
+use function Pest\Laravel\artisan;
+use function Pest\Laravel\assertDatabaseHas;
 
 describe('SnapshotMigrations can be pretended', function () {
     beforeEach(function () {

@@ -12,8 +12,7 @@ class VersionObserver
 {
     public function __construct(
         protected ManagesVersions $versions
-    ) {
-    }
+    ) {}
 
     public function creating(Version $version)
     {

@@ -2,8 +2,9 @@
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
-use function Pest\Laravel\artisan;
 use Plank\Snapshots\Tests\Models\Document;
+
+use function Pest\Laravel\artisan;
 
 describe('SnapshotBlueprint uses versions for named indexes', function () {
     beforeEach(function () {

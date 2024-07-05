@@ -1,11 +1,12 @@
 <?php
 
-use function Pest\Laravel\artisan;
-use function Pest\Laravel\seed;
 use Plank\Snapshots\Tests\Database\Seeders\Relation\PivotSeeder;
 use Plank\Snapshots\Tests\Models\Category;
 use Plank\Snapshots\Tests\Models\Product;
 use Plank\Snapshots\Tests\Models\Project;
+
+use function Pest\Laravel\artisan;
+use function Pest\Laravel\seed;
 
 describe('Custom versioned Pivot classes use version tables correctly', function () {
     beforeEach(function () {

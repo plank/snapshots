@@ -45,7 +45,7 @@ trait IdentifiesContent
     public static function identifiesRelationships(): Collection
     {
         return Collection::wrap(static::$identifiesRelationships ?? [])
-                ->sort()
-                ->values();
+            ->sort()
+            ->values();
     }
 }

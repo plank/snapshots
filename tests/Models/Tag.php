@@ -12,8 +12,8 @@ use Plank\Snapshots\Contracts\Identifying;
 class Tag extends Model implements Identifying
 {
     use HasFactory;
-    use InteractsWithVersionedContent;
     use IdentifiesContent;
+    use InteractsWithVersionedContent;
 
     protected $guarded = [];
 

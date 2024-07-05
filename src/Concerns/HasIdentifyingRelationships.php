@@ -74,8 +74,6 @@ trait HasIdentifyingRelationships
     /**
      * Instantiate a new BelongsToMany relationship.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @param  \Illuminate\Database\Eloquent\Model  $parent
      * @param  string|class-string<\Illuminate\Database\Eloquent\Model>  $table
      * @param  string  $foreignPivotKey
      * @param  string  $relatedPivotKey
@@ -124,7 +122,7 @@ trait HasIdentifyingRelationships
      * @return \Illuminate\Database\Eloquent\Relations\MorphToMany
      */
     public function identifyingMorphedByMany($related, $name, $table = null, $foreignPivotKey = null,
-                                  $relatedPivotKey = null, $parentKey = null, $relatedKey = null, $relation = null)
+        $relatedPivotKey = null, $parentKey = null, $relatedKey = null, $relation = null)
     {
         $foreignPivotKey = $foreignPivotKey ?: $this->getForeignKey();
 
@@ -203,8 +201,6 @@ trait HasIdentifyingRelationships
     /**
      * Instantiate a new MorphToMany relationship.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @param  \Illuminate\Database\Eloquent\Model  $parent
      * @param  string  $name
      * @param  string  $table
      * @param  string  $foreignPivotKey

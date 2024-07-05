@@ -1,12 +1,13 @@
 <?php
 
 use Illuminate\Support\Facades\Event;
-use function Pest\Laravel\artisan;
 use Plank\Snapshots\Events\TableCopied;
 use Plank\Snapshots\Listeners\LabelHistory;
 use Plank\Snapshots\Observers\HistoryObserver;
 use Plank\Snapshots\Tests\Models\Flag;
 use Plank\Snapshots\ValueObjects\Revision;
+
+use function Pest\Laravel\artisan;
 
 beforeEach(function () {
     config()->set('snapshots.history.observer', HistoryObserver::class);

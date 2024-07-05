@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Auth;
-use function Pest\Laravel\artisan;
 use Plank\Snapshots\Enums\Operation;
 use Plank\Snapshots\Events\TableCopied;
 use Plank\Snapshots\Exceptions\CauserException;
@@ -13,6 +12,8 @@ use Plank\Snapshots\Tests\Models\Company;
 use Plank\Snapshots\Tests\Models\Document;
 use Plank\Snapshots\Tests\Models\Flag;
 use Plank\Snapshots\Tests\Models\Image;
+
+use function Pest\Laravel\artisan;
 
 beforeEach(function () {
     config()->set('snapshots.history.observer', HistoryObserver::class);

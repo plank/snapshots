@@ -12,8 +12,7 @@ class TableCreated
 
     public function __construct(
         public string $table,
-        public (Version&Model) | null $version,
+        public (Version&Model)|null $version,
         public ?string $model = null,
-    ) {
-    }
+    ) {}
 }

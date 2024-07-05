@@ -30,7 +30,7 @@ use Plank\Snapshots\Contracts\Versioned;
  * @property-read Collection<Like> $likes
  * @property-read Collection<Seo> $seos
  */
-class Post extends Model implements Trackable, Identifying, Versioned
+class Post extends Model implements Identifying, Trackable, Versioned
 {
     use AsVersionedContent;
     use HasFactory;

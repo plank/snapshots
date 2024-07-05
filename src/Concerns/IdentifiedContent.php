@@ -90,14 +90,14 @@ trait IdentifiedContent
         }
 
         return Collection::wrap(static::$identifyingRelationships)
-                ->sort()
-                ->values();
+            ->sort()
+            ->values();
     }
 
     protected static function nonIdentifyingAttributes(): Collection
     {
         return Collection::wrap(static::$nonIdentifyingAttributes ?? [])
-                ->sort()
-                ->values();
+            ->sort()
+            ->values();
     }
 }

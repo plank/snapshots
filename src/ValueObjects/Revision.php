@@ -13,8 +13,7 @@ class Revision
         public Version $version,
         public Model $content,
         public bool $hidden,
-    ) {
-    }
+    ) {}
 
     public static function fromHistory(History $history): self
     {

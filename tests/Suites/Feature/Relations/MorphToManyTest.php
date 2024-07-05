@@ -1,11 +1,12 @@
 <?php
 
-use function Pest\Laravel\artisan;
-use function Pest\Laravel\seed;
 use Plank\Snapshots\Tests\Database\Seeders\Model\PostSeeder;
 use Plank\Snapshots\Tests\Database\Seeders\Model\TagSeeder;
 use Plank\Snapshots\Tests\Models\Post;
 use Plank\Snapshots\Tests\Models\Tag;
+
+use function Pest\Laravel\artisan;
+use function Pest\Laravel\seed;
 
 describe('MorphToMany relationships use versioned tables when one of the models is versioned', function () {
     beforeEach(function () {

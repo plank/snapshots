@@ -1,13 +1,14 @@
 <?php
 
-use function Pest\Laravel\artisan;
-use function Pest\Laravel\seed;
 use Plank\Snapshots\Enums\Operation;
 use Plank\Snapshots\Observers\HistoryObserver;
 use Plank\Snapshots\Tests\Database\Seeders\Model\PostSeeder;
 use Plank\Snapshots\Tests\Database\Seeders\Model\TagSeeder;
 use Plank\Snapshots\Tests\Database\Seeders\Model\VideoSeeder;
 use Plank\Snapshots\Tests\Models\Post;
+
+use function Pest\Laravel\artisan;
+use function Pest\Laravel\seed;
 
 beforeEach(function () {
     config()->set('snapshots.history.observer', HistoryObserver::class);

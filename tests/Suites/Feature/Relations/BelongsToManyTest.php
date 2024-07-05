@@ -1,9 +1,10 @@
 <?php
 
-use function Pest\Laravel\artisan;
-use function Pest\Laravel\seed;
 use Plank\Snapshots\Tests\Database\Seeders\Model\PostSeeder;
 use Plank\Snapshots\Tests\Models\Post;
+
+use function Pest\Laravel\artisan;
+use function Pest\Laravel\seed;
 
 describe('BelongsToMany relationships use versioned tables when one of the models is versioned', function () {
     beforeEach(function () {

@@ -1,8 +1,9 @@
 <?php
 
-use function Pest\Laravel\artisan;
 use Plank\Snapshots\Tests\Models\Post;
 use Plank\Snapshots\Tests\Models\User;
+
+use function Pest\Laravel\artisan;
 
 describe('HasMany relationships use versioned tables correctly', function () {
     beforeEach(function () {

@@ -10,8 +10,7 @@ class VersionNumber
         protected int $major,
         protected int $minor,
         protected int $patch
-    ) {
-    }
+    ) {}
 
     public static function fromVersionString(string $number): self
     {

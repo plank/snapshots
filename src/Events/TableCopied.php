@@ -12,10 +12,9 @@ class TableCopied
 
     public function __construct(
         public string $table,
-        public (Version&Model) | null $version,
+        public (Version&Model)|null $version,
         public ?string $model = null,
-    ) {
-    }
+    ) {}
 
     public static function fromCreated(TableCreated $created): self
     {

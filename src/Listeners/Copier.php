@@ -19,8 +19,7 @@ class Copier
     public function __construct(
         protected ManagesVersions $versions,
         protected ManagesCreatedTables $tables
-    ) {
-    }
+    ) {}
 
     public function handle()
     {
