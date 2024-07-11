@@ -4,6 +4,8 @@ namespace Plank\Snapshots\Concerns;
 
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Plank\Snapshots\Contracts\Identifiable;
+use Plank\Snapshots\Contracts\Identifying;
 use Plank\Snapshots\Contracts\ManagesVersions;
 use Plank\Snapshots\Contracts\Versioned;
 use Plank\Snapshots\Facades\Versions;
@@ -13,6 +15,8 @@ use Plank\Snapshots\Facades\Versions;
  */
 trait InteractsWithVersionedContent
 {
+    use HasIdentifyingRelationships;
+
     protected ManagesVersions $versions;
 
     protected function newBelongsToMany(
@@ -27,6 +31,19 @@ trait InteractsWithVersionedContent
     ) {
         if (($this instanceof Versioned || $query->getModel() instanceof Versioned) && $active = Versions::active()) {
             $table = $active->addTablePrefix($table);
+        }
+
+        if ($this instanceof Identifying || $this instanceof Identifiable) {
+            return $this->newIdentifyingBelongsToMany(
+                $query,
+                $parent,
+                $table,
+                $foreignPivotKey,
+                $relatedPivotKey,
+                $parentKey,
+                $relatedKey,
+                $relationName
+            );
         }
 
         return parent::newBelongsToMany(
@@ -58,6 +75,21 @@ trait InteractsWithVersionedContent
     ) {
         if (($this instanceof Versioned || $query->getModel() instanceof Versioned) && $active = Versions::active()) {
             $table = $active->addTablePrefix($table);
+        }
+
+        if ($this instanceof Identifying || $this instanceof Identifiable) {
+            return $this->newIdentifyingMorphToMany(
+                $query,
+                $parent,
+                $name,
+                $table,
+                $foreignPivotKey,
+                $relatedPivotKey,
+                $parentKey,
+                $relatedKey,
+                $relationName,
+                $inverse
+            );
         }
 
         return parent::newMorphToMany(

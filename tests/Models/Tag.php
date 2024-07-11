@@ -24,7 +24,7 @@ class Tag extends Model implements Identifying
      */
     public function posts(): MorphToMany
     {
-        return $this->identifyingMorphedByMany(Post::class, 'taggable');
+        return $this->morphedByMany(Post::class, 'taggable');
     }
 
     /**

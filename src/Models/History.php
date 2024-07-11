@@ -10,7 +10,7 @@ use Plank\Snapshots\Contracts\Trackable;
 use Plank\Snapshots\Enums\Operation;
 
 /**
- * @property string $operation
+ * @property Operation $operation
  * @property string $trackable_type
  * @property string|int $trackable_id
  * @property-read Model&Trackable $trackable

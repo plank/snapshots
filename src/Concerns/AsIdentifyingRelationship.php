@@ -3,9 +3,13 @@
 namespace Plank\Snapshots\Concerns;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Collection;
 use Plank\Snapshots\Contracts\Identifiable;
 
+/**
+ * @mixin BelongsToMany
+ */
 trait AsIdentifyingRelationship
 {
     public function attach($id, array $attributes = [], $touch = true)

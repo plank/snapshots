@@ -54,17 +54,17 @@ class Post extends Model implements Identifying, Trackable, Versioned
 
     public function related(): BelongsToMany
     {
-        return $this->identifyingBelongsToMany(Post::class, 'post_post', 'post_id', 'related_id', 'uuid', 'uuid');
+        return $this->belongsToMany(Post::class, 'post_post', 'post_id', 'related_id', 'uuid', 'uuid');
     }
 
     public function associated(): BelongsToMany
     {
-        return $this->identifyingBelongsToMany(Post::class, null, 'related_id', 'post_id', 'uuid', 'uuid');
+        return $this->belongsToMany(Post::class, null, 'related_id', 'post_id', 'uuid', 'uuid');
     }
 
     public function tags(): MorphToMany
     {
-        return $this->identifyingMorphToMany(Tag::class, 'taggable');
+        return $this->morphToMany(Tag::class, 'taggable');
     }
 
     public function likes(): HasMany
