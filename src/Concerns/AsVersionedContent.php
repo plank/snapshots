@@ -2,7 +2,6 @@
 
 namespace Plank\Snapshots\Concerns;
 
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Plank\LaravelHush\Concerns\HushesHandlers;
 use Plank\Snapshots\Contracts\Version as VersionContract;
