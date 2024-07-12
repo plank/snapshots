@@ -158,8 +158,8 @@ class SnapshotServiceProvider extends PackageServiceProvider
             Event::listen(MigrationsEnded::class, $copier);
         }
 
-        if ($labler = config()->get('snapshots.history.labler')) {
-            Event::listen(TableCopied::class, $labler);
+        if ($labeler = config()->get('snapshots.history.labeler')) {
+            Event::listen(TableCopied::class, $labeler);
         }
 
         return $this;

@@ -24,8 +24,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | Versions:
-    | This is the repository which will be used retrieve and maintain the version state
-    | for the Application.
+    | This repository will be used to retrieve and maintain the version state for the application.
     |
     | The interface is minimal to allow you to manage Versions in other ways if your application
     | requires it.
@@ -87,10 +86,16 @@ return [
     | As the package assumes "no active version" as the default approach to working on content,
     | when a new version is created we make sure all of the History events that occured on the
     | working version also get migrated to the newly created version.
+    |
+    | Identity:
+    | This is the Model Observer which will be used to track the Identity of the content. It also
+    | acts as a flag to fully enable or disable the identity management feature. Set to `null` to
+    | disable all hash tracking.
+    |
     */
     'history' => [
         'observer' => \Plank\Snapshots\Observers\HistoryObserver::class,
+        'labeler' => \Plank\Snapshots\Listeners\LabelHistory::class,
         'identity' => \Plank\Snapshots\Observers\IdentityObserver::class,
-        'labler' => \Plank\Snapshots\Listeners\LabelHistory::class,
     ],
 ];

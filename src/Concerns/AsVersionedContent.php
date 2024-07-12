@@ -7,12 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 use Plank\LaravelHush\Concerns\HushesHandlers;
 use Plank\Snapshots\Contracts\Version as VersionContract;
 use Plank\Snapshots\Facades\Versions;
-use Plank\Snapshots\ValueObjects\Revision;
 
 /**
  * @mixin Model
- *
- * @property-read Collection<Revision> $visibility
  */
 trait AsVersionedContent
 {
@@ -45,13 +42,5 @@ trait AsVersionedContent
         }
 
         return $table;
-    }
-
-    public function visibility(): Attribute
-    {
-        return Attribute::make(
-            get: function () {
-                return Revision::collection($this->visibleHistory());
-            })->shouldCache();
     }
 }

@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\MorphPivot;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Plank\Snapshots\Contracts\Trackable;
 use Plank\Snapshots\Enums\Operation;
+use Plank\Snapshots\Facades\Versions;
 
 /**
  * @property Operation $operation

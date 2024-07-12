@@ -1,17 +1,18 @@
 <?php
 
 use Illuminate\Support\Facades\Event;
+use Plank\Snapshots\Enums\Operation;
 use Plank\Snapshots\Events\TableCopied;
 use Plank\Snapshots\Listeners\LabelHistory;
+use Plank\Snapshots\Models\History;
 use Plank\Snapshots\Observers\HistoryObserver;
 use Plank\Snapshots\Tests\Models\Flag;
-use Plank\Snapshots\ValueObjects\Revision;
 
 use function Pest\Laravel\artisan;
 
 beforeEach(function () {
     config()->set('snapshots.history.observer', HistoryObserver::class);
-    config()->set('snapshots.history.labler', LabelHistory::class);
+    config()->set('snapshots.history.labeler', LabelHistory::class);
 
     Event::listen(TableCopied::class, LabelHistory::class);
 });
@@ -83,26 +84,24 @@ describe('The visiblity accurately reflects all versions where content is visibl
 
     it('shows the correct visibility for each version', function () {
         versions()->setActive(version('1.0.0'));
+        $history = Flag::query()->first()->visibleHistory();
 
-        /** @var Flag $flag */
-        $flag = Flag::query()->first();
-
-        $revision = function (string $number) use ($flag): ?Revision {
-            /** @var Revision $found */
-            $found = $flag->visibility->filter(function (Revision $revision) use ($number) {
-                return $revision->version->number->isEqualTo($number);
+        $revision = function (string $number) use ($history): ?History {
+            /** @var History $found */
+            $found = $history->filter(function (History $item) use ($number) {
+                return $item->version->number->isEqualTo($number);
             })->first();
 
             return $found;
         };
 
-        expect($revision('1.0.0')->hidden)->toBeFalse();
-        expect($revision('1.0.1')->hidden)->toBeFalse();
-        expect($revision('1.1.0')->hidden)->toBeFalse();
-        expect($revision('2.0.0')->hidden)->toBeTrue();
-        expect($revision('2.1.0')->hidden)->toBeTrue();
-        expect($revision('2.2.0')->hidden)->toBeFalse();
-        expect($revision('2.2.1')->hidden)->toBeFalse();
+        expect($revision('1.0.0')->operation)->toBe(Operation::Created);
+        expect($revision('1.0.1')->operation)->toBe(Operation::Updated);
+        expect($revision('1.1.0')->operation)->toBe(Operation::Snapshotted);
+        expect($revision('2.0.0')->operation)->toBe(Operation::SoftDeleted);
+        expect($revision('2.1.0')->operation)->toBe(Operation::Snapshotted);
+        expect($revision('2.2.0')->operation)->toBe(Operation::Restored);
+        expect($revision('2.2.1')->operation)->toBe(Operation::Updated);
         expect($revision('3.0.0'))->toBeNull();
         expect($revision('4.0.0'))->toBeNull();
     });

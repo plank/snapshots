@@ -13,7 +13,7 @@ use Plank\Snapshots\Models\History;
  * @mixin \Illuminate\Database\Eloquent\Model
  *
  * @property-read Collection<History> $history
- * @property-read Collection<History> $visibileHistory
+ * @property-read Collection<History> $visibleHistory
  * @property-read bool $hidden
  */
 trait HasHistory
