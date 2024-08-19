@@ -15,7 +15,7 @@ describe('SnapshotBlueprint uses versions for named indexes', function () {
     });
 
     it('can drop named indexes from tables', function () {
-        $tableName = (new Document())->getTable();
+        $tableName = (new Document)->getTable();
         $indexes = Collection::wrap(DB::select("PRAGMA index_list('$tableName')"));
 
         expect($indexes)->toHaveCount(2);
@@ -31,7 +31,7 @@ describe('SnapshotBlueprint uses versions for named indexes', function () {
 
         versions()->setActive(createFirstVersion('schema/create'));
 
-        $tableName = (new Document())->getTable();
+        $tableName = (new Document)->getTable();
         $indexes = Collection::wrap(DB::select("PRAGMA index_list('$tableName')"));
 
         expect($indexes)->toHaveCount(2);
@@ -56,7 +56,7 @@ describe('SnapshotBlueprint uses versions for computed indexes', function () {
     });
 
     it('can drop computed indexes from tables', function () {
-        $tableName = (new Document())->getTable();
+        $tableName = (new Document)->getTable();
         $indexes = Collection::wrap(DB::select("PRAGMA index_list('$tableName')"));
         expect($indexes)->toHaveCount(2);
         expect($indexes->pluck('name'))->toContain($tableName.'_released_at_index');
@@ -71,7 +71,7 @@ describe('SnapshotBlueprint uses versions for computed indexes', function () {
 
         versions()->setActive(createFirstVersion('schema/create'));
 
-        $tableName = (new Document())->getTable();
+        $tableName = (new Document)->getTable();
         $indexes = Collection::wrap(DB::select("PRAGMA index_list('$tableName')"));
 
         expect($indexes)->toHaveCount(2);

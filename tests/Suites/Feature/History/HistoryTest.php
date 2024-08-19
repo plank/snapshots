@@ -513,13 +513,13 @@ describe('Unversioned Content has its History tracked correctly', function () {
 
 describe('History Labeling handles bad configuration and arguments', function () {
     it('exists early when no model is provided', function () {
-        $labeler = new LabelHistory();
+        $labeler = new LabelHistory;
 
         expect($labeler->handle(new TableCopied('images', null, null)))->not->toThrow(LabelingException::class);
     });
 
     it('throws an exception when trying to label non-versioned models', function () {
-        $labeler = new LabelHistory();
+        $labeler = new LabelHistory;
 
         $labeler->handle(new TableCopied('images', null, Image::class));
     })->throws(LabelingException::class);
