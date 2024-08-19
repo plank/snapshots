@@ -8,7 +8,6 @@ use Plank\Snapshots\Concerns\AsVersionedContent;
 use Plank\Snapshots\Concerns\HasHistory;
 use Plank\Snapshots\Contracts\Trackable;
 use Plank\Snapshots\Contracts\Versioned;
-use Plank\Snapshots\Tests\Database\Factories\DocumentFactory;
 
 class Document extends Model implements Trackable, Versioned
 {
@@ -19,12 +18,13 @@ class Document extends Model implements Trackable, Versioned
     protected $guarded = [];
 
     /**
-     * Create a new factory instance for the model.
+     * The attributes that should be visible in serialization.
      *
-     * @return \Illuminate\Database\Eloquent\Factories\Factory<static>
+     * @var array<string>
      */
-    protected static function newFactory()
-    {
-        return DocumentFactory::new();
-    }
+    protected $visible = [
+        'title',
+        'text',
+        'released_at',
+    ];
 }

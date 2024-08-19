@@ -5,25 +5,19 @@ namespace Plank\Snapshots\Tests\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Plank\Snapshots\Concerns\IdentifiesContent;
 use Plank\Snapshots\Concerns\InteractsWithVersionedContent;
-use Plank\Snapshots\Tests\Database\Factories\TagFactory;
+use Plank\Snapshots\Contracts\Identifying;
 
-class Tag extends Model
+class Tag extends Model implements Identifying
 {
     use HasFactory;
+    use IdentifiesContent;
     use InteractsWithVersionedContent;
 
     protected $guarded = [];
 
-    /**
-     * Create a new factory instance for the model.
-     *
-     * @return \Illuminate\Database\Eloquent\Factories\Factory<static>
-     */
-    protected static function newFactory()
-    {
-        return TagFactory::new();
-    }
+    protected static array $identifiesRelationships = ['posts'];
 
     /**
      * Get all of the posts that are assigned this tag.

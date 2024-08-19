@@ -1,6 +1,6 @@
 <?php
 
-namespace Plank\Snapshots\Factories;
+namespace Plank\Snapshots\Tests\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Plank\Snapshots\Models\Version;

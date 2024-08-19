@@ -14,6 +14,5 @@ class TableCreated
         public string $table,
         public (Version&Model)|null $version,
         public ?string $model = null,
-    ) {
-    }
+    ) {}
 }

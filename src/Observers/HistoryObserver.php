@@ -40,9 +40,9 @@ class HistoryObserver
         }
 
         /** @var class-string<History>|null $history */
-        $history = config('snapshots.models.history');
+        $history = config()->get('snapshots.models.history');
 
-        $history::create([
+        $data = [
             'operation' => Operation::Created,
             'causer_id' => $this->causer?->getKey(),
             'causer_type' => $this->causer?->getMorphClass(),
@@ -51,7 +51,13 @@ class HistoryObserver
             'trackable_type' => $model->getMorphClass(),
             'from' => null,
             'to' => $this->getLoggableAttributes($model),
-        ]);
+        ];
+
+        if (config()->get('snapshots.history.identity')) {
+            $data['hash'] = $model->newHash();
+        }
+
+        $history::create($data);
     }
 
     public function updated(Model&Trackable $model)
@@ -72,9 +78,9 @@ class HistoryObserver
         }
 
         /** @var class-string<History>|null $history */
-        $history = config('snapshots.models.history');
+        $history = config()->get('snapshots.models.history');
 
-        $history::create([
+        $data = [
             'operation' => Operation::Updated,
             'causer_id' => $this->causer?->getKey(),
             'causer_type' => $this->causer?->getMorphClass(),
@@ -83,7 +89,13 @@ class HistoryObserver
             'trackable_type' => $model->getMorphClass(),
             'from' => $this->getLoggableOriginal($model),
             'to' => $this->getLoggableAttributes($model),
-        ]);
+        ];
+
+        if (config()->get('snapshots.history.identity')) {
+            $data['hash'] = $model->newHash();
+        }
+
+        $history::create($data);
     }
 
     public function deleted(Model&Trackable $model)
@@ -95,9 +107,9 @@ class HistoryObserver
         }
 
         /** @var class-string<History>|null $history */
-        $history = config('snapshots.models.history');
+        $history = config()->get('snapshots.models.history');
 
-        $history::create([
+        $data = [
             'operation' => $softDeletes ? Operation::SoftDeleted : Operation::Deleted,
             'causer_id' => $this->causer?->getKey(),
             'causer_type' => $this->causer?->getMorphClass(),
@@ -106,15 +118,21 @@ class HistoryObserver
             'trackable_type' => $model->getMorphClass(),
             'from' => $this->getLoggableOriginal($model),
             'to' => $softDeletes ? $this->getLoggableAttributes($model) : null,
-        ]);
+        ];
+
+        if (config()->get('snapshots.history.identity')) {
+            $data['hash'] = $softDeletes ? $model->newHash() : null;
+        }
+
+        $history::create($data);
     }
 
     public function restored(Model&Trackable $model)
     {
         /** @var class-string<History>|null $history */
-        $history = config('snapshots.models.history');
+        $history = config()->get('snapshots.models.history');
 
-        $history::create([
+        $data = [
             'operation' => Operation::Restored,
             'causer_id' => $this->causer?->getKey(),
             'causer_type' => $this->causer?->getMorphClass(),
@@ -123,15 +141,21 @@ class HistoryObserver
             'trackable_type' => $model->getMorphClass(),
             'from' => $this->getLoggableOriginal($model),
             'to' => $this->getLoggableAttributes($model),
-        ]);
+        ];
+
+        if (config()->get('snapshots.history.identity')) {
+            $data['hash'] = $model->newHash();
+        }
+
+        $history::create($data);
     }
 
     public function forceDeleted(Model&Trackable $model)
     {
         /** @var class-string<History>|null $history */
-        $history = config('snapshots.models.history');
+        $history = config()->get('snapshots.models.history');
 
-        $history::create([
+        $data = [
             'operation' => Operation::Deleted,
             'causer_id' => $this->causer?->getKey(),
             'causer_type' => $this->causer?->getMorphClass(),
@@ -140,7 +164,13 @@ class HistoryObserver
             'trackable_type' => $model->getMorphClass(),
             'from' => $this->getLoggableOriginal($model),
             'to' => null,
-        ]);
+        ];
+
+        if (config()->get('snapshots.history.identity')) {
+            $data['hash'] = null;
+        }
+
+        $history::create($data);
     }
 
     protected function activeVersionId(Model&Trackable $model): int|string|null
@@ -156,7 +186,8 @@ class HistoryObserver
     {
         return $this->getLoggableArray(
             $model->getAttributes(),
-            $model->getHidden()
+            $model->getHidden(),
+            $model->getVisible()
         );
     }
 
@@ -164,14 +195,19 @@ class HistoryObserver
     {
         return $this->getLoggableArray(
             $model->getOriginal(),
-            $model->getHidden()
+            $model->getHidden(),
+            $model->getVisible()
         );
     }
 
-    protected function getLoggableArray(array $attributes, array $hidden): array
+    protected function getLoggableArray(array $attributes, array $hidden, array $visible): array
     {
-        foreach ($hidden as $attribute) {
-            unset($attributes[$attribute]);
+        if (count($visible) > 0) {
+            $attributes = array_intersect_key($attributes, array_flip($visible));
+        }
+
+        if (count($hidden) > 0) {
+            $attributes = array_diff_key($attributes, array_flip($hidden));
         }
 
         return $attributes;

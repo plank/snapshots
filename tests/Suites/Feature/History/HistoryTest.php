@@ -18,7 +18,7 @@ use function Pest\Laravel\artisan;
 
 beforeEach(function () {
     config()->set('snapshots.history.observer', HistoryObserver::class);
-    config()->set('snapshots.history.labler', LabelHistory::class);
+    config()->set('snapshots.history.labeler', LabelHistory::class);
 
     Event::listen(TableCopied::class, LabelHistory::class);
 });
@@ -31,7 +31,7 @@ describe('Versioned Content has its History tracked correctly without Model Even
         ])->run();
     });
 
-    it('tracks Create Operations correctly', function () {
+    it('tracks Create Operations correctly without Model Events', function () {
         Document::factory()->create();
 
         expect(History::query()->count())->toBe(1);
@@ -63,8 +63,8 @@ describe('Versioned Content has its History tracked correctly without Model Even
         Document::factory()->create();
         versions()->setActive(createMinorVersion('schema/create_for_model'));
 
-        // Now we have 2 created history items, and 2 snapshotted history items for the first
-        // document, and 1 snapshotted history item for the second document.
+        // Now we have 1 created history items and 2 snapshotted history items for the first
+        // document, and 1 created history item and 1 snapshotted history item for the second document.
         expect(History::query()->where('operation', Operation::Created)->count())->toBe(2);
         expect(History::query()->where('operation', Operation::Snapshotted)->count())->toBe(3);
     });

@@ -3,7 +3,9 @@
 namespace Plank\Snapshots\Tests;
 
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Orchestra\Testbench\TestCase as Orchestra;
 use Plank\Snapshots\Repository\VersionRepository;
 use Plank\Snapshots\SnapshotServiceProvider;
@@ -17,6 +19,10 @@ class TestCase extends Orchestra
     protected function setUp(): void
     {
         parent::setUp();
+
+        Factory::guessFactoryNamesUsing(function (string $modelName) {
+            return 'Plank\\Snapshots\\Tests\\Database\\Factories\\'.class_basename($modelName).'Factory';
+        });
 
         $this->artisan('migrate', [
             '--path' => realpath(__DIR__.'/..').'/database/migrations',
@@ -33,6 +39,11 @@ class TestCase extends Orchestra
         Auth::setUser(User::query()->where('name', 'Administrator')->first());
 
         $this->travelTo(Carbon::now());
+
+        // Keep time ticking across database calls
+        DB::listen(function () {
+            $this->travel(1)->second();
+        });
     }
 
     protected function getPackageProviders($app)
@@ -45,6 +56,7 @@ class TestCase extends Orchestra
     public function getEnvironmentSetUp($app)
     {
         $app['config']->set('database.default', 'testing');
-        $app['config']->set('snapshots.history', null);
+        $app['config']->set('snapshots.history.observer', null);
+        $app['config']->set('snapshots.history.labeler', null);
     }
 }

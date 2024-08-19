@@ -26,7 +26,7 @@ class LabelHistory
         }
 
         /** @var class-string<History>|null */
-        $history = config('snapshots.models.history');
+        $history = config()->get('snapshots.models.history');
 
         $history::query()
             ->where('trackable_type', $event->model)
@@ -69,9 +69,9 @@ class LabelHistory
         $causer = app(ResolvesCauser::class)->active();
 
         /** @var class-string<History>|null $history */
-        $history = config('snapshots.models.history');
+        $history = config()->get('snapshots.models.history');
 
-        $history::create([
+        $data = [
             'operation' => Operation::Snapshotted,
             'causer_id' => $causer?->getKey(),
             'causer_type' => $causer?->getMorphClass(),
@@ -80,6 +80,12 @@ class LabelHistory
             'trackable_type' => $trackable->getMorphClass(),
             'from' => null,
             'to' => $item->to,
-        ]);
+        ];
+
+        if (config()->get('snapshots.history.identity')) {
+            $data['hash'] = $trackable->newHash();
+        }
+
+        $history::create($data);
     }
 }

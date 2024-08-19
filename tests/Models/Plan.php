@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Plank\Snapshots\Concerns\AsVersionedContent;
 use Plank\Snapshots\Contracts\Trackable;
 use Plank\Snapshots\Contracts\Versioned;
-use Plank\Snapshots\Tests\Database\Factories\PlanFactory;
 
 class Plan extends Model implements Trackable, Versioned
 {
@@ -16,16 +15,6 @@ class Plan extends Model implements Trackable, Versioned
     use HasFactory;
 
     protected $guarded = [];
-
-    /**
-     * Create a new factory instance for the model.
-     *
-     * @return \Illuminate\Database\Eloquent\Factories\Factory<static>
-     */
-    protected static function newFactory()
-    {
-        return PlanFactory::new();
-    }
 
     public function projects(): BelongsToMany
     {

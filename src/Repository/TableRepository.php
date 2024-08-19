@@ -20,6 +20,11 @@ class TableRepository implements ManagesCreatedTables
         return array_shift($this->tables);
     }
 
+    public function all(): array
+    {
+        return $this->tables;
+    }
+
     public function flush(): int
     {
         $count = count($this->tables);

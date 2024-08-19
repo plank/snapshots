@@ -2,11 +2,13 @@
 
 namespace Plank\Snapshots\Repository;
 
+use Closure;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Plank\Snapshots\Contracts\ManagesVersions;
 use Plank\Snapshots\Contracts\Version;
 use Plank\Snapshots\Models\Version as VersionModel;
+use Plank\Snapshots\ValueObjects\VersionNumber;
 
 class VersionRepository implements ManagesVersions
 {
@@ -17,7 +19,7 @@ class VersionRepository implements ManagesVersions
      */
     public function model(): Version&Model
     {
-        return new (config('snapshots.models.version') ?? VersionModel::class);
+        return new (config()->get('snapshots.models.version') ?? VersionModel::class);
     }
 
     /**
@@ -42,6 +44,24 @@ class VersionRepository implements ManagesVersions
     public function active(): (Version&Model)|null
     {
         return $this->active;
+    }
+
+    /**
+     * @param callable(?Version $version = null) $callback
+     */
+    public function withVersionActive(string|VersionNumber|Version $version, Closure $callback): mixed
+    {
+        $active = $this->active();
+
+        $this->setActive($version);
+
+        try {
+            $result = $callback($version);
+        } finally {
+            $this->setActive($active);
+        }
+
+        return $result;
     }
 
     /**

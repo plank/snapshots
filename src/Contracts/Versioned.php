@@ -2,9 +2,17 @@
 
 namespace Plank\Snapshots\Contracts;
 
-use Illuminate\Database\Eloquent\Casts\Attribute;
-
 interface Versioned
 {
-    public function visibility(): Attribute;
+    /**
+     * Retrieve the active version of the model.
+     */
+    public function activeVersion(): ?static;
+
+    /**
+     * Get the table associated with the model.
+     *
+     * @return string
+     */
+    public function getTable();
 }

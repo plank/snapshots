@@ -16,7 +16,13 @@ return new class extends Migration
             $table->string('operation');
             $table->json('from')->nullable();
             $table->json('to')->nullable();
+            $table->string('hash')->nullable();
             $table->timestamps();
         });
+    }
+
+    public function down()
+    {
+        Schema::dropIfExists('history');
     }
 };

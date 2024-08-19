@@ -10,7 +10,6 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Plank\Snapshots\Concerns\AsVersionedContent;
 use Plank\Snapshots\Contracts\Trackable;
 use Plank\Snapshots\Contracts\Versioned;
-use Plank\Snapshots\Tests\Database\Factories\ProjectFactory;
 
 class Project extends Model implements Trackable, Versioned
 {
@@ -21,16 +20,6 @@ class Project extends Model implements Trackable, Versioned
     protected $guarded = [];
 
     protected $primaryKey = 'ulid';
-
-    /**
-     * Create a new factory instance for the model.
-     *
-     * @return \Illuminate\Database\Eloquent\Factories\Factory<static>
-     */
-    protected static function newFactory()
-    {
-        return ProjectFactory::new();
-    }
 
     public function categories(): BelongsToMany
     {

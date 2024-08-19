@@ -3,7 +3,7 @@
 namespace Plank\Snapshots\Concerns;
 
 use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
-use Plank\Snapshots\Contracts\ManagesVersions;
+use Plank\Snapshots\Facades\Versions;
 
 /**
  * @mixin \Illuminate\Database\Eloquent\Relations\Pivot
@@ -14,13 +14,6 @@ trait AsVersionedPivot
         AsPivot::getTable as getPivotTable;
     }
 
-    protected ManagesVersions $versions;
-
-    public function initializeAsVersionedPivot()
-    {
-        $this->versions = $this->getVersionRepository();
-    }
-
     /**
      * Get the table associated with the model.
      *
@@ -28,18 +21,10 @@ trait AsVersionedPivot
      */
     public function getTable()
     {
-        if ($version = $this->versions->active()) {
+        if ($version = Versions::active()) {
             return $version->addTablePrefix($this->getPivotTable());
         }
 
         return $this->getPivotTable();
-    }
-
-    /**
-     * Resolve the version repository instance.
-     */
-    public function getVersionRepository(): ManagesVersions
-    {
-        return app(ManagesVersions::class);
     }
 }
