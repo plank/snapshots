@@ -40,6 +40,7 @@ use Plank\Snapshots\Contracts\VersionedSchema;
  * @method static \Illuminate\Database\Schema\Builder setConnection(\Illuminate\Database\Connection $connection)
  * @method static void blueprintResolver(\Closure $resolver)
  * @method static Builder&VersionedSchema getFacadeRoot()
+ *
  * @see \Illuminate\Database\Schema\Builder
  */
 class SnapshotSchema extends Facade

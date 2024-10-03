@@ -24,7 +24,7 @@ class SchemaBuilderFactory
         ManagesVersions $versions,
         ManagesCreatedTables $tables,
     ): Builder&VersionedSchema {
-        return match(get_class($connection->getSchemaBuilder())) {
+        return match (get_class($connection->getSchemaBuilder())) {
             MySqlBuilder::class => new MySqlSnapshotBuilder($connection, $versions, $tables),
             PostgresBuilder::class => new PostgresSnapshotBuilder($connection, $versions, $tables),
             SQLiteBuilder::class => new SQLiteSnapshotBuilder($connection, $versions, $tables),
