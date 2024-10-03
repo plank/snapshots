@@ -2,8 +2,9 @@
 
 namespace Plank\Snapshots\Facades;
 
+use Illuminate\Database\Schema\Builder;
 use Illuminate\Support\Facades\Facade;
-use Plank\Snapshots\Migrator\SnapshotSchemaBuilder;
+use Plank\Snapshots\Contracts\VersionedSchema;
 
 /**
  * @method static void defaultStringLength(int $length)
@@ -38,7 +39,7 @@ use Plank\Snapshots\Migrator\SnapshotSchemaBuilder;
  * @method static \Illuminate\Database\Connection getConnection()
  * @method static \Illuminate\Database\Schema\Builder setConnection(\Illuminate\Database\Connection $connection)
  * @method static void blueprintResolver(\Closure $resolver)
- *
+ * @method static Builder&VersionedSchema getFacadeRoot()
  * @see \Illuminate\Database\Schema\Builder
  */
 class SnapshotSchema extends Facade
@@ -57,6 +58,6 @@ class SnapshotSchema extends Facade
      */
     protected static function getFacadeAccessor()
     {
-        return SnapshotSchemaBuilder::class;
+        return VersionedSchema::class;
     }
 }

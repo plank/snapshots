@@ -1,23 +1,19 @@
 <?php
 
-namespace Plank\Snapshots\Migrator;
+namespace Plank\Snapshots\Concerns;
 
 use Closure;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Database\Schema\Builder;
 use InvalidArgumentException;
 use Plank\Snapshots\Contracts\ManagesCreatedTables;
 use Plank\Snapshots\Contracts\ManagesVersions;
 use Plank\Snapshots\Contracts\Version;
 use Plank\Snapshots\Contracts\Versioned;
 use Plank\Snapshots\Events\TableCreated;
+use Plank\Snapshots\Migrator\SnapshotBlueprint;
 
-/**
- * @mixin Builder
- */
-class SnapshotSchemaBuilder extends Builder
+trait HasVersionedSchema
 {
     public function __construct(
         Connection $connection,
@@ -170,26 +166,6 @@ class SnapshotSchemaBuilder extends Builder
     /**
      * {@inheritDoc}
      */
-    public function whenTableHasColumn(string $table, string $column, Closure $callback)
-    {
-        if ($this->hasColumn($table, $column)) {
-            $this->table($table, fn (Blueprint $table) => $callback($table));
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function whenTableDoesntHaveColumn(string $table, string $column, Closure $callback)
-    {
-        if (! $this->hasColumn($table, $column)) {
-            $this->table($table, fn (Blueprint $table) => $callback($table));
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public function dropColumns($table, $columns): void
     {
         if ($active = $this->versions->active()) {
@@ -221,5 +197,50 @@ class SnapshotSchemaBuilder extends Builder
         }
 
         return parent::getColumnListing($table);
+    }
+
+    /**
+     * Get the columns for a given table.
+     *
+     * @param  string  $table
+     * @return array
+     */
+    public function getColumns($table)
+    {
+        if ($active = $this->versions->active()) {
+            $table = $active->addTablePrefix($table);
+        }
+
+        return parent::getColumns($table);
+    }
+
+    /**
+     * Get the indexes for a given table.
+     *
+     * @param  string  $table
+     * @return array
+     */
+    public function getIndexes($table)
+    {
+        if ($active = $this->versions->active()) {
+            $table = $active->addTablePrefix($table);
+        }
+
+        return parent::getIndexes($table);
+    }
+
+    /**
+     * Get the foreign keys for a given table.
+     *
+     * @param  string  $table
+     * @return array
+     */
+    public function getForeignKeys($table)
+    {
+        if ($active = $this->versions->active()) {
+            $table = $active->addTablePrefix($table);
+        }
+
+        return parent::getForeignKeys($table);
     }
 }

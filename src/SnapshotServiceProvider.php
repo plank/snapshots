@@ -10,11 +10,12 @@ use Plank\Snapshots\Contracts\ManagesCreatedTables;
 use Plank\Snapshots\Contracts\ManagesVersions;
 use Plank\Snapshots\Contracts\ResolvesCauser;
 use Plank\Snapshots\Contracts\Version;
+use Plank\Snapshots\Contracts\VersionedSchema;
 use Plank\Snapshots\Events\TableCopied;
 use Plank\Snapshots\Events\VersionCreated;
 use Plank\Snapshots\Exceptions\VersionException;
+use Plank\Snapshots\Factory\SchemaBuilderFactory;
 use Plank\Snapshots\Migrator\SnapshotMigrator;
-use Plank\Snapshots\Migrator\SnapshotSchemaBuilder;
 use Spatie\LaravelPackageTools\Commands\InstallCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
@@ -115,18 +116,17 @@ class SnapshotServiceProvider extends PackageServiceProvider
 
     protected function bindSchemaBuilder(): self
     {
-        if (! $this->app->bound(SnapshotSchemaBuilder::class)) {
-            $this->app->scoped(SnapshotSchemaBuilder::class, function (Application $app) {
-                $schema = $this->app['db']->connection()->getSchemaBuilder();
-                $connection = $schema->getConnection();
-
-                return new SnapshotSchemaBuilder(
-                    $connection,
-                    $app[ManagesVersions::class],
-                    $app[ManagesCreatedTables::class]
-                );
-            });
+        if ($this->app->bound(VersionedSchema::class)) {
+            return $this;
         }
+
+        $this->app->scoped(VersionedSchema::class, function (Application $app) {
+            return SchemaBuilderFactory::make(
+                $app['db.connection'],
+                $app[ManagesVersions::class],
+                $app[ManagesCreatedTables::class],
+            );
+        });
 
         return $this;
     }
