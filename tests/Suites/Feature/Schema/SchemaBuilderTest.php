@@ -291,6 +291,78 @@ describe('SnapshotMigrations use versions to run `up`', function () {
         expect(SnapshotSchema::getColumnType('documents', 'text'))->toBe('text');
     });
 
+    it('reads the indexes of versioned tables correctly', function () {
+        versions()->setActive(createFirstVersion('schema/create'));
+
+        $indexes = SnapshotSchema::getIndexes('documents');
+
+        expect($indexes)->toContain([
+            "name" => "primary",
+            "columns" => [
+                0 => "id"
+            ],
+            "type" => null,
+            "unique" => true,
+            "primary" => true,
+        ]);
+        
+        expect($indexes)->toContain([
+            "name" => "v1_0_0_documents_released_at_index",
+            "columns" => [
+                0 => "released_at",
+            ],
+            "type" => null,
+            "unique" => false,
+            "primary" => false,
+        ]);
+
+        expect($indexes)->toContain([
+            "name" => "v1_0_0_idx_title",
+            "columns" => [
+                0 => "title"
+            ],
+            "type" => null,
+            "unique" => false,
+            "primary" => false,
+        ]);
+    });
+
+    it('reads the foreign keys of versioned tables correctly', function () {
+        artisan('migrate', [
+            '--path' => migrationPath('schema/fks'),
+            '--realpath' => true,
+        ])->run();
+
+        assertDatabaseHas('migrations', [
+            'migration' => 'y_add_folders_table',
+            'batch' => 4,
+        ]);
+
+        assertDatabaseHas('migrations', [
+            'migration' => 'z_alter_documents_table',
+            'batch' => 4,
+        ]);
+
+        versions()->setActive(createFirstVersion('schema/fks'));
+
+
+        $fks = SnapshotSchema::getForeignKeys('documents');
+
+        expect($fks)->toContain([
+            "name" => null,
+            "columns" => [
+                0 => "folder_id",
+            ],
+            "foreign_schema" => null,
+            "foreign_table" => "v1_0_0_folders",
+            "foreign_columns" => [
+                0 => "id",
+            ],
+            "on_update" => "no action",
+            "on_delete" => "no action",
+        ]);
+    });
+
     it('forwards non-table schema builder methods to the frameworks schema builder', function () {
         versions()->setActive(createFirstVersion('schema/create'));
 

@@ -3,6 +3,8 @@
 namespace Plank\Snapshots\Facades;
 
 use Illuminate\Database\Schema\Builder;
+use Illuminate\Database\Schema\ForeignKeyDefinition;
+use Illuminate\Database\Schema\IndexDefinition;
 use Illuminate\Support\Facades\Facade;
 use Plank\Snapshots\Contracts\VersionedSchema;
 
@@ -17,6 +19,8 @@ use Plank\Snapshots\Contracts\VersionedSchema;
  * @method static bool hasTable(string $table)
  * @method static bool hasColumn(string $table, string $column)
  * @method static bool hasColumns(string $table, array $columns)
+ * @method static IndexDefinition[] getIndexes(string $table)
+ * @method static ForeignKeyDefinition[] getForeignKeys(string $table)
  * @method static void whenTableHasColumn(string $table, string $column, \Closure $callback)
  * @method static void whenTableDoesntHaveColumn(string $table, string $column, \Closure $callback)
  * @method static string getColumnType(string $table, string $column)
