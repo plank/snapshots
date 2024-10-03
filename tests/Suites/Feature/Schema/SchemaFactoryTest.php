@@ -16,7 +16,7 @@ use Plank\Snapshots\Schema\SqlServerSnapshotBuilder;
 describe('The Schema Builder is resolved in the container based on the db connection', function () {
     it('resolves the MySql Snapshot Builder correctly', function () {
         $connection = (new ConnectionFactory(app()))->make(config()->get('database.connections.mysql'));
-        
+
         $instance = SchemaBuilderFactory::make(
             $connection,
             app(ManagesVersions::class),

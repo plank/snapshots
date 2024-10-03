@@ -297,33 +297,33 @@ describe('SnapshotMigrations use versions to run `up`', function () {
         $indexes = SnapshotSchema::getIndexes('documents');
 
         expect($indexes)->toContain([
-            "name" => "primary",
-            "columns" => [
-                0 => "id"
+            'name' => 'primary',
+            'columns' => [
+                0 => 'id',
             ],
-            "type" => null,
-            "unique" => true,
-            "primary" => true,
-        ]);
-        
-        expect($indexes)->toContain([
-            "name" => "v1_0_0_documents_released_at_index",
-            "columns" => [
-                0 => "released_at",
-            ],
-            "type" => null,
-            "unique" => false,
-            "primary" => false,
+            'type' => null,
+            'unique' => true,
+            'primary' => true,
         ]);
 
         expect($indexes)->toContain([
-            "name" => "v1_0_0_idx_title",
-            "columns" => [
-                0 => "title"
+            'name' => 'v1_0_0_documents_released_at_index',
+            'columns' => [
+                0 => 'released_at',
             ],
-            "type" => null,
-            "unique" => false,
-            "primary" => false,
+            'type' => null,
+            'unique' => false,
+            'primary' => false,
+        ]);
+
+        expect($indexes)->toContain([
+            'name' => 'v1_0_0_idx_title',
+            'columns' => [
+                0 => 'title',
+            ],
+            'type' => null,
+            'unique' => false,
+            'primary' => false,
         ]);
     });
 
@@ -345,21 +345,20 @@ describe('SnapshotMigrations use versions to run `up`', function () {
 
         versions()->setActive(createFirstVersion('schema/fks'));
 
-
         $fks = SnapshotSchema::getForeignKeys('documents');
 
         expect($fks)->toContain([
-            "name" => null,
-            "columns" => [
-                0 => "folder_id",
+            'name' => null,
+            'columns' => [
+                0 => 'folder_id',
             ],
-            "foreign_schema" => null,
-            "foreign_table" => "v1_0_0_folders",
-            "foreign_columns" => [
-                0 => "id",
+            'foreign_schema' => null,
+            'foreign_table' => 'v1_0_0_folders',
+            'foreign_columns' => [
+                0 => 'id',
             ],
-            "on_update" => "no action",
-            "on_delete" => "no action",
+            'on_update' => 'no action',
+            'on_delete' => 'no action',
         ]);
     });
 

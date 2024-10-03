@@ -13,10 +13,10 @@ describe('The Table Repository Gathers TableCreated events correctly', function 
             '--realpath' => true,
         ])->run();
     });
-    
+
     it('gathers tables correctly', function () {
         Event::forget(MigrationsEnded::class);
-        
+
         Event::listen(MigrationsEnded::class, function () {
             expect(app(ManagesCreatedTables::class)->all())
                 ->toHaveKeys([
