@@ -348,26 +348,21 @@ describe('SnapshotMigrations use versions to run `up`', function () {
         ])->run();
 
         assertDatabaseHas('migrations', [
-            'migration' => 'y_add_folders_table',
-            'batch' => 4,
-        ]);
-
-        assertDatabaseHas('migrations', [
-            'migration' => 'z_alter_documents_table',
+            'migration' => 'create_signatures_table',
             'batch' => 4,
         ]);
 
         versions()->setActive(createFirstVersion('schema/fks'));
 
-        $fks = SnapshotSchema::getForeignKeys('documents');
+        $fks = SnapshotSchema::getForeignKeys('signatures');
 
         expect($fks)->toContain([
             'name' => null,
             'columns' => [
-                0 => 'folder_id',
+                0 => 'document_id',
             ],
             'foreign_schema' => null,
-            'foreign_table' => 'v1_0_0_folders',
+            'foreign_table' => 'v1_0_0_documents',
             'foreign_columns' => [
                 0 => 'id',
             ],
