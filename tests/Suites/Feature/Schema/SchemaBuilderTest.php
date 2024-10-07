@@ -3,8 +3,10 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Nette\NotImplementedException;
 use Plank\Snapshots\Exceptions\MigrationFailedException;
 use Plank\Snapshots\Facades\SnapshotSchema;
+use Plank\Snapshots\Schema\SnapshotBuilder;
 use Plank\Snapshots\Tests\Models\Document;
 
 use function Pest\Laravel\artisan;
@@ -292,6 +294,12 @@ describe('SnapshotMigrations use versions to run `up`', function () {
     });
 
     it('reads the indexes of versioned tables correctly', function () {
+        if (SnapshotSchema::getFacadeRoot() instanceof SnapshotBuilder) {
+            expect(fn () => SnapshotSchema::getIndexes('error'))->toThrow(NotImplementedException::class);
+
+            return;
+        }
+
         versions()->setActive(createFirstVersion('schema/create'));
 
         $indexes = SnapshotSchema::getIndexes('documents');
@@ -328,6 +336,12 @@ describe('SnapshotMigrations use versions to run `up`', function () {
     });
 
     it('reads the foreign keys of versioned tables correctly', function () {
+        if (SnapshotSchema::getFacadeRoot() instanceof SnapshotBuilder) {
+            expect(fn () => SnapshotSchema::getForeignKeys('error'))->toThrow(NotImplementedException::class);
+
+            return;
+        }
+
         artisan('migrate', [
             '--path' => migrationPath('schema/fks'),
             '--realpath' => true,

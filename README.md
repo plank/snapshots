@@ -196,7 +196,7 @@ return new class extends SnapshotMigration
 }
 ```
 
-You will notice that in a `SnapshotMigration` you have `$this->schema` available which is the `SnapshotSchemaBuilder` instance. It is a wrapper around the framework's `\Illuminate\Database\Schema\Builder` class. You can also use the `SnapshotSchema` facade, however you should only use that inside a `SnapshotMigration`.
+You will notice that in a `SnapshotMigration` you have `$this->schema` available which is the `SnapshotBuilder` instance. It is a wrapper around the framework's `\Illuminate\Database\Schema\Builder` class. You can also use the `SnapshotSchema` facade, however you should only use that inside a `SnapshotMigration`.
 
 The `SnapshotMigrations` allow you to declare migrations in the way you are used to, but under the hood it will handle all of the versioning.
 

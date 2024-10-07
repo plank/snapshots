@@ -5,11 +5,13 @@ use Illuminate\Database\Schema\MySqlBuilder;
 use Illuminate\Database\Schema\PostgresBuilder;
 use Illuminate\Database\Schema\SQLiteBuilder;
 use Illuminate\Database\Schema\SqlServerBuilder;
+use Illuminate\Support\Facades\DB;
 use Plank\Snapshots\Contracts\ManagesCreatedTables;
 use Plank\Snapshots\Contracts\ManagesVersions;
 use Plank\Snapshots\Factory\SchemaBuilderFactory;
 use Plank\Snapshots\Schema\MySqlSnapshotBuilder;
 use Plank\Snapshots\Schema\PostgresSnapshotBuilder;
+use Plank\Snapshots\Schema\SnapshotBuilder;
 use Plank\Snapshots\Schema\SQLiteSnapshotBuilder;
 use Plank\Snapshots\Schema\SqlServerSnapshotBuilder;
 
@@ -41,7 +43,7 @@ describe('The Schema Builder is resolved in the container based on the db connec
     });
 
     it('resolves the SQLite Snapshot Builder correctly', function () {
-        $connection = (new ConnectionFactory(app()))->make(config()->get('database.connections.sqlite'));
+        $connection = DB::connection('testing');
 
         $instance = SchemaBuilderFactory::make(
             $connection,
@@ -49,8 +51,11 @@ describe('The Schema Builder is resolved in the container based on the db connec
             app(ManagesCreatedTables::class)
         );
 
-        expect($instance)->toBeInstanceOf(SQLiteBuilder::class);
-        expect($instance)->toBeInstanceOf(SQLiteSnapshotBuilder::class);
+        if ($connection->getSchemaBuilder() instanceof SQLiteBuilder) {
+            expect($instance)->toBeInstanceOf(SQLiteSnapshotBuilder::class);
+        } else {
+            expect($instance)->toBeInstanceOf(SnapshotBuilder::class);
+        }
     });
 
     it('resolves the SqlServer Snapshot Builder correctly', function () {
