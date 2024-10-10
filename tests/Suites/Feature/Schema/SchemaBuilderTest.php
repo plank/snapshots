@@ -3,8 +3,10 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Nette\NotImplementedException;
 use Plank\Snapshots\Exceptions\MigrationFailedException;
 use Plank\Snapshots\Facades\SnapshotSchema;
+use Plank\Snapshots\Schema\SnapshotBuilder;
 use Plank\Snapshots\Tests\Models\Document;
 
 use function Pest\Laravel\artisan;
@@ -289,6 +291,84 @@ describe('SnapshotMigrations use versions to run `up`', function () {
 
         expect(SnapshotSchema::getColumnType('documents', 'title'))->toBe(varcharColumn());
         expect(SnapshotSchema::getColumnType('documents', 'text'))->toBe('text');
+    });
+
+    it('reads the indexes of versioned tables correctly', function () {
+        if (SnapshotSchema::getFacadeRoot() instanceof SnapshotBuilder) {
+            expect(fn () => SnapshotSchema::getIndexes('error'))->toThrow(NotImplementedException::class);
+
+            return;
+        }
+
+        versions()->setActive(createFirstVersion('schema/create'));
+
+        $indexes = SnapshotSchema::getIndexes('documents');
+
+        expect($indexes)->toContain([
+            'name' => 'primary',
+            'columns' => [
+                0 => 'id',
+            ],
+            'type' => null,
+            'unique' => true,
+            'primary' => true,
+        ]);
+
+        expect($indexes)->toContain([
+            'name' => 'v1_0_0_documents_released_at_index',
+            'columns' => [
+                0 => 'released_at',
+            ],
+            'type' => null,
+            'unique' => false,
+            'primary' => false,
+        ]);
+
+        expect($indexes)->toContain([
+            'name' => 'v1_0_0_idx_title',
+            'columns' => [
+                0 => 'title',
+            ],
+            'type' => null,
+            'unique' => false,
+            'primary' => false,
+        ]);
+    });
+
+    it('reads the foreign keys of versioned tables correctly', function () {
+        if (SnapshotSchema::getFacadeRoot() instanceof SnapshotBuilder) {
+            expect(fn () => SnapshotSchema::getForeignKeys('error'))->toThrow(NotImplementedException::class);
+
+            return;
+        }
+
+        artisan('migrate', [
+            '--path' => migrationPath('schema/fks'),
+            '--realpath' => true,
+        ])->run();
+
+        assertDatabaseHas('migrations', [
+            'migration' => 'create_signatures_table',
+            'batch' => 4,
+        ]);
+
+        versions()->setActive(createFirstVersion('schema/fks'));
+
+        $fks = SnapshotSchema::getForeignKeys('signatures');
+
+        expect($fks)->toContain([
+            'name' => null,
+            'columns' => [
+                0 => 'document_id',
+            ],
+            'foreign_schema' => null,
+            'foreign_table' => 'v1_0_0_documents',
+            'foreign_columns' => [
+                0 => 'id',
+            ],
+            'on_update' => 'no action',
+            'on_delete' => 'no action',
+        ]);
     });
 
     it('forwards non-table schema builder methods to the frameworks schema builder', function () {

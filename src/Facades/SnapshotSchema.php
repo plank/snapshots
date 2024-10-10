@@ -2,8 +2,11 @@
 
 namespace Plank\Snapshots\Facades;
 
+use Illuminate\Database\Schema\Builder;
+use Illuminate\Database\Schema\ForeignKeyDefinition;
+use Illuminate\Database\Schema\IndexDefinition;
 use Illuminate\Support\Facades\Facade;
-use Plank\Snapshots\Migrator\SnapshotSchemaBuilder;
+use Plank\Snapshots\Contracts\VersionedSchema;
 
 /**
  * @method static void defaultStringLength(int $length)
@@ -16,6 +19,8 @@ use Plank\Snapshots\Migrator\SnapshotSchemaBuilder;
  * @method static bool hasTable(string $table)
  * @method static bool hasColumn(string $table, string $column)
  * @method static bool hasColumns(string $table, array $columns)
+ * @method static IndexDefinition[] getIndexes(string $table)
+ * @method static ForeignKeyDefinition[] getForeignKeys(string $table)
  * @method static void whenTableHasColumn(string $table, string $column, \Closure $callback)
  * @method static void whenTableDoesntHaveColumn(string $table, string $column, \Closure $callback)
  * @method static string getColumnType(string $table, string $column)
@@ -38,6 +43,7 @@ use Plank\Snapshots\Migrator\SnapshotSchemaBuilder;
  * @method static \Illuminate\Database\Connection getConnection()
  * @method static \Illuminate\Database\Schema\Builder setConnection(\Illuminate\Database\Connection $connection)
  * @method static void blueprintResolver(\Closure $resolver)
+ * @method static Builder&VersionedSchema getFacadeRoot()
  *
  * @see \Illuminate\Database\Schema\Builder
  */
@@ -57,6 +63,6 @@ class SnapshotSchema extends Facade
      */
     protected static function getFacadeAccessor()
     {
-        return SnapshotSchemaBuilder::class;
+        return VersionedSchema::class;
     }
 }

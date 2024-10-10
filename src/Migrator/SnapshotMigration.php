@@ -3,11 +3,13 @@
 namespace Plank\Snapshots\Migrator;
 
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Builder;
+use Plank\Snapshots\Contracts\VersionedSchema;
 use Plank\Snapshots\Facades\SnapshotSchema;
 
 abstract class SnapshotMigration extends Migration
 {
-    public SnapshotSchemaBuilder $schema;
+    public Builder&VersionedSchema $schema;
 
     /**
      * Create a new migration instance.
