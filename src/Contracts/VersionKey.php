@@ -8,8 +8,6 @@ interface VersionKey extends Stringable
 {
     /**
      * Build an instance from an identifying string
-     * 
-     * @return static
      */
     public static function fromVersionString(string $key): static;
 

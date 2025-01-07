@@ -7,6 +7,7 @@ use Plank\Snapshots\Contracts\VersionKey;
 class VersionNumber implements VersionKey
 {
     protected const DOT_REGEX = '/^(\d+\.\d+\.\d+)$/';
+
     protected const KEY_REGEX = '/^(v{0,1}\d+\_\d+\_\d+)$/';
 
     public function __construct(
