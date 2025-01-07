@@ -25,7 +25,7 @@ trait AsVersion
      */
     public function addMigrationPrefix(string $name): string
     {
-        return 'v'.$this->number->snake().'_'.$name;
+        return $this->number->key().'_'.$name;
     }
 
     /**
@@ -57,7 +57,7 @@ trait AsVersion
      */
     public function addTablePrefix(string $table): string
     {
-        return 'v'.$this->number->snake().'_'.$this->stripTablePrefix($table);
+        return $this->number->key().'_'.$this->stripTablePrefix($table);
     }
 
     /**
