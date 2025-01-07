@@ -2,9 +2,13 @@
 
 namespace Plank\Snapshots\ValueObjects;
 
-class VersionNumber
+use Plank\Snapshots\Contracts\VersionKey;
+
+class VersionNumber implements VersionKey
 {
-    protected const REGEX = '/^(\d+\.\d+\.\d+)$/';
+    protected const DOT_REGEX = '/^(\d+\.\d+\.\d+)$/';
+
+    protected const KEY_REGEX = '/^(v{0,1}\d+\_\d+\_\d+)$/';
 
     public function __construct(
         protected int $major,
@@ -12,20 +16,28 @@ class VersionNumber
         protected int $patch
     ) {}
 
-    public static function fromVersionString(string $number): self
+    public static function fromVersionString(string $number): static
     {
-        if (! static::isValidVersionString($number)) {
+        if (preg_match(static::DOT_REGEX, $number) === 1) {
+            [$major, $minor, $patch] = explode('.', $number);
+        } elseif (preg_match(static::KEY_REGEX, $number) === 1) {
+            [$major, $minor, $patch] = explode('_', $number);
+        } else {
             throw new \InvalidArgumentException('Invalid version number: '.$number);
         }
 
-        [$major, $minor, $patch] = explode('.', $number);
+        return new static(str($major)->after('v')->toInteger(), (int) $minor, (int) $patch);
+    }
 
-        return new static((int) $major, (int) $minor, (int) $patch);
+    public function key(): string
+    {
+        return 'v'.$this->major.'_'.$this->minor.'_'.$this->patch;
     }
 
     protected static function isValidVersionString(string $version)
     {
-        return preg_match(static::REGEX, $version) === 1;
+        return preg_match(static::DOT_REGEX, $version) === 1
+            || preg_match(static::KEY_REGEX, $version) === 1;
     }
 
     public function major(): int
@@ -58,45 +70,40 @@ class VersionNumber
         return new static($this->major, $this->minor, $this->patch + 1);
     }
 
-    public function snake(): string
-    {
-        return $this->major.'_'.$this->minor.'_'.$this->patch;
-    }
-
     public function kebab(): string
     {
         return $this->major.'-'.$this->minor.'-'.$this->patch;
     }
 
-    public function isGreaterThan(VersionNumber|string $other): bool
+    public function isGreaterThan(VersionKey|string $other): bool
     {
         $other = static::wrap($other);
 
         return $this->compare($other) > 0;
     }
 
-    public function isGreaterThanOrEqualTo(VersionNumber|string $other): bool
+    public function isGreaterThanOrEqualTo(VersionKey|string $other): bool
     {
         $other = static::wrap($other);
 
         return $this->compare($other) >= 0;
     }
 
-    public function isLessThan(VersionNumber|string $other): bool
+    public function isLessThan(VersionKey|string $other): bool
     {
         $other = static::wrap($other);
 
         return $this->compare($other) < 0;
     }
 
-    public function isLessThanOrEqualTo(VersionNumber|string $other): bool
+    public function isLessThanOrEqualTo(VersionKey|string $other): bool
     {
         $other = static::wrap($other);
 
         return $this->compare($other) <= 0;
     }
 
-    public function isEqualTo(VersionNumber|string $other): bool
+    public function isEqualTo(VersionKey|string $other): bool
     {
         $other = static::wrap($other);
 

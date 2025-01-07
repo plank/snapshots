@@ -45,10 +45,10 @@ describe('VersionNumber creates, compares and transforms correctly', function ()
         expect($next->patch())->toEqual(1);
     });
 
-    it('can return a snake cased string of the version', function () {
+    it('can return a string key of the version', function () {
         $version = VersionNumber::fromVersionString('1.0.0');
 
-        expect($version->snake())->toEqual('1_0_0');
+        expect($version->key())->toEqual('v1_0_0');
     });
 
     it('can return a kebab cased string of the version', function () {
