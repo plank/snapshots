@@ -1,6 +1,6 @@
 <?php
 
-use Doctrine\DBAL\Schema\SchemaException;
+use Doctrine\DBAL\Schema\Exception\TableDoesNotExist;
 use Plank\Snapshots\Contracts\ManagesCreatedTables;
 use Plank\Snapshots\Contracts\ManagesVersions;
 use Plank\Snapshots\Contracts\Version;
@@ -91,7 +91,7 @@ describe('SnapshotMigrations can be pretended', function () {
 
             protected function getQueries($migration, $method)
             {
-                throw SchemaException::tableDoesNotExist('test');
+                throw new TableDoesNotExist('test');
             }
 
             protected function write($component, ...$arguments)
