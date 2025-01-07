@@ -19,7 +19,7 @@
     ],
     "require": {
         "php": "^8.2",
-        "doctrine/dbal": "^3.6",
+        "doctrine/dbal": "^3.6|^4",
         "illuminate/contracts": "^10|^11",
         "plank/laravel-hush": "^1.0",
         "spatie/laravel-package-tools": "^1.14.0"
