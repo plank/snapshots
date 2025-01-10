@@ -10,7 +10,9 @@ use Plank\Snapshots\Contracts\ManagesCreatedTables;
 use Plank\Snapshots\Contracts\ManagesVersions;
 use Plank\Snapshots\Contracts\Version;
 use Plank\Snapshots\Contracts\Versioned;
+use Plank\Snapshots\Contracts\VersionKey;
 use Plank\Snapshots\Events\TableCreated;
+use Plank\Snapshots\Exceptions\MigrationFormatException;
 use Plank\Snapshots\Migrator\SnapshotBlueprint;
 
 trait HasVersionedSchema
@@ -18,11 +20,56 @@ trait HasVersionedSchema
     public function __construct(
         Connection $connection,
         protected ManagesVersions $versions,
-        protected ManagesCreatedTables $tables
+        protected ManagesCreatedTables $tables,
     ) {
         parent::__construct($connection);
 
         $this->blueprintResolver(fn ($table, $callback, $prefix) => new SnapshotBlueprint($table, $callback, $prefix));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function addMigrationPrefix(Version $version, string $migration): string
+    {
+        return $version->number->key().'_'.$migration;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function stripMigrationPrefix(string $migration): string
+    {
+        $regex = config('snapshots.migration_regex');
+
+        $matches = [];
+
+        if (preg_match($regex, $migration, $matches) !== 1) {
+            throw MigrationFormatException::create($migration);
+        }
+
+        return $matches[0];
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function versionFromMigration(string $migration): ?Version
+    {
+        /** @var class-string<VersionKey> $class */
+        $keyClass = config('snapshots.value_objects.version_number');
+
+        $stripped = $this->stripMigrationPrefix($migration);
+
+        $prefix = str($migration)->before('_'.$stripped);
+
+        try {
+            $key = $keyClass::fromVersionString($prefix);
+        } catch (InvalidArgumentException) {
+            return null;
+        }
+
+        return $this->versions->byNumber($key);
     }
 
     /**
@@ -42,9 +89,7 @@ trait HasVersionedSchema
     }
 
     /**
-     * Create a new table on the schema.
-     *
-     * @param  class-string<Model>  $model
+     * {@inheritDoc}
      */
     public function createForModel(string $model, Closure $callback): void
     {
@@ -54,7 +99,10 @@ trait HasVersionedSchema
 
         $active = $this->versions->active();
         $table = (new $model)->getTable();
-        $original = app(Version::class)::stripMigrationPrefix($table);
+
+        $original = $active
+            ? $active->stripTablePrefix($table)
+            : $table;
 
         parent::create($table, $callback);
 

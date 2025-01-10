@@ -78,8 +78,8 @@ class SnapshotBlueprint extends Blueprint
         $index = $index ?: $this->createIndexName($type, $columns);
 
         if ($version = Versions::active()) {
-            $index = $version->stripMigrationPrefix($index);
-            $index = $version->addMigrationPrefix($index);
+            $index = $version->stripTablePrefix($index);
+            $index = $version->addTablePrefix($index);
         }
 
         return $this->addCommand(

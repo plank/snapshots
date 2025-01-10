@@ -4,7 +4,7 @@ namespace Plank\Snapshots\Concerns;
 
 use Illuminate\Database\Eloquent\Model;
 use Plank\LaravelHush\Concerns\HushesHandlers;
-use Plank\Snapshots\Contracts\Version as VersionContract;
+use Plank\Snapshots\Contracts\Version;
 use Plank\Snapshots\Facades\Versions;
 
 /**
@@ -31,10 +31,13 @@ trait AsVersionedContent
      */
     public function getTable()
     {
-        $version = app(VersionContract::class);
+        $table = parent::getTable();
+
+        /** @var Version $class */
+        $class = config('snapshots.models.version');
 
         // Ensure we are starting from the user/framework defined table name
-        $table = $version::stripMigrationPrefix(parent::getTable());
+        $table = $class::stripTablePrefix($table);
 
         if ($version = Versions::active()) {
             $table = $version->addTablePrefix($table);

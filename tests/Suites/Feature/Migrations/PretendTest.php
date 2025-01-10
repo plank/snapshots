@@ -3,7 +3,7 @@
 use Doctrine\DBAL\Schema\Exception\TableDoesNotExist;
 use Plank\Snapshots\Contracts\ManagesCreatedTables;
 use Plank\Snapshots\Contracts\ManagesVersions;
-use Plank\Snapshots\Contracts\Version;
+use Plank\Snapshots\Contracts\VersionedSchema;
 use Plank\Snapshots\Migrator\SnapshotMigrator;
 use Plank\Snapshots\Models\Version as VersionModel;
 
@@ -85,7 +85,7 @@ describe('SnapshotMigrations can be pretended', function () {
     it('reports errors that occur during pretended migrations', function () {
         $version = createFirstVersion('schema/create');
 
-        $migrator = new class($this->app['migration.repository'], $this->app['db'], $this->app['files'], $this->app['events'], $this->app[ManagesVersions::class], $this->app[ManagesCreatedTables::class], $this->app[Version::class]) extends SnapshotMigrator
+        $migrator = new class($this->app[VersionedSchema::class], $this->app['migration.repository'], $this->app['db'], $this->app['files'], $this->app['events'], $this->app[ManagesVersions::class], $this->app[ManagesCreatedTables::class]) extends SnapshotMigrator
         {
             public string $written = '';
 

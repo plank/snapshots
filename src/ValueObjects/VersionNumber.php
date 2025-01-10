@@ -10,6 +10,8 @@ class VersionNumber implements VersionKey
 
     protected const KEY_REGEX = '/^(v{0,1}\d+\_\d+\_\d+)$/';
 
+    protected const MIGRATION_REGEX = '/\d{4}_\d{2}_\d{2}_\d{6}_[a-zA-Z0-9_]+/';
+
     public function __construct(
         protected int $major,
         protected int $minor,
