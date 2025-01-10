@@ -15,22 +15,6 @@ interface Version
     public function hasBeenMigrated(): bool;
 
     /**
-     * Add a prefix to the migration name which is stored in the repository
-     * when the migration is run.
-     */
-    public function addMigrationPrefix(string $name): string;
-
-    /**
-     * Remove the prefix from a migration name.
-     */
-    public static function stripMigrationPrefix(string $name): string;
-
-    /**
-     * Resolve a Version from a migration name.
-     */
-    public function resolveVersionFromMigrationName(string $name): ?self;
-
-    /**
      * Add a prefix for to the table names specified in SnapshotMigrations, and
      * also the Eloquent Models getTable() methods.
      */
@@ -39,7 +23,7 @@ interface Version
     /**
      * Remove the prefix from a table name.
      */
-    public function stripTablePrefix(string $table): string;
+    public static function stripTablePrefix(string $table): string;
 
     /**
      * Determine if the Version has already been migrated.

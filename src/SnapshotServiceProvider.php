@@ -9,11 +9,9 @@ use Illuminate\Support\Facades\Event;
 use Plank\Snapshots\Contracts\ManagesCreatedTables;
 use Plank\Snapshots\Contracts\ManagesVersions;
 use Plank\Snapshots\Contracts\ResolvesCauser;
-use Plank\Snapshots\Contracts\Version;
 use Plank\Snapshots\Contracts\VersionedSchema;
 use Plank\Snapshots\Events\TableCopied;
 use Plank\Snapshots\Events\VersionCreated;
-use Plank\Snapshots\Exceptions\VersionException;
 use Plank\Snapshots\Factory\SchemaBuilderFactory;
 use Plank\Snapshots\Migrator\SnapshotMigrator;
 use Spatie\LaravelPackageTools\Commands\InstallCommand;
@@ -60,29 +58,11 @@ class SnapshotServiceProvider extends PackageServiceProvider
 
     public function bootingPackage()
     {
-        $this->bindVersion()
-            ->bindRepositories()
+        $this->bindRepositories()
             ->bindSchemaBuilder()
             ->bindMigrator();
 
         $this->listenToEvents();
-    }
-
-    protected function bindVersion(): self
-    {
-        if (! $this->app->bound(Version::class)) {
-            $this->app->bind(Version::class, function (Application $app) {
-                $model = $app['config']->get('snapshots.models.version');
-
-                if (! is_a($model, Version::class, true)) {
-                    throw VersionException::create($model);
-                }
-
-                return new $model;
-            });
-        }
-
-        return $this;
     }
 
     protected function bindRepositories(): self
@@ -135,13 +115,13 @@ class SnapshotServiceProvider extends PackageServiceProvider
     {
         $this->app->extend('migrator', function (Migrator $migrator, Application $app) {
             return new SnapshotMigrator(
+                $app[VersionedSchema::class],
                 $app['migration.repository'],
                 $app['db'],
                 $app['files'],
                 $app['events'],
                 $app[ManagesVersions::class],
-                $app[ManagesCreatedTables::class],
-                $app[Version::class]
+                $app[ManagesCreatedTables::class]
             );
         });
 

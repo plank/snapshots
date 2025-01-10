@@ -1,20 +1,11 @@
 <?php
 
-use Plank\Snapshots\Contracts\Version as VersionContract;
+use Plank\Snapshots\Contracts\VersionedSchema;
 use Plank\Snapshots\Exceptions\MigrationInProgressException;
-use Plank\Snapshots\Exceptions\VersionException;
 use Plank\Snapshots\Models\Version;
 use Plank\Snapshots\ValueObjects\VersionNumber;
 
 describe('Versions are migrated correctly', function () {
-    it('throws an exception when you have the version configured incorrectly', function () {
-        expect(app()->make(VersionContract::class))->toBeInstanceOf(Version::class);
-
-        config()->set('snapshots.models.version', null);
-
-        app()->make(VersionContract::class);
-    })->throws(VersionException::class);
-
     it('throws an exception when creating a new version before the previous version has been migrated', function () {
         Version::factory()->createQuietly([
             'number' => '1.0.0',
@@ -41,6 +32,6 @@ describe('Versions are migrated correctly', function () {
     it('returns null when it cannot resolve a version from a migration name', function () {
         $version = createFirstVersion();
 
-        expect($version->resolveVersionFromMigrationName('invalid_migration_name'))->toBeNull();
+        expect(app(VersionedSchema::class)->versionFromMigration('invalid_migration_name'))->toBeNull();
     });
 });

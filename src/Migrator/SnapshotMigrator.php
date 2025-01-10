@@ -4,6 +4,8 @@ namespace Plank\Snapshots\Migrator;
 
 use Doctrine\DBAL\Schema\SchemaException;
 use Illuminate\Console\View\Components\BulletList;
+use Illuminate\Console\View\Components\Error;
+use Illuminate\Console\View\Components\Info;
 use Illuminate\Console\View\Components\Task;
 use Illuminate\Console\View\Components\TwoColumnDetail;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -18,10 +20,13 @@ use Illuminate\Support\Collection;
 use Plank\Snapshots\Contracts\ManagesCreatedTables;
 use Plank\Snapshots\Contracts\ManagesVersions;
 use Plank\Snapshots\Contracts\Version;
+use Plank\Snapshots\Contracts\VersionedSchema;
 use ReflectionClass;
 
 class SnapshotMigrator extends Migrator
 {
+    protected VersionedSchema $schema;
+
     public ManagesVersions $versions;
 
     public ManagesCreatedTables $tables;
@@ -29,19 +34,19 @@ class SnapshotMigrator extends Migrator
     public Version $version;
 
     public function __construct(
+        VersionedSchema $schema,
         MigrationRepositoryInterface $repository,
         ConnectionResolverInterface $resolver,
         Filesystem $files,
         ?Dispatcher $dispatcher,
         ManagesVersions $versions,
-        ManagesCreatedTables $tables,
-        Version $version
+        ManagesCreatedTables $tables
     ) {
         parent::__construct($repository, $resolver, $files, $dispatcher);
 
+        $this->schema = $schema;
         $this->versions = $versions;
         $this->tables = $tables;
-        $this->version = $version;
     }
 
     /**
@@ -58,13 +63,13 @@ class SnapshotMigrator extends Migrator
                     return in_array($name, $ran) ? null : $file;
                 }
 
-                if (! $this->version->hasBeenMigrated()) {
+                if (! $this->versionHasBeenMigrated()) {
                     return $this->versionedFile(in_array($name, $ran) ? null : $file);
                 }
 
                 return $this->versions->all()
                     ->map(function (Version $version) use ($file, $ran) {
-                        $name = $version->addMigrationPrefix($this->getMigrationName($file));
+                        $name = $this->schema->addMigrationPrefix($version, $this->getMigrationName($file));
 
                         return in_array($name, $ran) ? null : $this->versionedFile($file, $version);
                     })
@@ -76,6 +81,17 @@ class SnapshotMigrator extends Migrator
             ->filter()
             ->values()
             ->all();
+    }
+
+    /**
+     * Detrmine if the configured version model has been migrated yet
+     */
+    protected function versionHasBeenMigrated(): bool
+    {
+        /** @var class-string<Version> $class */
+        $class = config('snapshots.models.version');
+
+        return (new $class)->hasBeenMigrated();
     }
 
     /**
@@ -123,7 +139,7 @@ class SnapshotMigrator extends Migrator
     {
         $this->versions->setActive($version);
 
-        $name = $version->addMigrationPrefix($this->getMigrationName($file));
+        $name = $this->schema->addMigrationPrefix($version, $this->getMigrationName($file));
 
         if ($pretend) {
             return $this->pretendToRunVersion($version, $migration, 'up');
@@ -142,7 +158,6 @@ class SnapshotMigrator extends Migrator
      */
     protected function rollbackMigrations(array $migrations, $paths, array $options)
     {
-        $version = app(Version::class);
         $rolledBack = [];
 
         $this->requireFiles($files = $this->getMigrationFiles($paths));
@@ -160,7 +175,7 @@ class SnapshotMigrator extends Migrator
         // Next we will run through all of the migrations and call the "down" method
         // which will reverse each migration in order.
         foreach ($migrations as $migration) {
-            if (! $file = Arr::get($files, $version::stripMigrationPrefix($migration->migration))) {
+            if (! $file = Arr::get($files, $this->schema->stripMigrationPrefix($migration->migration))) {
                 $this->write(TwoColumnDetail::class, $migration->migration, '<fg=yellow;options=bold>Migration not found</>');
 
                 continue;
@@ -180,16 +195,14 @@ class SnapshotMigrator extends Migrator
 
     protected function includingPreviousBatches(array $migrations, array $ran): array
     {
-        $version = app(Version::class);
-
         $stripped = collect($migrations)
             ->map(fn ($migration) => (object) $migration)
-            ->map(fn ($migration) => $version::stripMigrationPrefix($migration->migration))
+            ->map(fn ($migration) => $this->schema->stripMigrationPrefix($migration->migration))
             ->unique();
 
         return collect($ran)
             ->map(fn ($migration) => (object) $migration)
-            ->filter(fn ($migration) => $stripped->contains($version::stripMigrationPrefix($migration->migration)))
+            ->filter(fn ($migration) => $stripped->contains($this->schema->stripMigrationPrefix($migration->migration)))
             ->sortByDesc('batch')
             ->groupBy('batch')
             ->map(fn ($migrations) => $migrations->sortByDesc(fn ($migration) => $migration->id ?? $migration->migration))
@@ -214,7 +227,7 @@ class SnapshotMigrator extends Migrator
 
         $active = $this->versions->active();
 
-        $version = $this->version->resolveVersionFromMigrationName($migration->migration);
+        $version = $this->schema->versionFromMigration($migration->migration);
 
         if ($version === null) {
             $this->versions->clearActive();
@@ -230,7 +243,7 @@ class SnapshotMigrator extends Migrator
     {
         $this->versions->setActive($version);
 
-        $name = $version->addMigrationPrefix($this->getMigrationName($file));
+        $name = $this->schema->addMigrationPrefix($version, $this->getMigrationName($file));
 
         if ($pretend) {
             return $this->pretendToRunVersion($version, $instance, 'down');
@@ -258,7 +271,7 @@ class SnapshotMigrator extends Migrator
                 $name = $this->getMigrationName($reflectionClass->getFileName());
             }
 
-            $name = $version->addMigrationPrefix($name);
+            $name = $this->schema->addMigrationPrefix($version, $name);
 
             $this->write(TwoColumnDetail::class, $name);
 
