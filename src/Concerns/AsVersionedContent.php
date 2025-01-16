@@ -33,6 +33,10 @@ trait AsVersionedContent
     {
         $table = parent::getTable();
 
+        if (str_contains($table, 'laravel_reserved_')) {
+            return $table;
+        }
+
         /** @var Version $class */
         $class = config('snapshots.models.version');
 
