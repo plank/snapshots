@@ -2,6 +2,7 @@
 
 namespace Plank\Snapshots\Migrator;
 
+use Closure;
 use Doctrine\DBAL\Schema\SchemaException;
 use Illuminate\Console\View\Components\BulletList;
 use Illuminate\Console\View\Components\Error;
@@ -9,6 +10,7 @@ use Illuminate\Console\View\Components\Info;
 use Illuminate\Console\View\Components\Task;
 use Illuminate\Console\View\Components\TwoColumnDetail;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\Events\MigrationsEnded;
 use Illuminate\Database\Events\MigrationsStarted;
@@ -19,19 +21,23 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Plank\Snapshots\Contracts\ManagesCreatedTables;
 use Plank\Snapshots\Contracts\ManagesVersions;
+use Plank\Snapshots\Contracts\SnapshotMigration;
 use Plank\Snapshots\Contracts\Version;
 use Plank\Snapshots\Contracts\VersionedSchema;
+use Plank\Snapshots\Factory\SchemaBuilderFactory;
 use ReflectionClass;
 
 class SnapshotMigrator extends Migrator
 {
     protected VersionedSchema $schema;
 
-    public ManagesVersions $versions;
+    protected ManagesVersions $versions;
 
-    public ManagesCreatedTables $tables;
+    protected ManagesCreatedTables $tables;
 
-    public Version $version;
+    protected Version $version;
+
+    protected Application $app;
 
     public function __construct(
         VersionedSchema $schema,
@@ -40,13 +46,15 @@ class SnapshotMigrator extends Migrator
         Filesystem $files,
         ?Dispatcher $dispatcher,
         ManagesVersions $versions,
-        ManagesCreatedTables $tables
+        ManagesCreatedTables $tables,
+        Application $app,
     ) {
         parent::__construct($repository, $resolver, $files, $dispatcher);
 
         $this->schema = $schema;
         $this->versions = $versions;
         $this->tables = $tables;
+        $this->app = $app;
     }
 
     /**
@@ -299,6 +307,40 @@ class SnapshotMigrator extends Migrator
     {
         parent::pretendToRun($migration, $method);
         $this->tables->flush();
+    }
+
+    protected function runMethod($connection, $migration, $method)
+    {
+        $previousConnection = $this->resolver->getDefaultConnection();
+
+        try {
+            $this->resolver->setDefaultConnection($connection->getName());
+
+            if ($migration instanceof SnapshotMigration) {
+                $this->usingSnapshotSchemaBuilder(fn () => $migration->{$method}());
+            } else {
+                $migration->{$method}();
+            }
+        } finally {
+            $this->resolver->setDefaultConnection($previousConnection);
+        }
+    }
+
+    protected function usingSnapshotSchemaBuilder(Closure $callback)
+    {
+        $active = $this->app->make('db.schema');
+
+        $this->app->instance('db.schema', SchemaBuilderFactory::make(
+            $this->app['db.connection'],
+            $this->app[ManagesVersions::class],
+            $this->app[ManagesCreatedTables::class],
+        ));
+
+        try {
+            return $callback();
+        } finally {
+            $this->app->instance('db.schema', $active);
+        }
     }
 
     protected function versionedFile(?string $file, ?Version $version = null): ?string
