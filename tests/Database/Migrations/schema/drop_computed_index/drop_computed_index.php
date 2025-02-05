@@ -2,8 +2,8 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\Schema;
-use Plank\Snapshots\Migrator\SnapshotBlueprint;
 use Plank\Snapshots\Contracts\SnapshotMigration;
+use Plank\Snapshots\Migrator\SnapshotBlueprint;
 
 return new class extends Migration implements SnapshotMigration
 {

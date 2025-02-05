@@ -2,4 +2,4 @@
 
 namespace Plank\Snapshots\Contracts;
 
-interface SnapshotMigration { }
+interface SnapshotMigration {}
