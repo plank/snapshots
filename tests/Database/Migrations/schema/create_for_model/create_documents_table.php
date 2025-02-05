@@ -1,14 +1,16 @@
 <?php
 
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Support\Facades\Schema;
 use Plank\Snapshots\Migrator\SnapshotBlueprint;
-use Plank\Snapshots\Migrator\SnapshotMigration;
+use Plank\Snapshots\Contracts\SnapshotMigration;
 use Plank\Snapshots\Tests\Models\Document;
 
-return new class extends SnapshotMigration
+return new class extends Migration implements SnapshotMigration
 {
     public function up()
     {
-        $this->schema->createForModel(Document::class, function (SnapshotBlueprint $table) {
+        Schema::createForModel(Document::class, function (SnapshotBlueprint $table) {
             $table->id();
             $table->string('title');
             $table->string('text');
@@ -19,6 +21,6 @@ return new class extends SnapshotMigration
 
     public function down()
     {
-        $this->schema->dropForModel(Document::class);
+        Schema::dropForModel(Document::class);
     }
 };
