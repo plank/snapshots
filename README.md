@@ -12,7 +12,7 @@
 
 :warning: Package is under active development. Wait for v1.0.0 for production use. :warning:
 
-Snapshots is a Laravel package that allows you to version the content of your app by replicating database tables and their content. Each snapshot represents a browesable version of your app's content at a specific point in time. By changing the active version of your app, you can view your app's content at a previous version.
+Snapshots is a Laravel package that allows you to version the content of your app by replicating database tables and their content. Each snapshot represents a browseable version of your app's content at a specific point in time. By changing the active version of your app, you can view your app's content at a previous version.
 
 The main goal of this package is for it to perform robust versioning of your content, but stay out of your way. You should be able to use it without having to change your existing codebase. It should be easy to install and configure, and it should be easy to use.
 
@@ -29,17 +29,17 @@ The main goal of this package is for it to perform robust versioning of your con
   - [Versions](#versions)
     - [Contract and Model](#contract-and-model)
       - [Events](#events)
-    - [Repository](#repository-1)
+    - [Repository](#version-repository)
   - [Migrations](#migrations)
     - [SnapshotMigration](#snapshotmigration)
     - [SnapshotMigrator](#snapshotmigrator)
       - [Limitations](#limitations)
   - [Models](#models)
-- [Plank](#plank)
 - [Contributing](#contributing)
 - [Credits](#credits)
 - [License](#license)
 - [Security Vulnerabilities](#security-vulnerabilities)
+- [Plank](#check-us-out)
 
 &nbsp;
 
@@ -61,14 +61,14 @@ php artisan snapshots:install
 
 Once the installation has completed, to begin using the package:
 
-1. Make all migrations for versioned content extend `Plank\Snapshots\Migrations\SnapshotMigration` instead of the framework's `Migration` class.
+1. Make all migrations for versioned content implement `Plank\Snapshots\Contracts\SnapshotMigration`.
 2. Replace references to `Illuminate\Database\Schema\Builder` with `$this->schema` or `Plank\Snapshots\Facades\SnapshotSchema` in those migrations for the versioned content.
 3. Make all models representing versioned content implement `Plank\Snapshots\Contracts\Versioned` and use the `Plank\Snapshots\Concerns\AsVersionedContent` trait.
 4. Make all models that are not versioned, but have a relation to versioned content use the `Plank\Snapshots\Concerns\InteractsWithVersionedContent` trait.
 5. Create a middleware to set the active version of your app based on the request.
 
 Middleware example:
-    
+
 ```php
 <?php
 
@@ -97,7 +97,7 @@ class SetActiveVersion
 }
 ```
 
-Now, whenever you create a new version, the `SnapshotDatabase` listener will handle the `VersionCreated` event and run all of the migrations for the versioned content. It will also copy the content from the previous version of the table into the new version of the table.
+Now, whenever you create a new version, the `SnapshotDatabase` listener will handle the `VersionCreated` event and run all migrations for the versioned content. It will also copy the content from the previous version of the table into the new version of the table.
 
 &nbsp;
 
@@ -123,11 +123,11 @@ The `repository` option is the fully qualified class name of the repository that
 
 ### Auto Migration
 
-The `auto_migrate` option determines whether or not the package will automatically create new tables for all of the versioned content when a new version model is created. The package provides the default implementation of `Plank\Snapshots\Listeners\SnapshotDatabase`, but you can provide your own implementation.
+The `auto_migrate` option determines whether the package will automatically create new tables for all versioned content when a new version model is created. The package provides the default implementation of `Plank\Snapshots\Listeners\SnapshotDatabase`, but you can provide your own implementation.
 
 ### Auto Copy
 
-The `auto_copy` option determines whether or not the package will automatically copy content to the newly versioned tables when a new version model is created. 
+The `auto_copy` option determines whether the package will automatically copy content to the newly versioned tables when a new version model is created.
 
 The package provides the default implementation of `Plank\Snapshots\Listeners\CopyTable`, where the data is copied over at the database level.
 
@@ -143,7 +143,7 @@ You can also provide your own implementation by setting it in the configuration 
 
 #### Contract and Model
 
-Snapshots are identified by and accessed through a `Version` model. This model is created by the package or can be overriden by the consumer by creating a class which implements the `Plank\Contracts\Version` contract, and specifying it as the [`model`](#version-model) in the configuration file.
+Snapshots are identified by and accessed through a `Version` model. This model is created by the package or can be overridden by the consumer by creating a class which implements the `Plank\Contracts\Version` contract, and specifying it as the [`model`](#version-model) in the configuration file.
 
 In applications that use this package, requests should generally specify an "active" `Version`. The active `Version` will alter the database tables which versioned content will be queried on.
 
@@ -153,9 +153,9 @@ In applications that use this package, requests should generally specify an "act
   - Fired after a new version model is created
   - Hooked on to by the package to run all the versioned migrations, but can be disabled by setting [`auto_migrate`](#auto-migration) to `false`
 
-#### Repository
+#### Version Repository
 
-The `ManagesVersions` interface is a minimal interface for a `Version` repository required for the migrator to function. The package provides a `VersionRepository` class which implements this interface, but it can be overriden by the consumer by creating a class which implements the `Plank\Contracts\ManagesVersions` contract, and specifying it as the [`repository`](#repository) in the configuration file.
+The `ManagesVersions` interface is a minimal interface for a `Version` repository required for the migrator to function. The package provides a `VersionRepository` class which implements this interface, but it can be overridden by the consumer by creating a class which implements the `Plank\Contracts\ManagesVersions` contract, and specifying it as the [`repository`](#repository) in the configuration file.
 
 The repository is responsible for querying existing versions and managing the active version. It is not used to create new versions, as that is out of scope for the package.
 
@@ -163,22 +163,23 @@ The repository is responsible for querying existing versions and managing the ac
 
 #### SnapshotMigration
 
-This package adds a `SnapshotMigration` class, to house the migrations for all of your versioned content. It allows the [`SnapshotMigrator`](#snapshotmigrator) to know which migrations need to be run accross all of the versions of your app.
+This package adds a `SnapshotMigration` class, to house the migrations for all of your versioned content. It allows the [`SnapshotMigrator`](#snapshotmigrator) to know which migrations need to be run across all versions of your app.
 
 To use it, simply make the Migration classes extend `SnapshotMigration` instead of the framework's `Migration` class.
 
 ```php
 <?php
 
+use Illuminate\Database\Migrations\Migration;
 use Plank\Snapshots\Facades\SnapshotSchema;
 use Plank\Snapshots\Migrations\SnapshotBlueprint;
-use Plank\Snapshots\Migrations\SnapshotMigration;
+use Plank\Snapshots\Contracts\SnapshotMigration;
 
-return new class extends SnapshotMigration
+return new class extends Migration implements SnapshotMigration
 {
     public function up()
     {
-        $this->schema->create('blocks', function (SnapshotBlueprint $table) {
+        Schema::create('blocks', function (SnapshotBlueprint $table) {
             $table->id();
             $table->unsignedBigInteger('page_id');
             $table->string('name');
@@ -198,7 +199,7 @@ return new class extends SnapshotMigration
 
 You will notice that in a `SnapshotMigration` you have `$this->schema` available which is the `SnapshotBuilder` instance. It is a wrapper around the framework's `\Illuminate\Database\Schema\Builder` class. You can also use the `SnapshotSchema` facade, however you should only use that inside a `SnapshotMigration`.
 
-The `SnapshotMigrations` allow you to declare migrations in the way you are used to, but under the hood it will handle all of the versioning.
+The `SnapshotMigrations` allow you to declare migrations in the way you are used to, but under the hood it will handle all versioning.
 
 You will also notice the `SnapshotBlueprint` class. This blueprint type exists to allow you to define foreign keys to versioned content from versioned content using the `->onSnapshot()` method.
 
@@ -252,7 +253,7 @@ INFO  Running migrations.
 
 When creating the first `Version` model – with [`auto_migrate`](#auto-migrate) set to `true` – assuming the Page content is versioned, the package will re-run your `2023_09_25_000002_create_pages_table` migration for the new `Version`.
 
-The following output is shown as an illustration. The migration is ran in the background, and not output.
+The following output is shown as an illustration. The migration is run in the background, and not output.
 
 ```bash
 php artisan migrate
@@ -281,9 +282,9 @@ The migration is applied to all versions of your content to achieve consistency 
 
 #### Versioned Models
 
-This package provides a `Plank\Snapshots\Contracts\Versioned` interface, and an `AsVersionedContent` trait. For models whose content should be versioned, have them implement the `Versioned` interface, and use the `AsVersionedContent` trait.
+This package provides a `Plank\Snapshots\Contracts\Versioned` interface, and a `AsVersionedContent` trait. For models whose content should be versioned, have them implement the `Versioned` interface, and use the `AsVersionedContent` trait.
 
-This trait ensures queries on the model's table are prefixed with the active version's prefix. It also overrides the pivotted relations to use the versioned pivot table.
+This trait ensures queries on the model's table are prefixed with the active version's prefix. It also overrides the pivoted relations to use the versioned pivot table.
 
 Example:
 

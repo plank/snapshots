@@ -1,19 +1,21 @@
 <?php
 
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Support\Facades\Schema;
+use Plank\Snapshots\Contracts\SnapshotMigration;
 use Plank\Snapshots\Migrator\SnapshotBlueprint;
-use Plank\Snapshots\Migrator\SnapshotMigration;
 
-return new class extends SnapshotMigration
+return new class extends Migration implements SnapshotMigration
 {
     public function up()
     {
-        $this->schema->table('items', function (SnapshotBlueprint $table) {
+        Schema::table('items', function (SnapshotBlueprint $table) {
             $table->boolean('complete')->after('name');
         });
     }
 
     public function down()
     {
-        $this->schema->drop('items');
+        Schema::drop('items');
     }
 };

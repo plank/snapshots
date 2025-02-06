@@ -85,7 +85,7 @@ describe('SnapshotMigrations can be pretended', function () {
     it('reports errors that occur during pretended migrations', function () {
         $version = createFirstVersion('schema/create');
 
-        $migrator = new class($this->app[VersionedSchema::class], $this->app['migration.repository'], $this->app['db'], $this->app['files'], $this->app['events'], $this->app[ManagesVersions::class], $this->app[ManagesCreatedTables::class]) extends SnapshotMigrator
+        $migrator = new class($this->app[VersionedSchema::class], $this->app['migration.repository'], $this->app['db'], $this->app['files'], $this->app['events'], $this->app[ManagesVersions::class], $this->app[ManagesCreatedTables::class], $this->app) extends SnapshotMigrator
         {
             public string $written = '';
 
