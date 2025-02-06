@@ -1,16 +1,18 @@
 <?php
 
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Support\Facades\Schema;
+use Plank\Snapshots\Contracts\SnapshotMigration;
 use Plank\Snapshots\Migrator\SnapshotBlueprint;
-use Plank\Snapshots\Migrator\SnapshotMigration;
 
-return new class extends SnapshotMigration
+return new class extends Migration implements SnapshotMigration
 {
     /**
      * Run the migrations.
      */
     public function up(): void
     {
-        $this->schema->create('posts', function (SnapshotBlueprint $table) {
+        Schema::create('posts', function (SnapshotBlueprint $table) {
             $table->uuid()->primary();
             $table->unsignedBigInteger('user_id');
             $table->string('slug');

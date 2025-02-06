@@ -9,7 +9,6 @@ use InvalidArgumentException;
 use Plank\Snapshots\Contracts\ManagesCreatedTables;
 use Plank\Snapshots\Contracts\ManagesVersions;
 use Plank\Snapshots\Contracts\Version;
-use Plank\Snapshots\Contracts\Versioned;
 use Plank\Snapshots\Contracts\VersionKey;
 use Plank\Snapshots\Events\TableCreated;
 use Plank\Snapshots\Exceptions\MigrationFormatException;
@@ -91,14 +90,14 @@ trait HasVersionedSchema
     /**
      * {@inheritDoc}
      */
-    public function createForModel(string $model, Closure $callback): void
+    public function createForModel(string $class, Closure $callback): void
     {
-        if (! is_a($model, Model::class, true) || ! is_a($model, Versioned::class, true)) {
-            throw new InvalidArgumentException('Models for snapshotted tables must implement '.Versioned::class.' and extend '.Model::class.'.');
+        if (! is_a($class, Model::class, true)) {
+            throw new InvalidArgumentException('Models used in migrations must be instances of '.Model::class.'.');
         }
 
         $active = $this->versions->active();
-        $table = (new $model)->getTable();
+        $table = (new $class)->getTable();
 
         $original = $active
             ? $active->stripTablePrefix($table)
@@ -106,7 +105,7 @@ trait HasVersionedSchema
 
         parent::create($table, $callback);
 
-        $this->tables->queue(new TableCreated($original, $active, $model));
+        $this->tables->queue(new TableCreated($original, $active, $class));
     }
 
     /**
@@ -122,18 +121,15 @@ trait HasVersionedSchema
     }
 
     /**
-     * Create a new table on the schema.
-     *
-     * @param  class-string<Model>  $model
-     * @param  \Closure  $callback
+     * {@inheritDoc}
      */
-    public function dropForModel($model): void
+    public function dropForModel($class): void
     {
-        if (! is_a($model, Model::class, true) || ! is_a($model, Versioned::class, true)) {
-            throw new InvalidArgumentException('Models for snapshotted tables must implement '.Versioned::class.' and extend '.Model::class.'.');
+        if (! is_a($class, Model::class, true)) {
+            throw new InvalidArgumentException('Models used in migrations must be instances of '.Model::class.'.');
         }
 
-        $table = (new $model)->getTable();
+        $table = (new $class)->getTable();
 
         parent::drop($table);
     }
@@ -160,6 +156,18 @@ trait HasVersionedSchema
         }
 
         parent::table($table, $callback);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function model(string $class, Closure $callback): void
+    {
+        if (! is_a($class, Model::class, true)) {
+            throw new InvalidArgumentException('Models used in migrations must be instances of '.Model::class.'.');
+        }
+
+        $this->table(((new $class)->getTable()), $callback);
     }
 
     /**

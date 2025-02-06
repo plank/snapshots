@@ -1,16 +1,18 @@
 <?php
 
-use Illuminate\Database\Schema\Blueprint;
-use Plank\Snapshots\Migrator\SnapshotMigration;
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Support\Facades\Schema;
+use Plank\Snapshots\Contracts\SnapshotMigration;
+use Plank\Snapshots\Migrator\SnapshotBlueprint;
 
-return new class extends SnapshotMigration
+return new class extends Migration implements SnapshotMigration
 {
     /**
      * Run the migrations.
      */
     public function up(): void
     {
-        $this->schema->create('seos', function (Blueprint $table) {
+        Schema::create('seos', function (SnapshotBlueprint $table) {
             $table->id();
             $table->unsignedBigInteger('post_id');
             $table->string('attribute');

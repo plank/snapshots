@@ -121,7 +121,8 @@ class SnapshotServiceProvider extends PackageServiceProvider
                 $app['files'],
                 $app['events'],
                 $app[ManagesVersions::class],
-                $app[ManagesCreatedTables::class]
+                $app[ManagesCreatedTables::class],
+                $app,
             );
         });
 

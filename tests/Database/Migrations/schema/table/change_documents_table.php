@@ -1,13 +1,15 @@
 <?php
 
-use Illuminate\Database\Schema\Blueprint;
-use Plank\Snapshots\Migrator\SnapshotMigration;
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Support\Facades\Schema;
+use Plank\Snapshots\Contracts\SnapshotMigration;
+use Plank\Snapshots\Migrator\SnapshotBlueprint;
 
-return new class extends SnapshotMigration
+return new class extends Migration implements SnapshotMigration
 {
     public function up()
     {
-        $this->schema->table('documents', function (Blueprint $table) {
+        Schema::table('documents', function (SnapshotBlueprint $table) {
             $table->text('text')->change();
         });
     }
