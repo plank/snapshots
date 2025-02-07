@@ -74,7 +74,7 @@ trait HasVersionedSchema
     /**
      * {@inheritDoc}
      */
-    public function create($table, Closure $callback): void
+    public function create($table, Closure $callback)
     {
         $original = $table;
 
@@ -90,7 +90,7 @@ trait HasVersionedSchema
     /**
      * {@inheritDoc}
      */
-    public function createForModel(string $class, Closure $callback): void
+    public function createForModel(string $class, Closure $callback)
     {
         if (! is_a($class, Model::class, true)) {
             throw new InvalidArgumentException('Models used in migrations must be instances of '.Model::class.'.');
@@ -111,7 +111,7 @@ trait HasVersionedSchema
     /**
      * {@inheritDoc}
      */
-    public function drop($table): void
+    public function drop($table)
     {
         if ($active = $this->versions->active()) {
             $table = $active->addTablePrefix($table);
@@ -123,7 +123,7 @@ trait HasVersionedSchema
     /**
      * {@inheritDoc}
      */
-    public function dropForModel($class): void
+    public function dropForModel($class)
     {
         if (! is_a($class, Model::class, true)) {
             throw new InvalidArgumentException('Models used in migrations must be instances of '.Model::class.'.');
@@ -137,7 +137,7 @@ trait HasVersionedSchema
     /**
      * {@inheritDoc}
      */
-    public function dropIfExists($table): void
+    public function dropIfExists($table)
     {
         if ($active = $this->versions->active()) {
             $table = $active->addTablePrefix($table);
@@ -149,7 +149,7 @@ trait HasVersionedSchema
     /**
      * {@inheritDoc}
      */
-    public function table($table, Closure $callback): void
+    public function table($table, Closure $callback)
     {
         if ($active = $this->versions->active()) {
             $table = $active->addTablePrefix($table);
@@ -161,7 +161,7 @@ trait HasVersionedSchema
     /**
      * {@inheritDoc}
      */
-    public function model(string $class, Closure $callback): void
+    public function model(string $class, Closure $callback)
     {
         if (! is_a($class, Model::class, true)) {
             throw new InvalidArgumentException('Models used in migrations must be instances of '.Model::class.'.');
@@ -173,7 +173,7 @@ trait HasVersionedSchema
     /**
      * {@inheritDoc}
      */
-    public function rename($from, $to): void
+    public function rename($from, $to)
     {
         if ($active = $this->versions->active()) {
             $from = $active->addTablePrefix($from);
@@ -186,7 +186,7 @@ trait HasVersionedSchema
     /**
      * {@inheritDoc}
      */
-    public function hasTable($table): bool
+    public function hasTable($table)
     {
         if ($active = $this->versions->active()) {
             $table = $active->addTablePrefix($table);
@@ -198,7 +198,7 @@ trait HasVersionedSchema
     /**
      * {@inheritDoc}
      */
-    public function hasColumn($table, $column): bool
+    public function hasColumn($table, $column)
     {
         if ($active = $this->versions->active()) {
             $table = $active->addTablePrefix($table);
@@ -210,7 +210,7 @@ trait HasVersionedSchema
     /**
      * {@inheritDoc}
      */
-    public function hasColumns($table, array $columns): bool
+    public function hasColumns($table, array $columns)
     {
         if ($active = $this->versions->active()) {
             $table = $active->addTablePrefix($table);
@@ -222,7 +222,7 @@ trait HasVersionedSchema
     /**
      * {@inheritDoc}
      */
-    public function dropColumns($table, $columns): void
+    public function dropColumns($table, $columns)
     {
         if ($active = $this->versions->active()) {
             $table = $active->addTablePrefix($table);
@@ -246,7 +246,7 @@ trait HasVersionedSchema
     /**
      * {@inheritDoc}
      */
-    public function getColumnListing($table): array
+    public function getColumnListing($table)
     {
         if ($active = $this->versions->active()) {
             $table = $active->addTablePrefix($table);
