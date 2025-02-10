@@ -11,6 +11,7 @@ use Illuminate\Console\View\Components\Task;
 use Illuminate\Console\View\Components\TwoColumnDetail;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Database\Connection;
 use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\Events\MigrationsEnded;
 use Illuminate\Database\Events\MigrationsStarted;
@@ -317,7 +318,7 @@ class SnapshotMigrator extends Migrator
             $this->resolver->setDefaultConnection($connection->getName());
 
             if ($migration instanceof SnapshotMigration) {
-                $this->usingSnapshotSchemaBuilder(fn () => $migration->{$method}());
+                $this->usingSnapshotSchemaBuilder($connection, fn () => $migration->{$method}());
             } else {
                 $migration->{$method}();
             }
@@ -326,12 +327,12 @@ class SnapshotMigrator extends Migrator
         }
     }
 
-    protected function usingSnapshotSchemaBuilder(Closure $callback)
+    protected function usingSnapshotSchemaBuilder(Connection $connection, Closure $callback)
     {
         $active = $this->app->make('db.schema');
 
         $this->app->instance('db.schema', SchemaBuilderFactory::make(
-            $this->app['db.connection'],
+            $connection,
             $this->app[ManagesVersions::class],
             $this->app[ManagesCreatedTables::class],
         ));
