@@ -9,7 +9,7 @@ class AsVersionNumber implements CastsAttributes
 {
     public function get($model, string $key, $value, array $attributes)
     {
-        return VersionNumberValueObject::fromVersionString($value);
+        return VersionNumberValueObject::fromVersionString($value ?? '0.0.0');
     }
 
     public function set($model, string $key, $value, array $attributes)
