@@ -58,6 +58,5 @@ class TestCase extends Orchestra
         $app['config']->set('database.default', 'testing');
         $app['config']->set('snapshots.history.observer', null);
         $app['config']->set('snapshots.history.labeler', null);
-        $app['config']->set('snapshots.migration_regex', '/[a-z][a-z_]+$/i');
     }
 }

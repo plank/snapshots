@@ -49,7 +49,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
         expect($plans)->not->toContain('Plumbing Blueprint');
         expect($plans)->toContain('Networking Blueprint');
 
-        versions()->setActive(versions()->byNumber('1.0.0'));
+        versions()->setActive(versions()->byKey('1.0.0'));
 
         $plans = $wellington->plans()->get()->pluck('name');
 
@@ -88,7 +88,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
         expect($plans)->not->toContain('Plumbing Blueprint');
         expect($plans)->not->toContain('Networking Blueprint');
 
-        versions()->setActive(versions()->byNumber('1.0.0'));
+        versions()->setActive(versions()->byKey('1.0.0'));
 
         $plans = $wellington->plans()->get()->pluck('name');
 
@@ -127,7 +127,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
         expect($plans)->not->toContain('Plumbing Blueprint');
         expect($plans)->not->toContain('Networking Blueprint');
 
-        versions()->setActive(versions()->byNumber('1.0.0'));
+        versions()->setActive(versions()->byKey('1.0.0'));
 
         $plans = $wellington->plans()->get()->pluck('name');
 
@@ -184,7 +184,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
         expect($plans)->toContain('Plumbing Blueprint');
         expect($plans)->toContain('Networking Blueprint');
 
-        versions()->setActive(versions()->byNumber('1.0.0'));
+        versions()->setActive(versions()->byKey('1.0.0'));
 
         $plans = $wellington->plans()->get()->pluck('name');
 
@@ -241,7 +241,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
         expect($plans)->toContain('Plumbing Blueprint');
         expect($plans)->toContain('Networking Blueprint');
 
-        versions()->setActive(versions()->byNumber('1.0.0'));
+        versions()->setActive(versions()->byKey('1.0.0'));
 
         $plans = $wellington->plans()->get()->pluck('name');
 
@@ -279,7 +279,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
         expect($contractors)->not->toContain('Anglocorp');
         expect($contractors)->toContain('Mega Canacorp');
 
-        versions()->setActive(versions()->byNumber('1.0.0'));
+        versions()->setActive(versions()->byKey('1.0.0'));
 
         $contractors = $wellington->contractors()->get()->pluck('name');
 
@@ -316,7 +316,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
         expect($contractors)->not->toContain('Americorp');
         expect($contractors)->not->toContain('Anglocorp');
 
-        versions()->setActive(versions()->byNumber('1.0.0'));
+        versions()->setActive(versions()->byKey('1.0.0'));
 
         $contractors = $wellington->contractors()->get()->pluck('name');
 
@@ -352,7 +352,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
         expect($contractors)->not->toContain('Americorp');
         expect($contractors)->not->toContain('Anglocorp');
 
-        versions()->setActive(versions()->byNumber('1.0.0'));
+        versions()->setActive(versions()->byKey('1.0.0'));
 
         $contractors = $wellington->contractors()->get()->pluck('name');
 
@@ -395,7 +395,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
         expect($contractors)->toContain('Americorp');
         expect($contractors)->toContain('Anglocorp');
 
-        versions()->setActive(versions()->byNumber('1.0.0'));
+        versions()->setActive(versions()->byKey('1.0.0'));
 
         $contractors = $wellington->contractors()->get()->pluck('name');
 
@@ -438,7 +438,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
         expect($contractors)->toContain('Americorp');
         expect($contractors)->toContain('Anglocorp');
 
-        versions()->setActive(versions()->byNumber('1.0.0'));
+        versions()->setActive(versions()->byKey('1.0.0'));
 
         $contractors = $wellington->contractors()->get()->pluck('name');
 
@@ -472,7 +472,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
         expect($projects)->toContain('Pennsylvania Ave.');
         expect($projects)->not->toContain('Downing St.');
 
-        versions()->setActive(versions()->byNumber('1.0.0'));
+        versions()->setActive(versions()->byKey('1.0.0'));
 
         $projects = $can->projects()->get()->pluck('name');
 
@@ -506,7 +506,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
         expect($projects)->not->toContain('Pennsylvania Ave.');
         expect($projects)->not->toContain('Downing St.');
 
-        versions()->setActive(versions()->byNumber('1.0.0'));
+        versions()->setActive(versions()->byKey('1.0.0'));
 
         $projects = $can->projects()->get()->pluck('name');
 
@@ -540,7 +540,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
         expect($projects)->not->toContain('Pennsylvania Ave.');
         expect($projects)->not->toContain('Downing St.');
 
-        versions()->setActive(versions()->byNumber('1.0.0'));
+        versions()->setActive(versions()->byKey('1.0.0'));
 
         $projects = $can->projects()->get()->pluck('name');
 
@@ -581,7 +581,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
         expect($projects)->toContain('Pennsylvania Ave.');
         expect($projects)->toContain('Downing St.');
 
-        versions()->setActive(versions()->byNumber('1.0.0'));
+        versions()->setActive(versions()->byKey('1.0.0'));
 
         $projects = $can->projects()->get()->pluck('name');
 
@@ -622,7 +622,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
         expect($projects)->toContain('Pennsylvania Ave.');
         expect($projects)->toContain('Downing St.');
 
-        versions()->setActive(versions()->byNumber('1.0.0'));
+        versions()->setActive(versions()->byKey('1.0.0'));
 
         $projects = $can->projects()->get()->pluck('name');
 

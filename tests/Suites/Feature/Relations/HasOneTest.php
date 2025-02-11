@@ -47,7 +47,7 @@ describe('HasMany relationships use versioned tables correctly', function () {
         expect($user->posts()->count())->toBe(2);
 
         // Go back to the first version and ensure the post was not attached there
-        versions()->setActive(versions()->byNumber('1.0.0'));
+        versions()->setActive(versions()->byKey('1.0.0'));
 
         expect($user->posts()->count())->toBe(0);
     });

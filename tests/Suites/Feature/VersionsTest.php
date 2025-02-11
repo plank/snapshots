@@ -1,7 +1,7 @@
 <?php
 
-use Plank\Snapshots\Contracts\VersionedSchema;
 use Plank\Snapshots\Exceptions\MigrationInProgressException;
+use Plank\Snapshots\Facades\SnapshotConnection;
 use Plank\Snapshots\Models\Version;
 use Plank\Snapshots\ValueObjects\VersionNumber;
 
@@ -30,8 +30,8 @@ describe('Versions are migrated correctly', function () {
     })->throws(InvalidArgumentException::class);
 
     it('returns null when it cannot resolve a version from a migration name', function () {
-        $version = createFirstVersion();
+        createFirstVersion();
 
-        expect(app(VersionedSchema::class)->versionFromMigration('invalid_migration_name'))->toBeNull();
+        expect(versions()->byKey('invalid_migration_name'))->toBeNull();
     });
 });
