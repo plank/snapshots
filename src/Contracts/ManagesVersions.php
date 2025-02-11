@@ -2,14 +2,22 @@
 
 namespace Plank\Snapshots\Contracts;
 
+use Closure;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 
 interface ManagesVersions
 {
     /**
-     * Set the active version which will serve to scope queries to the correct table
+     * Get an instance of the Model being used for versions.
      */
-    public function setActive(?Version $version): void;
+    public function model(): Version&Model;
+
+    /**
+     * Set the active version which will serve to scope queries to the correct table
+     * and return the previously active Version
+     */
+    public function setActive(string|null|VersionKey|Version $version): ?Version;
 
     /**
      * Clear the active version
@@ -20,6 +28,14 @@ interface ManagesVersions
      * Retrieve the version which queries are having their tables prefixed with
      */
     public function active(): ?Version;
+
+    /**
+     * @template TReturn
+     *
+     * @param callable(?Version $version = null): TReturn $callback
+     * @return TReturn
+     */
+    public function withVersionActive(string|null|VersionKey|Version $version, Closure $callback): mixed;
 
     /**
      * Retrieve the latest version
@@ -34,9 +50,9 @@ interface ManagesVersions
     public function find($key): ?Version;
 
     /**
-     * Find a version by its number
+     * Find a version by its uri key
      */
-    public function byNumber(string $number): ?Version;
+    public function byKey(string $key): ?Version;
 
     /**
      * Retrieve all versions

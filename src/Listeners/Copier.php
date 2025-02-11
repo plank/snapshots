@@ -75,7 +75,7 @@ class Copier
     protected function copyTable(TableCreated $created): void
     {
         $from = $created->table;
-        $to = $created->version->addTablePrefix($from);
+        $to = $created->version->key()->prefix($from);
 
         Schema::withoutForeignKeyConstraints(function () use ($from, $to) {
             DB::statement("INSERT INTO `$to` SELECT * FROM `$from`");

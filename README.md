@@ -88,7 +88,7 @@ class SetActiveVersion
     {
         $version = $request->route('version');
 
-        if ($version = $this->versions->byNumber($version)) {
+        if ($version = $this->versions->byKey($version)) {
             $this->versions->setActive($version);
         }
 

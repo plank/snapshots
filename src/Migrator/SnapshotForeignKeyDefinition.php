@@ -20,13 +20,11 @@ class SnapshotForeignKeyDefinition extends ForeignKeyDefinition
      */
     public function onSnapshot(string $table): SnapshotForeignKeyDefinition
     {
-        $active = $this->getVersionRepository()->active();
-
-        if ($active === null) {
-            return $this->on($table);
+        if ($active = $this->getVersionRepository()->active()) {
+            $table = $active->key()->prefix($table);
         }
 
-        return $this->on($active->addTablePrefix($table));
+        return $this->on($table);
     }
 
     protected function getVersionRepository(): ManagesVersions

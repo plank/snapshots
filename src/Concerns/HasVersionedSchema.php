@@ -3,21 +3,18 @@
 namespace Plank\Snapshots\Concerns;
 
 use Closure;
-use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Model;
 use InvalidArgumentException;
 use Plank\Snapshots\Contracts\ManagesCreatedTables;
 use Plank\Snapshots\Contracts\ManagesVersions;
-use Plank\Snapshots\Contracts\Version;
-use Plank\Snapshots\Contracts\VersionKey;
+use Plank\Snapshots\Contracts\VersionedConnection;
 use Plank\Snapshots\Events\TableCreated;
-use Plank\Snapshots\Exceptions\MigrationFormatException;
 use Plank\Snapshots\Migrator\SnapshotBlueprint;
 
 trait HasVersionedSchema
 {
     public function __construct(
-        Connection $connection,
+        VersionedConnection $connection,
         protected ManagesVersions $versions,
         protected ManagesCreatedTables $tables,
     ) {
@@ -29,57 +26,12 @@ trait HasVersionedSchema
     /**
      * {@inheritDoc}
      */
-    public function addMigrationPrefix(Version $version, string $migration): string
-    {
-        return $version->number->key().'_'.$migration;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function stripMigrationPrefix(string $migration): string
-    {
-        $regex = config('snapshots.migration_regex');
-
-        $matches = [];
-
-        if (preg_match($regex, $migration, $matches) !== 1) {
-            throw MigrationFormatException::create($migration);
-        }
-
-        return $matches[0];
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function versionFromMigration(string $migration): ?Version
-    {
-        /** @var class-string<VersionKey> $class */
-        $keyClass = config('snapshots.value_objects.version_number');
-
-        $stripped = $this->stripMigrationPrefix($migration);
-
-        $prefix = str($migration)->before('_'.$stripped);
-
-        try {
-            $key = $keyClass::fromVersionString($prefix);
-        } catch (InvalidArgumentException) {
-            return null;
-        }
-
-        return $this->versions->byNumber($key);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public function create($table, Closure $callback)
     {
         $original = $table;
 
         if ($active = $this->versions->active()) {
-            $table = $active->addTablePrefix($table);
+            $table = $active->key()->prefix($table);
         }
 
         parent::create($table, $callback);
@@ -100,7 +52,7 @@ trait HasVersionedSchema
         $table = (new $class)->getTable();
 
         $original = $active
-            ? $active->stripTablePrefix($table)
+            ? $active->key()->strip($table)
             : $table;
 
         parent::create($table, $callback);
@@ -114,7 +66,7 @@ trait HasVersionedSchema
     public function drop($table)
     {
         if ($active = $this->versions->active()) {
-            $table = $active->addTablePrefix($table);
+            $table = $active->key()->prefix($table);
         }
 
         parent::drop($table);
@@ -140,7 +92,7 @@ trait HasVersionedSchema
     public function dropIfExists($table)
     {
         if ($active = $this->versions->active()) {
-            $table = $active->addTablePrefix($table);
+            $table = $active->key()->prefix($table);
         }
 
         parent::dropIfExists($table);
@@ -152,7 +104,7 @@ trait HasVersionedSchema
     public function table($table, Closure $callback)
     {
         if ($active = $this->versions->active()) {
-            $table = $active->addTablePrefix($table);
+            $table = $active->key()->prefix($table);
         }
 
         parent::table($table, $callback);
@@ -176,8 +128,8 @@ trait HasVersionedSchema
     public function rename($from, $to)
     {
         if ($active = $this->versions->active()) {
-            $from = $active->addTablePrefix($from);
-            $to = $active->addTablePrefix($to);
+            $from = $active->key()->prefix($from);
+            $to = $active->key()->prefix($to);
         }
 
         parent::rename($from, $to);
@@ -189,7 +141,7 @@ trait HasVersionedSchema
     public function hasTable($table)
     {
         if ($active = $this->versions->active()) {
-            $table = $active->addTablePrefix($table);
+            $table = $active->key()->prefix($table);
         }
 
         return parent::hasTable($table);
@@ -201,7 +153,7 @@ trait HasVersionedSchema
     public function hasColumn($table, $column)
     {
         if ($active = $this->versions->active()) {
-            $table = $active->addTablePrefix($table);
+            $table = $active->key()->prefix($table);
         }
 
         return parent::hasColumn($table, $column);
@@ -213,7 +165,7 @@ trait HasVersionedSchema
     public function hasColumns($table, array $columns)
     {
         if ($active = $this->versions->active()) {
-            $table = $active->addTablePrefix($table);
+            $table = $active->key()->prefix($table);
         }
 
         return parent::hasColumns($table, $columns);
@@ -225,7 +177,7 @@ trait HasVersionedSchema
     public function dropColumns($table, $columns)
     {
         if ($active = $this->versions->active()) {
-            $table = $active->addTablePrefix($table);
+            $table = $active->key()->prefix($table);
         }
 
         parent::dropColumns($table, $columns);
@@ -237,7 +189,7 @@ trait HasVersionedSchema
     public function getColumnType($table, $column, $fullDefinition = false)
     {
         if ($active = $this->versions->active()) {
-            $table = $active->addTablePrefix($table);
+            $table = $active->key()->prefix($table);
         }
 
         return parent::getColumnType($table, $column, $fullDefinition);
@@ -249,7 +201,7 @@ trait HasVersionedSchema
     public function getColumnListing($table)
     {
         if ($active = $this->versions->active()) {
-            $table = $active->addTablePrefix($table);
+            $table = $active->key()->prefix($table);
         }
 
         return parent::getColumnListing($table);
@@ -264,7 +216,7 @@ trait HasVersionedSchema
     public function getColumns($table)
     {
         if ($active = $this->versions->active()) {
-            $table = $active->addTablePrefix($table);
+            $table = $active->key()->prefix($table);
         }
 
         return parent::getColumns($table);
@@ -279,7 +231,7 @@ trait HasVersionedSchema
     public function getIndexes($table)
     {
         if ($active = $this->versions->active()) {
-            $table = $active->addTablePrefix($table);
+            $table = $active->key()->prefix($table);
         }
 
         return parent::getIndexes($table);
@@ -294,7 +246,7 @@ trait HasVersionedSchema
     public function getForeignKeys($table)
     {
         if ($active = $this->versions->active()) {
-            $table = $active->addTablePrefix($table);
+            $table = $active->key()->prefix($table);
         }
 
         return parent::getForeignKeys($table);

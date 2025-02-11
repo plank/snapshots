@@ -49,7 +49,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
         expect($products)->toContain('Fan');
         expect($products)->toContain('Heat Pump');
 
-        versions()->setActive(versions()->byNumber('1.0.0'));
+        versions()->setActive(versions()->byKey('1.0.0'));
 
         $products = $project->activeVersion()->products->pluck('name');
 
@@ -86,7 +86,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
         expect($products)->toContain('Outlet');
         expect($products)->not()->toContain('Switch');
 
-        versions()->setActive(versions()->byNumber('1.0.0'));
+        versions()->setActive(versions()->byKey('1.0.0'));
 
         $products = $project->activeVersion()->products->pluck('name');
 
@@ -118,7 +118,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
         expect($products)->not()->toContain('Sink');
         expect($products)->not()->toContain('Shower');
 
-        versions()->setActive(versions()->byNumber('1.0.0'));
+        versions()->setActive(versions()->byKey('1.0.0'));
 
         $products = $project->activeVersion()->products->pluck('name');
 
@@ -174,7 +174,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
 
         expect($pivot->quantity)->toBe(10);
 
-        versions()->setActive(versions()->byNumber('1.0.0'));
+        versions()->setActive(versions()->byKey('1.0.0'));
 
         $products = $project->activeVersion()->products->pluck('name');
 
@@ -222,7 +222,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
         expect($products)->toContain('Outlet');
         expect($products)->toContain('Switch');
 
-        versions()->setActive(versions()->byNumber('1.0.0'));
+        versions()->setActive(versions()->byKey('1.0.0'));
 
         $products = $project->activeVersion()->products->pluck('name');
 
@@ -260,7 +260,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
         expect($products)->toContain('Electrical');
         expect($products)->not()->toContain('Plumbing');
 
-        versions()->setActive(versions()->byNumber('1.0.0'));
+        versions()->setActive(versions()->byKey('1.0.0'));
 
         $products = $project->activeVersion()->categories->pluck('name');
 
@@ -297,7 +297,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
         expect($products)->not()->toContain('Electrical');
         expect($products)->not()->toContain('Plumbing');
 
-        versions()->setActive(versions()->byNumber('1.0.0'));
+        versions()->setActive(versions()->byKey('1.0.0'));
 
         $products = $project->activeVersion()->categories->pluck('name');
 
@@ -329,7 +329,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
         expect($products)->not()->toContain('Electrical');
         expect($products)->not()->toContain('Plumbing');
 
-        versions()->setActive(versions()->byNumber('1.0.0'));
+        versions()->setActive(versions()->byKey('1.0.0'));
 
         $products = $project->activeVersion()->categories->pluck('name');
 
@@ -367,7 +367,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
         expect($products)->toContain('Electrical');
         expect($products)->not()->toContain('Plumbing');
 
-        versions()->setActive(versions()->byNumber('1.0.0'));
+        versions()->setActive(versions()->byKey('1.0.0'));
 
         $products = $project->activeVersion()->categories->pluck('name');
 
@@ -405,7 +405,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
         expect($products)->toContain('Electrical');
         expect($products)->not()->toContain('Plumbing');
 
-        versions()->setActive(versions()->byNumber('1.0.0'));
+        versions()->setActive(versions()->byKey('1.0.0'));
 
         $products = $project->activeVersion()->categories->pluck('name');
 
@@ -443,7 +443,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
         expect($projects)->not()->toContain('Pennsylvania Ave.');
         expect($projects)->toContain('Downing St.');
 
-        versions()->setActive(versions()->byNumber('1.0.0'));
+        versions()->setActive(versions()->byKey('1.0.0'));
 
         $projects = $category->unsetRelations()->projects->pluck('name');
 
@@ -480,7 +480,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
         expect($projects)->not()->toContain('Pennsylvania Ave.');
         expect($projects)->not()->toContain('Downing St.');
 
-        versions()->setActive(versions()->byNumber('1.0.0'));
+        versions()->setActive(versions()->byKey('1.0.0'));
 
         $projects = $category->unsetRelations()->projects->pluck('name');
 
@@ -512,7 +512,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
         expect($projects)->not()->toContain('Pennsylvania Ave.');
         expect($projects)->not()->toContain('Downing St.');
 
-        versions()->setActive(versions()->byNumber('1.0.0'));
+        versions()->setActive(versions()->byKey('1.0.0'));
 
         $projects = $category->unsetRelations()->projects->pluck('name');
 
@@ -550,7 +550,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
         expect($projects)->not()->toContain('Pennsylvania Ave.');
         expect($projects)->toContain('Downing St.');
 
-        versions()->setActive(versions()->byNumber('1.0.0'));
+        versions()->setActive(versions()->byKey('1.0.0'));
 
         $projects = $category->unsetRelations()->projects->pluck('name');
 
@@ -588,7 +588,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
         expect($projects)->not()->toContain('Pennsylvania Ave.');
         expect($projects)->toContain('Downing St.');
 
-        versions()->setActive(versions()->byNumber('1.0.0'));
+        versions()->setActive(versions()->byKey('1.0.0'));
 
         $projects = $category->unsetRelations()->projects->pluck('name');
 

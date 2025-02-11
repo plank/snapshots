@@ -9,10 +9,9 @@ use Illuminate\Support\Facades\Event;
 use Plank\Snapshots\Contracts\ManagesCreatedTables;
 use Plank\Snapshots\Contracts\ManagesVersions;
 use Plank\Snapshots\Contracts\ResolvesCauser;
-use Plank\Snapshots\Contracts\VersionedSchema;
 use Plank\Snapshots\Events\TableCopied;
 use Plank\Snapshots\Events\VersionCreated;
-use Plank\Snapshots\Factory\SchemaBuilderFactory;
+use Plank\Snapshots\Factory\SnapshotConnectionBuilder;
 use Plank\Snapshots\Migrator\SnapshotMigrator;
 use Spatie\LaravelPackageTools\Commands\InstallCommand;
 use Spatie\LaravelPackageTools\Package;
@@ -59,50 +58,38 @@ class SnapshotServiceProvider extends PackageServiceProvider
     public function bootingPackage()
     {
         $this->bindRepositories()
-            ->bindSchemaBuilder()
-            ->bindMigrator();
-
-        $this->listenToEvents();
+            ->bindConnectionBuilder()
+            ->bindMigrator()
+            ->listenToEvents();
     }
 
     protected function bindRepositories(): self
     {
-        if (! $this->app->bound(ManagesVersions::class)) {
-            $this->app->scoped(ManagesVersions::class, function (Application $app) {
-                $repo = $app['config']->get('snapshots.repositories.version');
+        $this->app->scopedIf(ManagesVersions::class, function (Application $app) {
+            $repo = $app['config']->get('snapshots.repositories.version');
 
-                return new $repo;
-            });
-        }
+            return new $repo;
+        });
 
-        if (! $this->app->bound(ResolvesCauser::class)) {
-            $this->app->scoped(ResolvesCauser::class, function (Application $app) {
-                $repo = $app['config']->get('snapshots.repositories.causer');
+        $this->app->scopedIf(ResolvesCauser::class, function (Application $app) {
+            $repo = $app['config']->get('snapshots.repositories.causer');
 
-                return new $repo;
-            });
-        }
+            return new $repo;
+        });
 
-        if (! $this->app->bound(ManagesCreatedTables::class)) {
-            $this->app->scoped(ManagesCreatedTables::class, function (Application $app) {
-                $repo = $app['config']->get('snapshots.repositories.table');
+        $this->app->scopedIf(ManagesCreatedTables::class, function (Application $app) {
+            $repo = $app['config']->get('snapshots.repositories.table');
 
-                return new $repo;
-            });
-        }
+            return new $repo;
+        });
 
         return $this;
     }
 
-    protected function bindSchemaBuilder(): self
+    protected function bindConnectionBuilder(): self
     {
-        if ($this->app->bound(VersionedSchema::class)) {
-            return $this;
-        }
-
-        $this->app->scoped(VersionedSchema::class, function (Application $app) {
-            return SchemaBuilderFactory::make(
-                $app['db.connection'],
+        $this->app->scopedIf(SnapshotConnectionBuilder::class, function (Application $app) {
+            return new SnapshotConnectionBuilder(
                 $app[ManagesVersions::class],
                 $app[ManagesCreatedTables::class],
             );
@@ -115,11 +102,11 @@ class SnapshotServiceProvider extends PackageServiceProvider
     {
         $this->app->extend('migrator', function (Migrator $migrator, Application $app) {
             return new SnapshotMigrator(
-                $app[VersionedSchema::class],
                 $app['migration.repository'],
                 $app['db'],
                 $app['files'],
                 $app['events'],
+                $app[SnapshotConnectionBuilder::class],
                 $app[ManagesVersions::class],
                 $app[ManagesCreatedTables::class],
                 $app,

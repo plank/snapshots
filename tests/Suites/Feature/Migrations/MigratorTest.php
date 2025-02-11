@@ -2,8 +2,6 @@
 
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schema;
-use Plank\Snapshots\Contracts\VersionedSchema;
-use Plank\Snapshots\Exceptions\MigrationFormatException;
 use Plank\Snapshots\Tests\Models\Item;
 
 use function Pest\Laravel\artisan;
@@ -23,10 +21,6 @@ describe('SnapshotMigrations use versions to run up and down', function () {
         createPatchVersion('schema/create');
         createMajorVersion('schema/create');
     });
-
-    it('throws an error when migrations do not follow the configured naming format', function () {
-        app(VersionedSchema::class)->stripMigrationPrefix('numbers_at_the_end_are_bad_6');
-    })->throws(MigrationFormatException::class);
 
     it('runs snapshot migrations when new versions are created', function () {
         assertDatabaseHas('migrations', [
