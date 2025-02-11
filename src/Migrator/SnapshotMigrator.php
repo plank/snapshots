@@ -111,7 +111,7 @@ class SnapshotMigrator extends Migrator
      * Detrmine if the configured version model has been migrated yet
      */
     protected function versionModelHasBeenMigrated(): bool
-    {   
+    {
         return $this->usingConnectionSchema(
             $this->resolver->connection(),
             fn () => $this->versions->model()->hasBeenMigrated()
@@ -372,7 +372,7 @@ class SnapshotMigrator extends Migrator
     /**
      * @template TReturn
      *
-     * @param callable(): TReturn $callback
+     * @param  callable(): TReturn  $callback
      * @return TReturn
      */
     protected function usingConnectionSchema(Connection $connection, Closure $callback): mixed

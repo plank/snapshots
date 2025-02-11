@@ -47,7 +47,7 @@ class VersionNumber implements VersionKey
 
         return new static(str($major)->after('v')->toInteger(), (int) $minor, (int) $patch);
     }
-    
+
     public static function fromVersionString(string $version): static
     {
         if (preg_match(static::DOT_REGEX, $version) === 1) {

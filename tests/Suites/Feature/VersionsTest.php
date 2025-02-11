@@ -1,7 +1,6 @@
 <?php
 
 use Plank\Snapshots\Exceptions\MigrationInProgressException;
-use Plank\Snapshots\Facades\SnapshotConnection;
 use Plank\Snapshots\Models\Version;
 use Plank\Snapshots\ValueObjects\VersionNumber;
 
