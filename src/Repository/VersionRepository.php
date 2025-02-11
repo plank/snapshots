@@ -7,8 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Plank\Snapshots\Contracts\ManagesVersions;
 use Plank\Snapshots\Contracts\Version;
+use Plank\Snapshots\Contracts\VersionKey;
 use Plank\Snapshots\Models\Version as VersionModel;
-use Plank\Snapshots\ValueObjects\VersionNumber;
 
 class VersionRepository implements ManagesVersions
 {
@@ -25,9 +25,17 @@ class VersionRepository implements ManagesVersions
     /**
      * {@inheritDoc}
      */
-    public function setActive(?Version $version): void
+    public function setActive(string|null|VersionKey|Version $version): ?Version
     {
+        $oldActive = $this->active;
+
+        if ($version && ! $version instanceof Version) {
+            $version = $this->byKey($version);
+        }
+
         $this->active = $version;
+
+        return $oldActive;
     }
 
     /**
@@ -47,18 +55,19 @@ class VersionRepository implements ManagesVersions
     }
 
     /**
-     * @param callable(?Version $version = null) $callback
+     * @template TReturn
+     *
+     * @param callable(?Version $version = null): TReturn $callback
+     * @return TReturn
      */
-    public function withVersionActive(string|VersionNumber|Version $version, Closure $callback): mixed
+    public function withVersionActive(string|null|VersionKey|Version $version, Closure $callback): mixed
     {
-        $active = $this->active();
-
-        $this->setActive($version);
+        $oldActive = $this->setActive($version);
 
         try {
-            $result = $callback($version);
+            $result = $callback($this->active);
         } finally {
-            $this->setActive($active);
+            $this->setActive($oldActive);
         }
 
         return $result;
@@ -89,11 +98,23 @@ class VersionRepository implements ManagesVersions
     /**
      * {@inheritDoc}
      */
-    public function byNumber(string $number): (Version&Model)|null
+    public function byKey(string|VersionKey $key): (Version&Model)|null
     {
-        return $this->model()
-            ->query()
-            ->where('number', $number)
+        $model = $this->model();
+
+        if (is_string($key)) {
+            /** @var class-string<VersionKey> $keyClass */
+            $keyClass = config('snapshots.value_objects.version_key');
+
+            try {
+                $key = $keyClass::fromString($key);
+            } catch (\InvalidArgumentException) {
+                return null;
+            }
+        }
+
+        return $model->query()
+            ->where($model::keyColumn(), $key)
             ->first();
     }
 

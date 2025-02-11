@@ -30,7 +30,7 @@ trait InteractsWithVersionedContent
         $relationName = null
     ) {
         if (($this instanceof Versioned || $query->getModel() instanceof Versioned) && $active = Versions::active()) {
-            $table = $active->addTablePrefix($table);
+            $table = $active->key()->prefix($table);
         }
 
         if ($this instanceof Identifying || $this instanceof Identifiable) {
@@ -74,7 +74,7 @@ trait InteractsWithVersionedContent
         $inverse = false
     ) {
         if (($this instanceof Versioned || $query->getModel() instanceof Versioned) && $active = Versions::active()) {
-            $table = $active->addTablePrefix($table);
+            $table = $active->key()->prefix($table);
         }
 
         if ($this instanceof Identifying || $this instanceof Identifiable) {

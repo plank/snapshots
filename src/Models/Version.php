@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Plank\Snapshots\Casts\AsVersionNumber;
 use Plank\Snapshots\Concerns\AsVersion;
 use Plank\Snapshots\Contracts\Version as VersionContract;
+use Plank\Snapshots\Contracts\VersionKey;
 use Plank\Snapshots\Observers\VersionObserver;
 use Plank\Snapshots\ValueObjects\VersionNumber;
 
@@ -22,9 +23,20 @@ class Version extends Model implements VersionContract
 
     protected $guarded = [];
 
-    protected $casts = [
-        'number' => AsVersionNumber::class,
-    ];
+    /**
+     * Create a new Eloquent model instance.
+     *
+     * @param  array  $attributes
+     * @return void
+     */
+    public function __construct(array $attributes = [])
+    {
+        $this->mergeCasts([
+            static::keyColumn() => AsVersionNumber::class,
+        ]);
+
+        parent::__construct($attributes);
+    }
 
     public static function boot(): void
     {
@@ -33,8 +45,13 @@ class Version extends Model implements VersionContract
         static::observe(VersionObserver::class);
     }
 
-    public function uriKey(): string
+    public static function keyColumn(): string
     {
-        return (string) $this->number;
+        return 'number';
+    }
+
+    public function key(): VersionKey
+    {
+        return $this->{static::keyColumn()};
     }
 }

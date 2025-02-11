@@ -15,25 +15,19 @@ interface Version
     public function hasBeenMigrated(): bool;
 
     /**
-     * Add a prefix for to the table names specified in SnapshotMigrations, and
-     * also the Eloquent Models getTable() methods.
-     */
-    public function addTablePrefix(string $table): string;
-
-    /**
-     * Remove the prefix from a table name.
-     */
-    public static function stripTablePrefix(string $table): string;
-
-    /**
      * Determine if the Version has already been migrated.
      */
     public function isMigrated(): bool;
 
     /**
+     * Get the version's identifying key
+     */
+    public static function keyColumn(): string;
+
+    /**
      * Get a string which can identify the version in a URL
      */
-    public function uriKey(): string;
+    public function key(): VersionKey;
 
     /**
      * Get the version's identifying key

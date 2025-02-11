@@ -22,7 +22,7 @@ trait AsVersionedPivot
     public function getTable()
     {
         if ($version = Versions::active()) {
-            return $version->addTablePrefix($this->getPivotTable());
+            return $version->key()->prefix($this->getPivotTable());
         }
 
         return $this->getPivotTable();

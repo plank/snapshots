@@ -78,8 +78,7 @@ class SnapshotBlueprint extends Blueprint
         $index = $index ?: $this->createIndexName($type, $columns);
 
         if ($version = Versions::active()) {
-            $index = $version->stripTablePrefix($index);
-            $index = $version->addTablePrefix($index);
+            $index = $version->key()->prefix($index);
         }
 
         return $this->addCommand(

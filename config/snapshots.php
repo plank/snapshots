@@ -3,15 +3,6 @@
 return [
     /*
     |--------------------------------------------------------------------------
-    | Migration Regex
-    |--------------------------------------------------------------------------
-    |
-    | The format indicated by this regex must be adhered to for all migration files
-    */
-    'migration_regex' => '/\d{4}_\d{2}_\d{2}_\d{6}_[a-zA-Z0-9_]+/',
-
-    /*
-    |--------------------------------------------------------------------------
     | Models
     |--------------------------------------------------------------------------
     |
@@ -32,12 +23,12 @@ return [
     | Value Objects
     |--------------------------------------------------------------------------
     |
-    | version_number:
+    | version_key:
     | This object adds some helper methods for working with version numbers.
     | It must implement the \Plank\Snapshots\Contracts\VersionKey interface.
     */
     'value_objects' => [
-        'version_number' => \Plank\Snapshots\ValueObjects\VersionNumber::class,
+        'version_key' => \Plank\Snapshots\ValueObjects\VersionNumber::class,
     ],
 
     /*
