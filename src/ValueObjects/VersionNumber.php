@@ -86,7 +86,7 @@ class VersionNumber implements VersionKey
             ->replaceMatches(static::DOT_REGEX, '')
             ->replaceMatches(static::KEY_REGEX, '')
             ->replaceMatches(static::MIGRATION_REGEX, '')
-            ->trim(' _')
+            ->trim(' _.-')
             ->toString();
     }
 
