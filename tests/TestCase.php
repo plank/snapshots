@@ -4,9 +4,11 @@ namespace Plank\Snapshots\Tests;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Orchestra\Testbench\TestCase as Orchestra;
+use Plank\LaravelSchemaEvents\LaravelSchemaEventsServiceProvider;
 use Plank\Snapshots\Repository\VersionRepository;
 use Plank\Snapshots\SnapshotServiceProvider;
 use Plank\Snapshots\Tests\Database\Seeders\Model\UserSeeder;
@@ -14,6 +16,8 @@ use Plank\Snapshots\Tests\Models\User;
 
 class TestCase extends Orchestra
 {
+    use RefreshDatabase;
+
     public ?VersionRepository $versions = null;
 
     protected function setUp(): void
@@ -49,6 +53,7 @@ class TestCase extends Orchestra
     protected function getPackageProviders($app)
     {
         return [
+            LaravelSchemaEventsServiceProvider::class,
             SnapshotServiceProvider::class,
         ];
     }

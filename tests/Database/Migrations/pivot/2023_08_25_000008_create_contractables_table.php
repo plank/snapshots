@@ -1,11 +1,10 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\Schema;
-use Plank\Snapshots\Contracts\SnapshotMigration;
-use Plank\Snapshots\Migrator\SnapshotBlueprint;
+use Plank\Snapshots\Migrator\Blueprint\SnapshotBlueprint;
+use Plank\Snapshots\Migrator\SnapshotMigration;
 
-return new class extends Migration implements SnapshotMigration
+return new class extends SnapshotMigration
 {
     /**
      * Run the migrations.
@@ -18,7 +17,10 @@ return new class extends Migration implements SnapshotMigration
             $table->morphs('contractable');
             $table->timestamps();
 
-            $table->foreign('contractor_id')->references('id')->on('contractors')->onDelete('cascade');
+            $table->unversionedForeign('contractor_id')
+                ->references('id')
+                ->on('contractors')
+                ->onDelete('cascade');
         });
     }
 };
