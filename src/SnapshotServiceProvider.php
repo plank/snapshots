@@ -6,7 +6,7 @@ use Illuminate\Database\Events\MigrationsEnded;
 use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Event;
-use Plank\Snapshots\Contracts\ManagesCreatedTables;
+use Plank\LaravelSchemaEvents\Events\TableCreated;
 use Plank\Snapshots\Contracts\ManagesVersions;
 use Plank\Snapshots\Contracts\ResolvesCauser;
 use Plank\Snapshots\Events\TableCopied;
@@ -122,8 +122,8 @@ class SnapshotServiceProvider extends PackageServiceProvider
             Event::listen(VersionCreated::class, $migrator);
         }
 
-        if ($copier = config()->get('snapshots.copier.handler')) {
-            Event::listen(MigrationsEnded::class, $copier);
+        if ($copier = config()->get('snapshots.copier')) {
+            Event::listen(TableCreated::class, $copier);
         }
 
         if ($labeler = config()->get('snapshots.history.labeler')) {
