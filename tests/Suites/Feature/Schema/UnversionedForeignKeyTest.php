@@ -1,8 +1,6 @@
 <?php
 
 use Illuminate\Database\Schema\Builder as SchemaBuilder;
-use Illuminate\Database\SQLiteConnection;
-use Illuminate\Support\Facades\DB;
 
 use function Pest\Laravel\artisan;
 
