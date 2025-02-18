@@ -5,40 +5,45 @@ namespace Plank\Snapshots\Listeners;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Collection;
 use Plank\Snapshots\Contracts\CausesChanges;
+use Plank\Snapshots\Contracts\ManagesVersions;
 use Plank\Snapshots\Contracts\ResolvesCauser;
+use Plank\Snapshots\Contracts\ResolvesModels;
 use Plank\Snapshots\Contracts\Trackable;
-use Plank\Snapshots\Contracts\Versioned;
 use Plank\Snapshots\Enums\Operation;
 use Plank\Snapshots\Events\TableCopied;
-use Plank\Snapshots\Exceptions\LabelingException;
 use Plank\Snapshots\Models\History;
 
 class LabelHistory
 {
+    public function __construct(
+        protected ManagesVersions $versions,
+        protected ResolvesModels $models,
+    ) {}
+
     public function handle(TableCopied $event)
     {
-        if ($event->model === null) {
+        $model = $this->models->resolve($event->table);
+
+        if ($model === null) {
             return;
         }
 
-        if (! is_a($event->model, Versioned::class, true)) {
-            throw LabelingException::create($event->model);
-        }
+        $version = $this->versions->byKey($event->table);
 
         /** @var class-string<History>|null */
         $history = config()->get('snapshots.models.history');
 
         $history::query()
-            ->where('trackable_type', $event->model)
+            ->where('trackable_type', $model)
             ->whereNull('version_id')
             ->cursor()
             ->groupBy('trackable_id')
-            ->each(function (Collection $items) use ($event) {
+            ->each(function (Collection $items) use ($version) {
                 // Move all History items from the working version to the newly created version
-                $items->each(function (History $item) use ($event) {
-                    History::withoutTimestamps(function () use ($item, $event) {
+                $items->each(function (History $item) use ($version) {
+                    History::withoutTimestamps(function () use ($item, $version) {
                         $item->updateQuietly([
-                            'version_id' => $event->version->getKey(),
+                            'version_id' => $version->getKey(),
                         ]);
                     });
                 });

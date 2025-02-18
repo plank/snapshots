@@ -10,7 +10,7 @@ use Plank\Snapshots\Contracts\Version;
 /**
  * @method static void setActive(?Version $version)
  * @method static void clearActive()
- * @method static mixed withVersionActive(string|VersionNumber|Version $version, callable $callback)
+ * @method static mixed withVersionActive(string|VersionNumber|Version|null $version, callable $callback)
  * @method static Version|null active()
  * @method static Version|null latest()
  * @method static Version|null find($key)

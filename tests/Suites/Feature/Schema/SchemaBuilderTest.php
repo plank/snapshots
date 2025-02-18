@@ -1,13 +1,9 @@
 <?php
 
+use Illuminate\Database\Schema\Builder as SchemaBuilder;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
-use Nette\NotImplementedException;
 use Plank\Snapshots\Exceptions\MigrationFailedException;
-use Plank\Snapshots\Facades\SnapshotConnection;
-use Plank\Snapshots\Migrator\SnapshotBlueprint;
-use Plank\Snapshots\Schema\SnapshotBuilder;
-use Plank\Snapshots\Tests\Models\Document;
+use Plank\Snapshots\Migrator\Blueprint\SnapshotBlueprint;
 
 use function Pest\Laravel\artisan;
 use function Pest\Laravel\assertDatabaseHas;
@@ -15,8 +11,6 @@ use function Pest\Laravel\partialMock;
 
 describe('The snapshot schema prefixes tables appropriately', function () {
     beforeEach(function () {
-        app()->instance('db.schema', SnapshotConnection::default()->getSchemaBuilder());
-
         artisan('migrate', [
             '--path' => migrationPath('schema/create'),
             '--realpath' => true,
@@ -25,28 +19,34 @@ describe('The snapshot schema prefixes tables appropriately', function () {
 
     it('migrates the declared table before the versions table has been migrated', function () {
         DB::table('migrations')->truncate();
-        Schema::drop('versions');
-        Schema::drop('documents');
+        usingSnapshotSchema(function (SchemaBuilder $schema) {
+            $schema->drop('versions');
+            $schema->drop('documents');
+        });
 
         artisan('migrate', [
             '--path' => migrationPath('schema/create'),
             '--realpath' => true,
         ])->run();
 
-        expect(Schema::hasTable('documents'))->toBeTrue();
+        usingSnapshotSchema(function (SchemaBuilder $schema) {
+            expect($schema->hasTable('documents'))->toBeTrue();
+        });
     });
 
     it('uses the declared table name when no active version is set', function () {
         versions()->clearActive();
 
-        Schema::create('files', function (SnapshotBlueprint $table) {
-            $table->id();
-            $table->string('title');
-            $table->string('contents');
-            $table->timestamps();
-        });
+        usingSnapshotSchema(function (SchemaBuilder $schema) {
+            $schema->create('files', function (SnapshotBlueprint $table) {
+                $table->id();
+                $table->string('title');
+                $table->string('contents');
+                $table->timestamps();
+            });
 
-        expect(Schema::hasTable('files'))->toBeTrue();
+            expect($schema->hasTable('files'))->toBeTrue();
+        });
     });
 
     it('creates versioned tables', function () {
@@ -95,7 +95,9 @@ describe('The snapshot schema prefixes tables appropriately', function () {
             'batch' => 4,
         ]);
 
-        expect(Schema::hasTable('v1_0_0_documents'))->toBeTrue();
+        usingSnapshotSchema(function (SchemaBuilder $schema) {
+            expect($schema->hasTable('documents'))->toBeTrue();
+        });
 
         createMinorVersion('schema/create_for_model');
 
@@ -104,14 +106,10 @@ describe('The snapshot schema prefixes tables appropriately', function () {
             'batch' => 5,
         ]);
 
-        expect(Schema::hasTable('v1_1_0_documents'))->toBeTrue();
-    });
-
-    it('throws an error when you pass an improper class string to createForModel', function () {
-        Schema::createForModel('documents', function ($table) {
-            // The error will already be triggered
+        usingSnapshotSchema(function (SchemaBuilder $schema) {
+            expect($schema->hasTable('documents'))->toBeTrue();
         });
-    })->throws(InvalidArgumentException::class);
+    });
 
     it('drops versioned tables', function () {
         createFirstVersion('schema/create');
@@ -126,16 +124,6 @@ describe('The snapshot schema prefixes tables appropriately', function () {
             'batch' => 5,
         ]);
     });
-
-    it('drops versioned tables for models', function () {
-        Schema::dropForModel(Document::class);
-
-        expect(Schema::hasTable('documents'))->toBeFalse();
-    });
-
-    it('throws an error when you pass an improper class string to dropForModel', function () {
-        Schema::dropForModel('documents');
-    })->throws(InvalidArgumentException::class);
 
     it('drops versioned tables if they exist when they exist', function () {
         createFirstVersion('schema/create');
@@ -192,9 +180,11 @@ describe('The snapshot schema prefixes tables appropriately', function () {
     });
 
     it('drops columns on the original tables', function () {
-        Schema::whenTableHasColumn('documents', 'released_at', function () {
-            expect(Schema::hasColumn('documents', 'released_at'))->toBeTrue();
-            expect(Schema::getColumnListing('documents'))->toBe(['id', 'title', 'text', 'released_at', 'created_at', 'updated_at']);
+        usingSnapshotSchema(function (SchemaBuilder $schema) {
+            $schema->whenTableHasColumn('documents', 'released_at', function () use ($schema) {
+                expect($schema->hasColumn('documents', 'released_at'))->toBeTrue();
+                expect($schema->getColumnListing('documents'))->toBe(['id', 'title', 'text', 'released_at', 'created_at', 'updated_at']);
+            });
         });
 
         artisan('migrate', [
@@ -207,18 +197,22 @@ describe('The snapshot schema prefixes tables appropriately', function () {
             'batch' => 4,
         ]);
 
-        Schema::whenTableDoesntHaveColumn('documents', 'released_at', function () {
-            expect(Schema::hasColumns('documents', ['released_at']))->toBeFalse();
-            expect(Schema::getColumnListing('documents'))->toBe(['id', 'title', 'text', 'created_at', 'updated_at']);
+        usingSnapshotSchema(function (SchemaBuilder $schema) {
+            $schema->whenTableDoesntHaveColumn('documents', 'released_at', function () use ($schema) {
+                expect($schema->hasColumns('documents', ['released_at']))->toBeFalse();
+                expect($schema->getColumnListing('documents'))->toBe(['id', 'title', 'text', 'created_at', 'updated_at']);
+            });
         });
     });
 
     it('drops columns on the versioned tables', function () {
         versions()->setActive(createFirstVersion('schema/create'));
 
-        Schema::whenTableHasColumn('documents', 'released_at', function () {
-            expect(Schema::hasColumn('documents', 'released_at'))->toBeTrue();
-            expect(Schema::getColumnListing('documents'))->toBe(['id', 'title', 'text', 'released_at', 'created_at', 'updated_at']);
+        usingSnapshotSchema(function (SchemaBuilder $schema) {
+            $schema->whenTableHasColumn('documents', 'released_at', function () use ($schema) {
+                expect($schema->hasColumn('documents', 'released_at'))->toBeTrue();
+                expect($schema->getColumnListing('documents'))->toBe(['id', 'title', 'text', 'released_at', 'created_at', 'updated_at']);
+            });
         });
 
         artisan('migrate', [
@@ -231,15 +225,19 @@ describe('The snapshot schema prefixes tables appropriately', function () {
             'batch' => 5,
         ]);
 
-        Schema::whenTableDoesntHaveColumn('documents', 'released_at', function () {
-            expect(Schema::hasColumns('documents', ['released_at']))->toBeFalse();
-            expect(Schema::getColumnListing('documents'))->toBe(['id', 'title', 'text', 'created_at', 'updated_at']);
+        usingSnapshotSchema(function (SchemaBuilder $schema) {
+            $schema->whenTableDoesntHaveColumn('documents', 'released_at', function () use ($schema) {
+                expect($schema->hasColumns('documents', ['released_at']))->toBeFalse();
+                expect($schema->getColumnListing('documents'))->toBe(['id', 'title', 'text', 'created_at', 'updated_at']);
+            });
         });
     });
 
     it('renames the original tables', function () {
-        expect(Schema::hasTable('documents'))->toBeTrue();
-        expect(Schema::hasTable('files'))->toBeFalse();
+        usingSnapshotSchema(function (SchemaBuilder $schema) {
+            expect($schema->hasTable('documents'))->toBeTrue();
+            expect($schema->hasTable('files'))->toBeFalse();
+        });
 
         artisan('migrate', [
             '--path' => migrationPath('schema/rename'),
@@ -251,17 +249,24 @@ describe('The snapshot schema prefixes tables appropriately', function () {
             'batch' => 4,
         ]);
 
-        expect(Schema::hasTable('documents'))->toBeFalse();
-        expect(Schema::hasTable('files'))->toBeTrue();
+        usingSnapshotSchema(function (SchemaBuilder $schema) {
+            expect($schema->hasTable('documents'))->toBeFalse();
+            expect($schema->hasTable('files'))->toBeTrue();
+        });
     });
 
     it('renames the versioned tables', function () {
+        usingSnapshotSchema(function (SchemaBuilder $schema) {
+            expect($schema->hasTable('documents'))->toBeTrue();
+            expect($schema->hasTable('files'))->toBeFalse();
+        });
+
         versions()->setActive(createFirstVersion('schema/create'));
 
-        expect(Schema::hasTable('v1_0_0_documents'))->toBeTrue();
-        expect(Schema::hasTable('documents'))->toBeTrue();
-        expect(Schema::hasTable('v1_0_0_files'))->toBeFalse();
-        expect(Schema::hasTable('files'))->toBeFalse();
+        usingSnapshotSchema(function (SchemaBuilder $schema) {
+            expect($schema->hasTable('documents'))->toBeTrue();
+            expect($schema->hasTable('files'))->toBeFalse();
+        });
 
         artisan('migrate', [
             '--path' => migrationPath('schema/rename'),
@@ -273,17 +278,22 @@ describe('The snapshot schema prefixes tables appropriately', function () {
             'batch' => 5,
         ]);
 
-        expect(Schema::hasTable('v1_0_0_documents'))->toBeFalse();
-        expect(Schema::hasTable('documents'))->toBeFalse();
-        expect(Schema::hasTable('v1_0_0_files'))->toBeTrue();
-        expect(Schema::hasTable('files'))->toBeTrue();
+        usingSnapshotSchema(function (SchemaBuilder $schema) {
+            expect($schema->hasTable('documents'))->toBeFalse();
+            expect($schema->hasTable('files'))->toBeTrue();
+
+            expect($schema->hasTable('documents'))->toBeFalse();
+            expect($schema->hasTable('files'))->toBeTrue();
+        });
     });
 
     it('changes columns on versioned tables', function () {
         versions()->setActive(createFirstVersion('schema/create'));
 
-        expect(Schema::getColumnType('documents', 'title'))->toBe(varcharColumn());
-        expect(Schema::getColumnType('documents', 'text'))->toBe(varcharColumn());
+        usingSnapshotSchema(function (SchemaBuilder $schema) {
+            expect($schema->getColumnType('documents', 'title'))->toBe(varcharColumn());
+            expect($schema->getColumnType('documents', 'text'))->toBe(varcharColumn());
+        });
 
         artisan('migrate', [
             '--path' => migrationPath('schema/table'),
@@ -295,20 +305,18 @@ describe('The snapshot schema prefixes tables appropriately', function () {
             'batch' => 5,
         ]);
 
-        expect(Schema::getColumnType('documents', 'title'))->toBe(varcharColumn());
-        expect(Schema::getColumnType('documents', 'text'))->toBe('text');
+        usingSnapshotSchema(function (SchemaBuilder $schema) {
+            expect($schema->getColumnType('documents', 'title'))->toBe(varcharColumn());
+            expect($schema->getColumnType('documents', 'text'))->toBe('text');
+        });
     });
 
     it('reads the indexes of versioned tables correctly', function () {
-        if (Schema::getFacadeRoot() instanceof SnapshotBuilder) {
-            expect(fn () => Schema::getIndexes('error'))->toThrow(NotImplementedException::class);
-
-            return;
-        }
-
         versions()->setActive(createFirstVersion('schema/create'));
 
-        $indexes = Schema::getIndexes('documents');
+        $indexes = usingSnapshotSchema(function (SchemaBuilder $schema) {
+            return $schema->getIndexes('documents');
+        });
 
         expect($indexes)->toContain([
             'name' => 'primary',
@@ -342,12 +350,6 @@ describe('The snapshot schema prefixes tables appropriately', function () {
     });
 
     it('reads the foreign keys of versioned tables correctly', function () {
-        if (Schema::getFacadeRoot() instanceof SnapshotBuilder) {
-            expect(fn () => Schema::getForeignKeys('error'))->toThrow(NotImplementedException::class);
-
-            return;
-        }
-
         artisan('migrate', [
             '--path' => migrationPath('schema/fks'),
             '--realpath' => true,
@@ -360,7 +362,9 @@ describe('The snapshot schema prefixes tables appropriately', function () {
 
         versions()->setActive(createFirstVersion('schema/fks'));
 
-        $fks = Schema::getForeignKeys('signatures');
+        $fks = usingSnapshotSchema(function (SchemaBuilder $schema) {
+            return $schema->getForeignKeys('signatures');
+        });
 
         expect($fks)->toContain([
             'name' => null,
@@ -380,7 +384,9 @@ describe('The snapshot schema prefixes tables appropriately', function () {
     it('forwards non-table schema builder methods to the frameworks schema builder', function () {
         versions()->setActive(createFirstVersion('schema/create'));
 
-        expect(Schema::hasTable('documents'))->toBeTrue();
+        usingSnapshotSchema(function (SchemaBuilder $schema) {
+            expect($schema->hasTable('documents'))->toBeTrue();
+        });
 
         artisan('migrate', [
             '--path' => migrationPath('schema/drop_without_fk_constraints'),
@@ -392,7 +398,9 @@ describe('The snapshot schema prefixes tables appropriately', function () {
             'batch' => 5,
         ]);
 
-        expect(Schema::hasTable('documents'))->toBeFalse();
+        usingSnapshotSchema(function (SchemaBuilder $schema) {
+            expect($schema->hasTable('documents'))->toBeFalse();
+        });
     });
 
     it('throws an exception when the artisan command migrations fail when auto-migrating', function () {

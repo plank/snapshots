@@ -1,16 +1,15 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use Plank\Snapshots\Contracts\SnapshotMigration;
-use Plank\Snapshots\Migrator\SnapshotBlueprint;
+use Plank\Snapshots\Migrator\SnapshotMigration;
 
-return new class extends Migration implements SnapshotMigration
+return new class extends SnapshotMigration
 {
     public function up()
     {
         if (version_compare(app()->version(), '11.0.0', '>=')) {
-            Schema::table('documents', function (SnapshotBlueprint $table) {
+            Schema::table('documents', function (Blueprint $table) {
                 $table->dropIndex(['released_at']);
             });
         }

@@ -1,11 +1,6 @@
 <?php
 
-use Doctrine\DBAL\Schema\Exception\TableDoesNotExist;
 use Illuminate\Support\Facades\Artisan;
-use Plank\Snapshots\Contracts\ManagesCreatedTables;
-use Plank\Snapshots\Contracts\ManagesVersions;
-use Plank\Snapshots\Factory\SnapshotConnectionBuilder;
-use Plank\Snapshots\Migrator\SnapshotMigrator;
 use Plank\Snapshots\Models\Version as VersionModel;
 
 use function Pest\Laravel\artisan;
@@ -94,29 +89,5 @@ describe('SnapshotMigrations can be pretended', function () {
 
         $output = Artisan::output();
         expect($output)->toContain('drop table "files"');
-    });
-
-    it('reports errors that occur during pretended migrations', function () {
-        $version = createFirstVersion('schema/create');
-        $migrator = new class($this->app['migration.repository'], $this->app['db'], $this->app['files'], $this->app['events'], $this->app[SnapshotConnectionBuilder::class], $this->app[ManagesVersions::class], $this->app[ManagesCreatedTables::class], $this->app) extends SnapshotMigrator
-        {
-            public string $written = '';
-
-            protected function getVersionedQueries($migration, $method)
-            {
-                throw new TableDoesNotExist('test');
-            }
-
-            protected function write($component, ...$arguments)
-            {
-                $this->written .= implode("\n", $arguments);
-            }
-        };
-
-        $migration = include migrationPath('schema/create').'/create_documents_table.php';
-
-        $migrator->pretendToRunVersion($version, $migration, 'up');
-
-        expect($migrator->written)->toContain('[v1_0_0_create_documents_table] failed to dump queries.');
     });
 });

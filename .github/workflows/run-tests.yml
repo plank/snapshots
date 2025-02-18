@@ -40,6 +40,7 @@ jobs:
       - name: Install dependencies
         run: |
           composer update --${{ matrix.stability }} --prefer-dist --no-interaction
+          composer dump-autoload --optimize
 
       - name: Execute tests
         run: vendor/bin/pest
@@ -80,6 +81,7 @@ jobs:
       - name: Install dependencies
         run: |
           composer update --${{ matrix.stability }} --prefer-dist --no-interaction
+          composer dump-autoload --optimize
 
       - name: Test & publish code coverage
         uses: paambaati/codeclimate-action@v9.0.0
