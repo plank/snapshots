@@ -1,5 +1,8 @@
 <?php
 
+use Illuminate\Database\Schema\Builder as SchemaBuilder;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Plank\Snapshots\Contracts\ManagesVersions;
 use Plank\Snapshots\Models\Version;
 use Plank\Snapshots\Repository\VersionRepository;
@@ -122,4 +125,32 @@ function varcharColumn(): string
     }
 
     return 'string';
+}
+
+/**
+ * @template TReturn
+ *
+ * @param  callable(SchemaBuilder $schema): TReturn  $callback
+ * @return TReturn
+ */
+function usingSnapshotSchema(Closure $callback): mixed
+{
+    /** @var SchemaBuilder $schema */
+    $schema = Schema::getFacadeRoot();
+    $connection = $schema->getConnection();
+    $name = $connection->getName();
+
+    $name = str($name)->endsWith('_snapshots')
+        ? $name
+        : $name.'_snapshots';
+
+    DB::purge($name);
+
+    $snapshotConnection = DB::connection($name);
+
+    try {
+        return $callback($snapshotConnection->getSchemaBuilder());
+    } finally {
+        app()->instance('db.schema', $schema);
+    }
 }

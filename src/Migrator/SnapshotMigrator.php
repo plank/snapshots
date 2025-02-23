@@ -3,58 +3,45 @@
 namespace Plank\Snapshots\Migrator;
 
 use Closure;
-use Doctrine\DBAL\Schema\SchemaException;
-use Illuminate\Console\View\Components\BulletList;
-use Illuminate\Console\View\Components\Error;
 use Illuminate\Console\View\Components\Info;
-use Illuminate\Console\View\Components\Task;
 use Illuminate\Console\View\Components\TwoColumnDetail;
 use Illuminate\Contracts\Events\Dispatcher;
-use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Database\Connection;
-use Illuminate\Database\ConnectionResolverInterface;
+use Illuminate\Database\DatabaseManager;
 use Illuminate\Database\Events\MigrationsEnded;
 use Illuminate\Database\Events\MigrationsStarted;
 use Illuminate\Database\Migrations\MigrationRepositoryInterface;
 use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Foundation\Application;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use Plank\Snapshots\Contracts\ManagesCreatedTables;
 use Plank\Snapshots\Contracts\ManagesVersions;
-use Plank\Snapshots\Contracts\SnapshotMigration;
 use Plank\Snapshots\Contracts\Version;
-use Plank\Snapshots\Contracts\VersionedSchema;
-use Plank\Snapshots\Factory\SchemaBuilderFactory;
-use ReflectionClass;
+use Plank\Snapshots\Contracts\VersionKey;
 
 class SnapshotMigrator extends Migrator
 {
-    protected VersionedSchema $schema;
-
     protected ManagesVersions $versions;
 
-    protected ManagesCreatedTables $tables;
-
-    protected Version $version;
+    /**
+     * @var DatabaseManager
+     */
+    protected $resolver;
 
     protected Application $app;
 
     public function __construct(
-        VersionedSchema $schema,
         MigrationRepositoryInterface $repository,
-        ConnectionResolverInterface $resolver,
+        DatabaseManager $resolver,
         Filesystem $files,
         ?Dispatcher $dispatcher,
         ManagesVersions $versions,
-        ManagesCreatedTables $tables,
         Application $app,
     ) {
         parent::__construct($repository, $resolver, $files, $dispatcher);
 
-        $this->schema = $schema;
         $this->versions = $versions;
-        $this->tables = $tables;
         $this->app = $app;
     }
 
@@ -72,13 +59,13 @@ class SnapshotMigrator extends Migrator
                     return in_array($name, $ran) ? null : $file;
                 }
 
-                if (! $this->versionHasBeenMigrated()) {
+                if (! $this->versionModelHasBeenMigrated()) {
                     return $this->versionedFile(in_array($name, $ran) ? null : $file);
                 }
 
                 return $this->versions->all()
                     ->map(function (Version $version) use ($file, $ran) {
-                        $name = $this->schema->addMigrationPrefix($version, $this->getMigrationName($file));
+                        $name = $this->addMigrationPrefix($version, $this->getMigrationName($file));
 
                         return in_array($name, $ran) ? null : $this->versionedFile($file, $version);
                     })
@@ -95,24 +82,33 @@ class SnapshotMigrator extends Migrator
     /**
      * Detrmine if the configured version model has been migrated yet
      */
-    protected function versionHasBeenMigrated(): bool
+    protected function versionModelHasBeenMigrated(): bool
     {
-        /** @var class-string<Version> $class */
-        $class = config('snapshots.models.version');
-
-        return (new $class)->hasBeenMigrated();
+        return $this->usingConnectionSchema(
+            $this->resolver->connection(),
+            fn () => $this->versions->model()->hasBeenMigrated()
+        );
     }
 
     /**
-     * Require in all the migration files in a given path.
+     * @template TReturn
      *
-     * @return void
+     * @param  callable(): TReturn  $callback
+     * @return TReturn
      */
-    public function requireFiles(array $files)
+    protected function usingConnectionSchema(Connection $connection, Closure $callback): mixed
     {
-        foreach ($files as $file) {
-            $this->files->requireOnce($this->unversionedFile($file));
+        $previousSchema = $this->app->make('db.schema');
+
+        try {
+            $this->app->instance('db.schema', $connection->getSchemaBuilder());
+
+            $result = $callback();
+        } finally {
+            $this->app->instance('db.schema', $previousSchema);
         }
+
+        return $result;
     }
 
     /**
@@ -120,46 +116,24 @@ class SnapshotMigrator extends Migrator
      */
     protected function runUp($file, $batch, $pretend)
     {
-        // First we will resolve a "real" instance of the migration class from this
-        // migration file name. Once we have the instances we can run the actual
-        // command such as "up" or "down", or we can just simulate the action.
-        $migration = $this->resolvePath($this->unversionedFile($file));
+        [$file, $versionKey] = str_contains($file, '@version:')
+            ? explode('@version:', $file)
+            : [$file, null];
 
-        if (! $migration instanceof SnapshotMigration) {
-            return parent::runUp($file, $batch, $pretend);
+        $migration = $this->resolvePath($file);
+
+        if ($migration instanceof SnapshotMigration) {
+            $this->resolver->purge($migration->getConnection());
         }
 
-        $active = $this->versions->active();
+        $this->versions->withVersionActive(
+            $versionKey ? $this->versions->find($versionKey) : null,
+            fn () => parent::runUp($file, $batch, $pretend)
+        );
 
-        [$file, $versionKey] = explode('@version:', $file);
-
-        if ($versionKey) {
-            $version = $this->versions->find($versionKey);
-            $this->runVersionedUp($version, $migration, $file, $batch, $pretend);
-        } else {
-            $this->versions->clearActive();
-            parent::runUp($file, $batch, $pretend);
+        if ($migration instanceof SnapshotMigration) {
+            $this->app->instance('db.schema', $this->resolver->connection($this->connection)->getSchemaBuilder());
         }
-
-        $this->versions->setActive($active);
-    }
-
-    protected function runVersionedUp(Version $version, SnapshotMigration $migration, string $file, int $batch, bool $pretend)
-    {
-        $this->versions->setActive($version);
-
-        $name = $this->schema->addMigrationPrefix($version, $this->getMigrationName($file));
-
-        if ($pretend) {
-            return $this->pretendToRunVersion($version, $migration, 'up');
-        }
-
-        $this->write(Task::class, $name, fn () => $this->runMigration($migration, 'up'));
-
-        // Once we have run a migrations class, we will log that it was run in this
-        // repository so that we don't try to run it next time we do a migration
-        // in the application. A migration repository keeps the migrate order.
-        $this->repository->log($name, $batch);
     }
 
     /**
@@ -184,7 +158,7 @@ class SnapshotMigrator extends Migrator
         // Next we will run through all of the migrations and call the "down" method
         // which will reverse each migration in order.
         foreach ($migrations as $migration) {
-            if (! $file = Arr::get($files, $this->schema->stripMigrationPrefix($migration->migration))) {
+            if (! $file = Arr::get($files, $this->stripMigrationPrefix($migration->migration))) {
                 $this->write(TwoColumnDetail::class, $migration->migration, '<fg=yellow;options=bold>Migration not found</>');
 
                 continue;
@@ -202,16 +176,28 @@ class SnapshotMigrator extends Migrator
         return $rolledBack;
     }
 
+    /**
+     * Require in all the migration files in a given path.
+     *
+     * @return void
+     */
+    public function requireFiles(array $files)
+    {
+        foreach ($files as $file) {
+            $this->files->requireOnce($this->unversionedFile($file));
+        }
+    }
+
     protected function includingPreviousBatches(array $migrations, array $ran): array
     {
         $stripped = collect($migrations)
             ->map(fn ($migration) => (object) $migration)
-            ->map(fn ($migration) => $this->schema->stripMigrationPrefix($migration->migration))
+            ->map(fn ($migration) => $this->stripMigrationPrefix($migration->migration))
             ->unique();
 
         return collect($ran)
             ->map(fn ($migration) => (object) $migration)
-            ->filter(fn ($migration) => $stripped->contains($this->schema->stripMigrationPrefix($migration->migration)))
+            ->filter(fn ($migration) => $stripped->contains($this->stripMigrationPrefix($migration->migration)))
             ->sortByDesc('batch')
             ->groupBy('batch')
             ->map(fn ($migrations) => $migrations->sortByDesc(fn ($migration) => $migration->id ?? $migration->migration))
@@ -225,123 +211,43 @@ class SnapshotMigrator extends Migrator
      */
     protected function runDown($file, $migration, $pretend)
     {
-        // First we will get the file name of the migration so we can resolve out an
-        // instance of the migration. Once we get an instance we can either run a
-        // pretend execution of the migration or we can run the real migration.
         $instance = $this->resolvePath($file);
 
-        if (! $instance instanceof SnapshotMigration) {
-            return parent::runDown($file, $migration, $pretend);
+        if ($instance instanceof SnapshotMigration) {
+            $this->resolver->purge($instance->getConnection());
         }
 
-        $active = $this->versions->active();
+        $this->versions->withVersionActive(
+            $this->versions->byKey($migration->migration),
+            fn () => parent::runDown($file, $migration, $pretend),
+        );
 
-        $version = $this->schema->versionFromMigration($migration->migration);
+        if ($migration instanceof SnapshotMigration) {
+            $this->app->instance('db.schema', $this->resolver->connection($this->connection)->getSchemaBuilder());
+        }
+    }
 
+    /**
+     * {@inheritDoc}
+     */
+    protected function addMigrationPrefix(?Version $version, string $migration): string
+    {
         if ($version === null) {
-            $this->versions->clearActive();
-            parent::runDown($file, $migration, $pretend);
-        } else {
-            $this->runVersionedDown($version, $migration, $instance, $file, $pretend);
+            return $migration;
         }
 
-        $this->versions->setActive($active);
-    }
-
-    protected function runVersionedDown(Version $version, $migration, SnapshotMigration $instance, string $file, bool $pretend)
-    {
-        $this->versions->setActive($version);
-
-        $name = $this->schema->addMigrationPrefix($version, $this->getMigrationName($file));
-
-        if ($pretend) {
-            return $this->pretendToRunVersion($version, $instance, 'down');
-        }
-
-        $this->write(Task::class, $name, fn () => $this->runMigration($instance, 'down'));
-
-        $this->repository->delete($migration);
+        return $version->key()->prefix($migration);
     }
 
     /**
-     * Pretend to run the migrations.
-     *
-     * @param  object  $migration
-     * @return void
+     * {@inheritDoc}
      */
-    public function pretendToRunVersion(Version $version, SnapshotMigration $migration, string $method)
+    protected function stripMigrationPrefix(string $migration): string
     {
-        try {
-            $name = get_class($migration);
+        /** @var class-string<VersionKey> $keyClass */
+        $keyClass = config('snapshots.value_objects.version_key');
 
-            $reflectionClass = new ReflectionClass($migration);
-
-            if ($reflectionClass->isAnonymous()) {
-                $name = $this->getMigrationName($reflectionClass->getFileName());
-            }
-
-            $name = $this->schema->addMigrationPrefix($version, $name);
-
-            $this->write(TwoColumnDetail::class, $name);
-
-            $this->write(BulletList::class, collect($this->getQueries($migration, $method))->map(function ($query) {
-                return $query['query'];
-            }));
-
-            $this->tables->flush();
-        } catch (SchemaException) {
-            $this->write(Error::class, sprintf(
-                '[%s] failed to dump queries. This may be due to changing database columns using Doctrine, which is not supported while pretending to run migrations.',
-                $name,
-            ));
-        }
-    }
-
-    /**
-     * Pretend to run the migrations.
-     *
-     * @param  object  $migration
-     * @param  string  $method
-     * @return void
-     */
-    protected function pretendToRun($migration, $method)
-    {
-        parent::pretendToRun($migration, $method);
-        $this->tables->flush();
-    }
-
-    protected function runMethod($connection, $migration, $method)
-    {
-        $previousConnection = $this->resolver->getDefaultConnection();
-
-        try {
-            $this->resolver->setDefaultConnection($connection->getName());
-
-            if ($migration instanceof SnapshotMigration) {
-                $this->usingSnapshotSchemaBuilder($connection, fn () => $migration->{$method}());
-            } else {
-                $migration->{$method}();
-            }
-        } finally {
-            $this->resolver->setDefaultConnection($previousConnection);
-        }
-    }
-
-    protected function usingSnapshotSchemaBuilder(Connection $connection, Closure $callback)
-    {
-        $active = $this->app->make('db.schema');
-
-        $this->app->instance('db.schema', SchemaBuilderFactory::make(
-            $connection,
-            $this->app[ManagesVersions::class],
-            $this->app[ManagesCreatedTables::class],
-        ));
-
-        try {
-            return $callback();
-        } finally {
-            $this->app->instance('db.schema', $active);
-        }
+        return $keyClass::strip($migration);
     }
 
     protected function versionedFile(?string $file, ?Version $version = null): ?string

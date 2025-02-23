@@ -6,11 +6,11 @@ use Plank\Snapshots\Contracts\VersionKey;
 
 class VersionNumber implements VersionKey
 {
-    protected const DOT_REGEX = '/^(\d+\.\d+\.\d+)$/';
+    protected const DOT_REGEX = '/(\d+\.\d+\.\d+)/';
 
-    protected const KEY_REGEX = '/^(v{0,1}\d+\_\d+\_\d+)$/';
+    protected const KEY_REGEX = '/(v{0,1}\d+\_\d+\_\d+)/';
 
-    protected const MIGRATION_REGEX = '/\d{4}_\d{2}_\d{2}_\d{6}_[a-zA-Z0-9_]+/';
+    protected const MIGRATION_REGEX = '/(v{0,1}\d+\_\d+\_\d+)/';
 
     public function __construct(
         protected int $major,
@@ -18,14 +18,53 @@ class VersionNumber implements VersionKey
         protected int $patch
     ) {}
 
-    public static function fromVersionString(string $number): static
+    public static function fromString(string $string): static
     {
-        if (preg_match(static::DOT_REGEX, $number) === 1) {
-            [$major, $minor, $patch] = explode('.', $number);
-        } elseif (preg_match(static::KEY_REGEX, $number) === 1) {
-            [$major, $minor, $patch] = explode('_', $number);
+        if (preg_match(static::DOT_REGEX, $string) === 1) {
+            return static::fromVersionString($string);
+        }
+
+        if (preg_match(static::KEY_REGEX, $string) === 1) {
+            return static::fromKeyString($string);
+        }
+
+        if (preg_match(static::MIGRATION_REGEX, $string) === 1) {
+            return static::fromMigrationString($string);
+        }
+
+        throw new \InvalidArgumentException('Invalid version: '.$string);
+    }
+
+    public static function fromMigrationString(string $name): static
+    {
+        $matches = [];
+
+        if (preg_match(static::MIGRATION_REGEX, $name, $matches) === 1) {
+            [$major, $minor, $patch] = explode('_', $matches[1]);
         } else {
-            throw new \InvalidArgumentException('Invalid version number: '.$number);
+            throw new \InvalidArgumentException('Invalid version: '.$name);
+        }
+
+        return new static(str($major)->after('v')->toInteger(), (int) $minor, (int) $patch);
+    }
+
+    public static function fromVersionString(string $version): static
+    {
+        if (preg_match(static::DOT_REGEX, $version) === 1) {
+            [$major, $minor, $patch] = explode('.', $version);
+        } else {
+            throw new \InvalidArgumentException('Invalid version number: '.$version);
+        }
+
+        return new static((int) $major, (int) $minor, (int) $patch);
+    }
+
+    public static function fromKeyString(string $key): static
+    {
+        if (preg_match(static::KEY_REGEX, $key) === 1) {
+            [$major, $minor, $patch] = explode('_', $key);
+        } else {
+            throw new \InvalidArgumentException('Invalid version key: '.$key);
         }
 
         return new static(str($major)->after('v')->toInteger(), (int) $minor, (int) $patch);
@@ -34,6 +73,21 @@ class VersionNumber implements VersionKey
     public function key(): string
     {
         return 'v'.$this->major.'_'.$this->minor.'_'.$this->patch;
+    }
+
+    public function prefix(string $string): string
+    {
+        return $this->key().'_'.$this->strip($string);
+    }
+
+    public static function strip(string $string): string
+    {
+        return str($string)
+            ->replaceMatches(static::DOT_REGEX, '')
+            ->replaceMatches(static::KEY_REGEX, '')
+            ->replaceMatches(static::MIGRATION_REGEX, '')
+            ->trim(' _.-')
+            ->toString();
     }
 
     protected static function isValidVersionString(string $version)
