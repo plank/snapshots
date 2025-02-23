@@ -6,8 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 /**
  * @mixin \Illuminate\Database\Eloquent\Model
- *
- * @property \Plank\Snapshots\ValueObjects\VersionNumber $number
  */
 trait AsVersion
 {
@@ -17,22 +15,6 @@ trait AsVersion
     public function hasBeenMigrated(): bool
     {
         return Schema::hasTable($this->getTable());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function addTablePrefix(string $table): string
-    {
-        return $this->number->key().'_'.$this->stripTablePrefix($table);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public static function stripTablePrefix(string $table): string
-    {
-        return (string) str($table)->replaceMatches('/^v\d+_\d+_\d+_/', '');
     }
 
     /**

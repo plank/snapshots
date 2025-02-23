@@ -4,63 +4,50 @@ namespace Plank\Snapshots\Listeners;
 
 use Closure;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
 use Plank\LaravelHush\Concerns\HushesHandlers;
-use Plank\Snapshots\Contracts\ManagesCreatedTables;
+use Plank\LaravelSchemaEvents\Events\TableCreated;
 use Plank\Snapshots\Contracts\ManagesVersions;
+use Plank\Snapshots\Contracts\ResolvesModels;
 use Plank\Snapshots\Contracts\Versioned;
 use Plank\Snapshots\Events\TableCopied;
-use Plank\Snapshots\Events\TableCreated;
 
-class Copier
+class ModelCopier
 {
     public function __construct(
         protected ManagesVersions $versions,
-        protected ManagesCreatedTables $tables
+        protected ResolvesModels $models,
     ) {}
 
-    public function handle()
+    public function handle(TableCreated $created)
     {
-        $active = $this->versions->active();
-
         Schema::disableForeignKeyConstraints();
 
-        while ($created = $this->tables->dequeue()) {
-            if ($created->version === null) {
-                continue;
-            }
+        $version = $this->versions->byKey($created->table);
 
-            if (config()->get('snapshots.copier.model_events') && $created->model) {
-                $this->copyModel($created);
-            } else {
-                $this->copyTable($created);
-            }
-
-            Event::dispatch(TableCopied::fromCreated($created));
+        if ($version === null) {
+            return;
         }
 
-        Schema::enableForeignKeyConstraints();
+        $model = $this->models->resolve($created->table);
 
-        $this->versions->setActive($active);
-    }
+        if ($model === null) {
+            return;
+        }
 
-    protected function copyModel(TableCreated $created): void
-    {
-        // Clear the active version so we can get a query for the model that is scoped
-        // to the working version.
+        // Store the active version so we can restore it when we are done our work
+        $active = $this->versions->active();
+
+        // Grab the data from the "working version"
         $this->versions->clearActive();
-
-        /** @var Model&Versioned $model */
-        $model = new ($created->model);
-        $models = $model->newQueryWithoutScopes()->cursor();
+        $models = $model::query()->withoutGlobalScopes()->cursor();
 
         // Set the version to the newly created table's version, so we can begin copying
         // over the data.
-        $this->versions->setActive($created->version);
+        $this->versions->setActive($version);
 
-        $this->quietlyReplicate($created->model, function () use ($models) {
+        $this->quietlyReplicate($model, function () use ($models) {
             $models->each(function (Model&Versioned $model) {
                 $id = $model->getKeyName();
                 $replicated = $model->replicate();
@@ -70,16 +57,12 @@ class Copier
                 $replicated->save();
             });
         });
-    }
 
-    protected function copyTable(TableCreated $created): void
-    {
-        $from = $created->table;
-        $to = $created->version->addTablePrefix($from);
+        $this->versions->setActive($active);
 
-        Schema::withoutForeignKeyConstraints(function () use ($from, $to) {
-            DB::statement("INSERT INTO `$to` SELECT * FROM `$from`");
-        });
+        Event::dispatch(new TableCopied($created->table));
+
+        Schema::enableForeignKeyConstraints();
     }
 
     /**

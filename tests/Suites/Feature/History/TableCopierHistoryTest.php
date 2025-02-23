@@ -2,11 +2,13 @@
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Event;
+use Plank\LaravelSchemaEvents\Events\TableCreated;
 use Plank\Snapshots\Enums\Operation;
 use Plank\Snapshots\Events\TableCopied;
 use Plank\Snapshots\Exceptions\CauserException;
-use Plank\Snapshots\Exceptions\LabelingException;
 use Plank\Snapshots\Listeners\LabelHistory;
+use Plank\Snapshots\Listeners\ModelCopier;
+use Plank\Snapshots\Listeners\TableCopier;
 use Plank\Snapshots\Models\History;
 use Plank\Snapshots\Observers\HistoryObserver;
 use Plank\Snapshots\Tests\Models\Company;
@@ -18,8 +20,11 @@ use function Pest\Laravel\artisan;
 
 beforeEach(function () {
     config()->set('snapshots.history.observer', HistoryObserver::class);
-    config()->set('snapshots.history.labeler', LabelHistory::class);
 
+    Event::forget(TableCreated::class);
+    Event::listen(TableCreated::class, TableCopier::class);
+
+    Event::forget(TableCopied::class);
     Event::listen(TableCopied::class, LabelHistory::class);
 });
 
@@ -410,7 +415,7 @@ describe('Versioned Content has its History tracked correctly without Model Even
 
 describe('Versioned Content has its History tracked correctly with Model Events', function () {
     beforeEach(function () {
-        config()->set('snapshots.copier.model_events', true);
+        config()->set('snapshots.copier', ModelCopier::class);
 
         artisan('migrate', [
             '--path' => migrationPath('schema/create_for_model'),
@@ -512,18 +517,6 @@ describe('Unversioned Content has its History tracked correctly', function () {
 });
 
 describe('History Labeling handles bad configuration and arguments', function () {
-    it('exists early when no model is provided', function () {
-        $labeler = new LabelHistory;
-
-        expect($labeler->handle(new TableCopied('images', null, null)))->not->toThrow(LabelingException::class);
-    });
-
-    it('throws an exception when trying to label non-versioned models', function () {
-        $labeler = new LabelHistory;
-
-        $labeler->handle(new TableCopied('images', null, Image::class));
-    })->throws(LabelingException::class);
-
     it('throws an exception when the causer does not implement the causer interface', function () {
         $badUser = new \Illuminate\Foundation\Auth\User;
         Auth::setUser($badUser);

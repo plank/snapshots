@@ -3,15 +3,6 @@
 return [
     /*
     |--------------------------------------------------------------------------
-    | Migration Regex
-    |--------------------------------------------------------------------------
-    |
-    | The format indicated by this regex must be adhered to for all migration files
-    */
-    'migration_regex' => '/\d{4}_\d{2}_\d{2}_\d{6}_[a-zA-Z0-9_]+/',
-
-    /*
-    |--------------------------------------------------------------------------
     | Models
     |--------------------------------------------------------------------------
     |
@@ -32,12 +23,12 @@ return [
     | Value Objects
     |--------------------------------------------------------------------------
     |
-    | version_number:
+    | version_key:
     | This object adds some helper methods for working with version numbers.
     | It must implement the \Plank\Snapshots\Contracts\VersionKey interface.
     */
     'value_objects' => [
-        'version_number' => \Plank\Snapshots\ValueObjects\VersionNumber::class,
+        'version_key' => \Plank\Snapshots\ValueObjects\VersionNumber::class,
     ],
 
     /*
@@ -61,7 +52,6 @@ return [
     'repositories' => [
         'version' => \Plank\Snapshots\Repository\VersionRepository::class,
         'causer' => \Plank\Snapshots\Repository\CauserRepository::class,
-        'table' => \Plank\Snapshots\Repository\TableRepository::class,
     ],
 
     /*
@@ -79,18 +69,10 @@ return [
     | Table Data Copying
     |--------------------------------------------------------------------------
     |
-    | handler
     | When provided, the class will be used to automatically copy data from the the working
     | version to the newly created versions.
-    |
-    | model_events
-    | When enabled, the copier will use the underlying models for each table to copy the data,
-    | which will trigger any model events that are configured.
     */
-    'copier' => [
-        'handler' => \Plank\Snapshots\Listeners\Copier::class,
-        'model_events' => false,
-    ],
+    'copier' => \Plank\Snapshots\Listeners\TableCopier::class,
 
     /*
     |---------------------------------------------------------------------------
@@ -119,5 +101,22 @@ return [
         'observer' => \Plank\Snapshots\Observers\HistoryObserver::class,
         'labeler' => \Plank\Snapshots\Listeners\LabelHistory::class,
         'identity' => \Plank\Snapshots\Observers\IdentityObserver::class,
+    ],
+
+    'model_resolver' => [
+        'skip_tests' => false,
+        'ignore' => [
+            'DeepCopy\\',
+            'Doctrine\\',
+            'Illuminate\\',
+            'Mockery\\',
+            'PHPStan\\',
+            'PHPUnit\\',
+            'Prophecy\\',
+            'Psr\\',
+            'Psy\\',
+            'Sebastian\\',
+            'Symfony\\',
+        ],
     ],
 ];

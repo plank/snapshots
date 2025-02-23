@@ -2,18 +2,25 @@
 
 namespace Plank\Snapshots;
 
-use Illuminate\Database\Events\MigrationsEnded;
+use Illuminate\Database\Migrations\DatabaseMigrationRepository;
 use Illuminate\Database\Migrations\Migrator;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Schema\Grammars\Grammar;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Event;
-use Plank\Snapshots\Contracts\ManagesCreatedTables;
+use Plank\LaravelSchemaEvents\Events\TableCreated;
+use Plank\Snapshots\Connection\SnapshotConnectionInitializer;
 use Plank\Snapshots\Contracts\ManagesVersions;
 use Plank\Snapshots\Contracts\ResolvesCauser;
-use Plank\Snapshots\Contracts\VersionedSchema;
+use Plank\Snapshots\Contracts\ResolvesModels;
 use Plank\Snapshots\Events\TableCopied;
 use Plank\Snapshots\Events\VersionCreated;
-use Plank\Snapshots\Factory\SchemaBuilderFactory;
+use Plank\Snapshots\Migrator\Blueprint\Macros\DropUnversionedForeignKey;
+use Plank\Snapshots\Migrator\Blueprint\Macros\UnversionedForeignKey;
+use Plank\Snapshots\Migrator\Blueprint\SnapshotBlueprint;
+use Plank\Snapshots\Migrator\SnapshotMigrationRepository;
 use Plank\Snapshots\Migrator\SnapshotMigrator;
+use Plank\Snapshots\Repository\ModelRepository;
 use Spatie\LaravelPackageTools\Commands\InstallCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
@@ -59,53 +66,27 @@ class SnapshotServiceProvider extends PackageServiceProvider
     public function bootingPackage()
     {
         $this->bindRepositories()
-            ->bindSchemaBuilder()
-            ->bindMigrator();
-
-        $this->listenToEvents();
+            ->bindMigrator()
+            ->registerGrammarMacros()
+            ->listenToEvents();
     }
 
     protected function bindRepositories(): self
     {
-        if (! $this->app->bound(ManagesVersions::class)) {
-            $this->app->scoped(ManagesVersions::class, function (Application $app) {
-                $repo = $app['config']->get('snapshots.repositories.version');
+        $this->app->scopedIf(ManagesVersions::class, function (Application $app) {
+            $repo = $app['config']->get('snapshots.repositories.version');
 
-                return new $repo;
-            });
-        }
+            return new $repo;
+        });
 
-        if (! $this->app->bound(ResolvesCauser::class)) {
-            $this->app->scoped(ResolvesCauser::class, function (Application $app) {
-                $repo = $app['config']->get('snapshots.repositories.causer');
+        $this->app->scopedIf(ResolvesCauser::class, function (Application $app) {
+            $repo = $app['config']->get('snapshots.repositories.causer');
 
-                return new $repo;
-            });
-        }
+            return new $repo;
+        });
 
-        if (! $this->app->bound(ManagesCreatedTables::class)) {
-            $this->app->scoped(ManagesCreatedTables::class, function (Application $app) {
-                $repo = $app['config']->get('snapshots.repositories.table');
-
-                return new $repo;
-            });
-        }
-
-        return $this;
-    }
-
-    protected function bindSchemaBuilder(): self
-    {
-        if ($this->app->bound(VersionedSchema::class)) {
-            return $this;
-        }
-
-        $this->app->scoped(VersionedSchema::class, function (Application $app) {
-            return SchemaBuilderFactory::make(
-                $app['db.connection'],
-                $app[ManagesVersions::class],
-                $app[ManagesCreatedTables::class],
-            );
+        $this->app->scopedIf(ResolvesModels::class, function (Application $app) {
+            return new ModelRepository;
         });
 
         return $this;
@@ -113,18 +94,52 @@ class SnapshotServiceProvider extends PackageServiceProvider
 
     protected function bindMigrator(): self
     {
+        $this->app->extend('migration.repository', function (DatabaseMigrationRepository $migrator, Application $app) {
+            $migrations = $app['config']['database.migrations'];
+
+            $table = is_array($migrations) ? ($migrations['table'] ?? null) : $migrations;
+
+            return new SnapshotMigrationRepository($app['db'], $table, $app[ManagesVersions::class]);
+        });
+
+        $this->app->bind(Blueprint::class, function (Application $app, array $arguments) {
+            return new SnapshotBlueprint(...$arguments);
+        });
+
         $this->app->extend('migrator', function (Migrator $migrator, Application $app) {
+            $versions = $app[ManagesVersions::class];
+            $db = $app['db'];
+
+            foreach ($app['config']->get('database.connections') as $name => $config) {
+                $connections = $app['config']->get('database.connections');
+                $connections[$name.'_snapshots'] = $config;
+                $app['config']->set('database.connections', $connections);
+
+                $db->extend($name.'_snapshots', fn () => SnapshotConnectionInitializer::initialize(
+                    $app,
+                    $db,
+                    $versions,
+                    $name
+                ));
+            }
+
             return new SnapshotMigrator(
-                $app[VersionedSchema::class],
                 $app['migration.repository'],
-                $app['db'],
+                $db,
                 $app['files'],
                 $app['events'],
-                $app[ManagesVersions::class],
-                $app[ManagesCreatedTables::class],
-                $app,
+                $versions,
+                $app
             );
         });
+
+        return $this;
+    }
+
+    protected function registerGrammarMacros(): self
+    {
+        Grammar::macro('compileUnversionedForeign', app(UnversionedForeignKey::class)());
+        Grammar::macro('compileDropUnversionedForeign', app(DropUnversionedForeignKey::class)());
 
         return $this;
     }
@@ -135,8 +150,8 @@ class SnapshotServiceProvider extends PackageServiceProvider
             Event::listen(VersionCreated::class, $migrator);
         }
 
-        if ($copier = config()->get('snapshots.copier.handler')) {
-            Event::listen(MigrationsEnded::class, $copier);
+        if ($copier = config()->get('snapshots.copier')) {
+            Event::listen(TableCreated::class, $copier);
         }
 
         if ($labeler = config()->get('snapshots.history.labeler')) {
