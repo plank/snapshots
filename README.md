@@ -61,11 +61,10 @@ php artisan snapshots:install
 
 Once the installation has completed, to begin using the package:
 
-1. Make all migrations for versioned content implement `Plank\Snapshots\Contracts\SnapshotMigration`.
-2. Replace references to `Illuminate\Database\Schema\Builder` with `$this->schema` or `Plank\Snapshots\Facades\SnapshotSchema` in those migrations for the versioned content.
-3. Make all models representing versioned content implement `Plank\Snapshots\Contracts\Versioned` and use the `Plank\Snapshots\Concerns\AsVersionedContent` trait.
-4. Make all models that are not versioned, but have a relation to versioned content use the `Plank\Snapshots\Concerns\InteractsWithVersionedContent` trait.
-5. Create a middleware to set the active version of your app based on the request.
+1. Make all migrations for versioned content implement `Plank\Snapshots\Migrator\SnapshotMigration`.
+2. Make all models representing versioned content implement `Plank\Snapshots\Contracts\Versioned` and use the `Plank\Snapshots\Concerns\AsVersionedContent` trait.
+3. Make all models that are not versioned, but have a relation to versioned content use the `Plank\Snapshots\Concerns\InteractsWithVersionedContent` trait.
+4. Create a middleware to set the active version of your app based on the request.
 
 Middleware example:
 
@@ -170,12 +169,10 @@ To use it, simply make the Migration classes extend `SnapshotMigration` instead 
 ```php
 <?php
 
-use Illuminate\Database\Migrations\Migration;
-use Plank\Snapshots\Facades\SnapshotSchema;
 use Plank\Snapshots\Migrations\SnapshotBlueprint;
-use Plank\Snapshots\Contracts\SnapshotMigration;
+use Plank\Snapshots\Migrator\SnapshotMigration;
 
-return new class extends Migration implements SnapshotMigration
+return new class extends SnapshotMigration
 {
     public function up()
     {
@@ -192,16 +189,12 @@ return new class extends Migration implements SnapshotMigration
 
     public function down()
     {
-        SnapshotSchema::dropIfExists('blocks');
+        Schema::dropIfExists('blocks');
     }
 }
 ```
 
-You will notice that in a `SnapshotMigration` you have `$this->schema` available which is the `SnapshotBuilder` instance. It is a wrapper around the framework's `\Illuminate\Database\Schema\Builder` class. You can also use the `SnapshotSchema` facade, however you should only use that inside a `SnapshotMigration`.
-
-The `SnapshotMigrations` allow you to declare migrations in the way you are used to, but under the hood it will handle all versioning.
-
-You will also notice the `SnapshotBlueprint` class. This blueprint type exists to allow you to define foreign keys to versioned content from versioned content using the `->onSnapshot()` method.
+You will notice that in a `SnapshotMigration` you have the `SnapshotBlueprint` class injected into your schema calls. This blueprint type exists to allow you to define unversioned foreign keys on versioned content using methods like `->unversionedForeign('user_id')` method.
 
 
 ##### Limitations

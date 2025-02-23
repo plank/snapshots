@@ -1,9 +1,11 @@
 <?php
 
 use Illuminate\Support\Facades\Event;
+use Plank\LaravelSchemaEvents\Events\TableCreated;
 use Plank\Snapshots\Enums\Operation;
 use Plank\Snapshots\Events\TableCopied;
 use Plank\Snapshots\Listeners\LabelHistory;
+use Plank\Snapshots\Listeners\ModelCopier;
 use Plank\Snapshots\Models\History;
 use Plank\Snapshots\Observers\HistoryObserver;
 use Plank\Snapshots\Tests\Models\Flag;
@@ -12,8 +14,11 @@ use function Pest\Laravel\artisan;
 
 beforeEach(function () {
     config()->set('snapshots.history.observer', HistoryObserver::class);
-    config()->set('snapshots.history.labeler', LabelHistory::class);
 
+    Event::forget(TableCreated::class);
+    Event::listen(TableCreated::class, ModelCopier::class);
+
+    Event::forget(TableCopied::class);
     Event::listen(TableCopied::class, LabelHistory::class);
 });
 

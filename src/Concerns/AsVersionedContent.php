@@ -4,7 +4,6 @@ namespace Plank\Snapshots\Concerns;
 
 use Illuminate\Database\Eloquent\Model;
 use Plank\LaravelHush\Concerns\HushesHandlers;
-use Plank\Snapshots\Contracts\Version;
 use Plank\Snapshots\Contracts\VersionKey;
 use Plank\Snapshots\Facades\Versions;
 
