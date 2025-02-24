@@ -3,8 +3,8 @@
 namespace Plank\Snapshots\Repository;
 
 use Illuminate\Database\Eloquent\Model;
-use Plank\Snapshots\Contracts\VersionKey;
 use Plank\LaravelModelResolver\Repository\ModelRepository as BaseModelRepository;
+use Plank\Snapshots\Contracts\VersionKey;
 use Throwable;
 
 class ModelRepository extends BaseModelRepository
