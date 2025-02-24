@@ -19,7 +19,7 @@ return new class extends SnapshotMigration
             $table->string('body');
             $table->timestamps();
 
-            $table->foreign('user_id')
+            $table->unversionedForeign('user_id')
                 ->references('id')
                 ->on('users');
         });

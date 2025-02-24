@@ -13,8 +13,8 @@ return new class extends SnapshotMigration
     {
         Schema::create('product_project', function (SnapshotBlueprint $table) {
             $table->id();
-            $table->foreignId('product_id')->constrainedToSnapshot('products');
-            $table->foreignUlid('project_id')->constrainedToSnapshot('projects', 'ulid');
+            $table->foreignId('product_id')->constrained('products');
+            $table->foreignUlid('project_id')->constrained('projects', 'ulid');
             $table->unsignedInteger('quantity');
             $table->timestamps();
         });
