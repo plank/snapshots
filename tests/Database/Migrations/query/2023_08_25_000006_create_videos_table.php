@@ -18,7 +18,9 @@ return new class extends Migration
             $table->timestamps();
             $table->timestamp('deleted_at')->nullable();
 
-            $table->foreign('post_id')->references('uuid')->on('posts');
+            // We cannot logically add an fk from unversioned
+            // content to versioned content
+            // $table->foreign('post_id')->references('uuid')->on('posts');
         });
     }
 };
