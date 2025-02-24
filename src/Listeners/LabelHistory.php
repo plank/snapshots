@@ -4,10 +4,10 @@ namespace Plank\Snapshots\Listeners;
 
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Collection;
+use Plank\LaravelModelResolver\Facades\Models;
 use Plank\Snapshots\Contracts\CausesChanges;
 use Plank\Snapshots\Contracts\ManagesVersions;
 use Plank\Snapshots\Contracts\ResolvesCauser;
-use Plank\Snapshots\Contracts\ResolvesModels;
 use Plank\Snapshots\Contracts\Trackable;
 use Plank\Snapshots\Enums\Operation;
 use Plank\Snapshots\Events\TableCopied;
@@ -17,12 +17,11 @@ class LabelHistory
 {
     public function __construct(
         protected ManagesVersions $versions,
-        protected ResolvesModels $models,
     ) {}
 
     public function handle(TableCopied $event)
     {
-        $model = $this->models->resolve($event->table);
+        $model = Models::fromTable($event->table);
 
         if ($model === null) {
             return;

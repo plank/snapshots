@@ -12,7 +12,6 @@ use Plank\LaravelSchemaEvents\Events\TableCreated;
 use Plank\Snapshots\Connection\SnapshotConnectionInitializer;
 use Plank\Snapshots\Contracts\ManagesVersions;
 use Plank\Snapshots\Contracts\ResolvesCauser;
-use Plank\Snapshots\Contracts\ResolvesModels;
 use Plank\Snapshots\Events\TableCopied;
 use Plank\Snapshots\Events\VersionCreated;
 use Plank\Snapshots\Migrator\Blueprint\Macros\DropUnversionedForeignKey;
@@ -20,7 +19,6 @@ use Plank\Snapshots\Migrator\Blueprint\Macros\UnversionedForeignKey;
 use Plank\Snapshots\Migrator\Blueprint\SnapshotBlueprint;
 use Plank\Snapshots\Migrator\SnapshotMigrationRepository;
 use Plank\Snapshots\Migrator\SnapshotMigrator;
-use Plank\Snapshots\Repository\ModelRepository;
 use Spatie\LaravelPackageTools\Commands\InstallCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
@@ -83,10 +81,6 @@ class SnapshotServiceProvider extends PackageServiceProvider
             $repo = $app['config']->get('snapshots.repositories.causer');
 
             return new $repo;
-        });
-
-        $this->app->scopedIf(ResolvesModels::class, function (Application $app) {
-            return new ModelRepository;
         });
 
         return $this;

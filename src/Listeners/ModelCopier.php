@@ -7,17 +7,16 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
 use Plank\LaravelHush\Concerns\HushesHandlers;
+use Plank\LaravelModelResolver\Facades\Models;
 use Plank\LaravelSchemaEvents\Events\TableCreated;
 use Plank\Snapshots\Contracts\ManagesVersions;
-use Plank\Snapshots\Contracts\ResolvesModels;
 use Plank\Snapshots\Contracts\Versioned;
 use Plank\Snapshots\Events\TableCopied;
 
 class ModelCopier
 {
     public function __construct(
-        protected ManagesVersions $versions,
-        protected ResolvesModels $models,
+        protected ManagesVersions $versions
     ) {}
 
     public function handle(TableCreated $created)
@@ -30,7 +29,7 @@ class ModelCopier
             return;
         }
 
-        $model = $this->models->resolve($created->table);
+        $model = Models::fromTable($created->table);
 
         if ($model === null) {
             return;
