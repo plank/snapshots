@@ -8,7 +8,9 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Orchestra\Testbench\TestCase as Orchestra;
+use Plank\LaravelModelResolver\LaravelModelResolverServiceProvider;
 use Plank\LaravelSchemaEvents\LaravelSchemaEventsServiceProvider;
+use Plank\Snapshots\Repository\ModelRepository;
 use Plank\Snapshots\Repository\VersionRepository;
 use Plank\Snapshots\SnapshotServiceProvider;
 use Plank\Snapshots\Tests\Database\Seeders\Model\UserSeeder;
@@ -53,6 +55,7 @@ class TestCase extends Orchestra
     protected function getPackageProviders($app)
     {
         return [
+            LaravelModelResolverServiceProvider::class,
             LaravelSchemaEventsServiceProvider::class,
             SnapshotServiceProvider::class,
         ];
@@ -63,5 +66,6 @@ class TestCase extends Orchestra
         $app['config']->set('database.default', 'testing');
         $app['config']->set('snapshots.history.observer', null);
         $app['config']->set('snapshots.history.labeler', null);
+        $app['config']->set('model-resolver.repository', ModelRepository::class);
     }
 }
