@@ -4,7 +4,6 @@ namespace Plank\Snapshots\Connection;
 
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Grammars\SQLiteGrammar;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Fluent;
 
 class SnapshotSQLiteGrammar extends SQLiteGrammar
