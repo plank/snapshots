@@ -183,7 +183,7 @@ return new class extends SnapshotMigration
             $table->morphs('blockable');
             $table->timestamps();
 
-            $table->foreign('page_id')->references('id')->onSnapshot('pages');
+            $table->foreign('page_id')->references('id')->on('pages');
         });
     }
 

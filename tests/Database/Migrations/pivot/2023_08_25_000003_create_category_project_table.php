@@ -13,11 +13,9 @@ return new class extends SnapshotMigration
     {
         Schema::create('category_project', function (SnapshotBlueprint $table) {
             $table->id();
-            $table->foreignId('category_id')->constrained('categories');
-            $table->foreignUlid('project_id')->constrainedToSnapshot('projects', 'ulid');
+            $table->foreignId('category_id')->constrained('categories')->onDelete('cascade');
+            $table->foreignUlid('project_id')->constrained('projects', 'ulid');
             $table->timestamps();
-
-            $table->foreign('category_id')->references('id')->on('categories')->onDelete('cascade');
         });
     }
 };
