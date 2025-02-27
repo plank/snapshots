@@ -102,21 +102,4 @@ return [
         'labeler' => \Plank\Snapshots\Listeners\LabelHistory::class,
         'identity' => \Plank\Snapshots\Observers\IdentityObserver::class,
     ],
-
-    'model_resolver' => [
-        'skip_tests' => false,
-        'ignore' => [
-            'DeepCopy\\',
-            'Doctrine\\',
-            'Illuminate\\',
-            'Mockery\\',
-            'PHPStan\\',
-            'PHPUnit\\',
-            'Prophecy\\',
-            'Psr\\',
-            'Psy\\',
-            'Sebastian\\',
-            'Symfony\\',
-        ],
-    ],
 ];
