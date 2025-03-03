@@ -13,6 +13,7 @@ return new class extends Migration
             $table->unsignedBigInteger('previous_version_id')->nullable()->index();
             $table->string('number')->unique();
             $table->boolean('migrated', false);
+            $table->boolean('copied', false);
             $table->timestamps();
 
             $table->foreign('previous_version_id')
