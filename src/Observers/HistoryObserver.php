@@ -165,35 +165,4 @@ class HistoryObserver
 
         return null;
     }
-
-    protected function getLoggableAttributes(Model&Trackable $model): array
-    {
-        return $this->getLoggableArray(
-            $model->getAttributes(),
-            $model->getHidden(),
-            $model->getVisible()
-        );
-    }
-
-    protected function getLoggableOriginal(Model&Trackable $model): array
-    {
-        return $this->getLoggableArray(
-            $model->getOriginal(),
-            $model->getHidden(),
-            $model->getVisible()
-        );
-    }
-
-    protected function getLoggableArray(array $attributes, array $hidden, array $visible): array
-    {
-        if (count($visible) > 0) {
-            $attributes = array_intersect_key($attributes, array_flip($visible));
-        }
-
-        if (count($hidden) > 0) {
-            $attributes = array_diff_key($attributes, array_flip($hidden));
-        }
-
-        return $attributes;
-    }
 }
