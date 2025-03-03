@@ -1,42 +1,27 @@
 <?php
 
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Event;
-use Plank\LaravelSchemaEvents\Events\TableCreated;
 use Plank\Snapshots\Enums\Operation;
-use Plank\Snapshots\Events\TableCopied;
-use Plank\Snapshots\Exceptions\CauserException;
-use Plank\Snapshots\Listeners\LabelHistory;
-use Plank\Snapshots\Listeners\ModelCopier;
-use Plank\Snapshots\Listeners\TableCopier;
+use Plank\Snapshots\Jobs\CopyModel;
+use Plank\Snapshots\Jobs\CopyTable;
 use Plank\Snapshots\Models\History;
 use Plank\Snapshots\Observers\HistoryObserver;
-use Plank\Snapshots\Tests\Models\Company;
 use Plank\Snapshots\Tests\Models\Document;
 use Plank\Snapshots\Tests\Models\Flag;
-use Plank\Snapshots\Tests\Models\Image;
 
 use function Pest\Laravel\artisan;
 
-beforeEach(function () {
-    config()->set('snapshots.history.observer', HistoryObserver::class);
-
-    Event::forget(TableCreated::class);
-    Event::listen(TableCreated::class, TableCopier::class);
-
-    Event::forget(TableCopied::class);
-    Event::listen(TableCopied::class, LabelHistory::class);
-});
-
-describe('Versioned Content has its History tracked correctly without Model Events', function () {
+describe('Versioned Content has its History tracked correctly when copying by table', function () {
     beforeEach(function () {
+        config()->set('snapshots.observers.history', HistoryObserver::class);
+        config()->set('snapshots.release.copy.job', CopyTable::class);
+
         artisan('migrate', [
-            '--path' => migrationPath('schema/create_for_model'),
+            '--path' => migrationPath('schema/create'),
             '--realpath' => true,
         ])->run();
     });
 
-    it('tracks Create Operations correctly without Model Events', function () {
+    it('tracks Create Operations correctly', function () {
         Document::factory()->create();
 
         expect(History::query()->count())->toBe(1);
@@ -47,7 +32,7 @@ describe('Versioned Content has its History tracked correctly without Model Even
         expect($item->operation)->toBe(Operation::Created);
         expect($item->version)->toBeNull();
 
-        createFirstVersion('schema/create_for_model');
+        createFirstVersion('schema/create');
 
         expect(History::query()->count())->toBe(2);
 
@@ -66,7 +51,7 @@ describe('Versioned Content has its History tracked correctly without Model Even
         expect($item->version)->toBeNull();
 
         Document::factory()->create();
-        versions()->setActive(createMinorVersion('schema/create_for_model'));
+        versions()->setActive(createMinorVersion('schema/create'));
 
         // Now we have 1 created history items and 2 snapshotted history items for the first
         // document, and 1 created history item and 1 snapshotted history item for the second document.
@@ -81,7 +66,7 @@ describe('Versioned Content has its History tracked correctly without Model Even
         $document->update(['title' => $document->title.' – Updated']);
         expect(History::query()->count())->toBe(2);
 
-        createFirstVersion('schema/create_for_model');
+        createFirstVersion('schema/create');
 
         $created = History::query()
             ->where('operation', Operation::Created)
@@ -118,7 +103,7 @@ describe('Versioned Content has its History tracked correctly without Model Even
         $document->delete();
         expect(History::query()->count())->toBe(2);
 
-        createFirstVersion('schema/create_for_model');
+        createFirstVersion('schema/create');
 
         $created = History::query()
             ->where('operation', Operation::Created)
@@ -152,7 +137,7 @@ describe('Versioned Content has its History tracked correctly without Model Even
         $flag->forceDelete();
         expect(History::query()->count())->toBe(2);
 
-        createFirstVersion('schema/create_for_model');
+        createFirstVersion('schema/create');
 
         $created = History::query()
             ->where('operation', Operation::Created)
@@ -186,7 +171,7 @@ describe('Versioned Content has its History tracked correctly without Model Even
         $flag->delete();
         expect(History::query()->count())->toBe(2);
 
-        createFirstVersion('schema/create_for_model');
+        createFirstVersion('schema/create');
 
         $created = History::query()
             ->where('operation', Operation::Created)
@@ -223,7 +208,7 @@ describe('Versioned Content has its History tracked correctly without Model Even
         $flag->delete();
         expect(History::query()->count())->toBe(2);
 
-        createFirstVersion('schema/create_for_model');
+        createFirstVersion('schema/create');
 
         $flag->restore();
         expect(History::query()->count())->toBe(4);
@@ -267,7 +252,7 @@ describe('Versioned Content has its History tracked correctly without Model Even
     });
 
     it('tracks Create Operations correctly while a version is active', function () {
-        versions()->setActive(createFirstVersion('schema/create_for_model'));
+        versions()->setActive(createFirstVersion('schema/create'));
 
         Document::factory()->create();
 
@@ -279,13 +264,13 @@ describe('Versioned Content has its History tracked correctly without Model Even
         expect($item->operation)->toBe(Operation::Created);
         expect((string) $item->version->number)->toBe('1.0.0');
 
-        createPatchVersion('schema/create_for_model');
+        createPatchVersion('schema/create');
 
         expect(History::query()->count())->toBe(1);
     });
 
     it('tracks Update Operations correctly while a version is active', function () {
-        versions()->setActive(createFirstVersion('schema/create_for_model'));
+        versions()->setActive(createFirstVersion('schema/create'));
 
         $document = Document::factory()->create();
         $document->update(['title' => $document->title.' – Updated']);
@@ -299,13 +284,13 @@ describe('Versioned Content has its History tracked correctly without Model Even
 
         expect((string) $item->version->number)->toBe('1.0.0');
 
-        createPatchVersion('schema/create_for_model');
+        createPatchVersion('schema/create');
 
         expect(History::query()->where('operation', Operation::Updated)->count())->toBe(1);
     });
 
     it('tracks Deleted Operations for models while a version is active', function () {
-        versions()->setActive(createFirstVersion('schema/create_for_model'));
+        versions()->setActive(createFirstVersion('schema/create'));
 
         $document = Document::factory()->create();
         $document->delete();
@@ -319,13 +304,13 @@ describe('Versioned Content has its History tracked correctly without Model Even
 
         expect((string) $item->version->number)->toBe('1.0.0');
 
-        createPatchVersion('schema/create_for_model');
+        createPatchVersion('schema/create');
 
         expect(History::query()->where('operation', Operation::Deleted)->count())->toBe(1);
     });
 
     it('tracks Deleted Operations for SoftDeleting models which are force deleted while a version is active', function () {
-        versions()->setActive(createFirstVersion('schema/create_for_model'));
+        versions()->setActive(createFirstVersion('schema/create'));
 
         $flag = Flag::factory()->create();
         $flag->forceDelete();
@@ -339,13 +324,13 @@ describe('Versioned Content has its History tracked correctly without Model Even
 
         expect((string) $item->version->number)->toBe('1.0.0');
 
-        createPatchVersion('schema/create_for_model');
+        createPatchVersion('schema/create');
 
         expect(History::query()->where('operation', Operation::Deleted)->count())->toBe(1);
     });
 
     it('tracks SoftDeleted Operations for SoftDeleting models while a version is active', function () {
-        versions()->setActive(createFirstVersion('schema/create_for_model'));
+        versions()->setActive(createFirstVersion('schema/create'));
 
         $flag = Flag::factory()->create();
         $flag->delete();
@@ -359,13 +344,13 @@ describe('Versioned Content has its History tracked correctly without Model Even
 
         expect((string) $item->version->number)->toBe('1.0.0');
 
-        createPatchVersion('schema/create_for_model');
+        createPatchVersion('schema/create');
 
         expect(History::query()->where('operation', Operation::SoftDeleted)->count())->toBe(1);
     });
 
     it('tracks Restored Operations for SoftDeleting models while a version is active', function () {
-        versions()->setActive(createFirstVersion('schema/create_for_model'));
+        versions()->setActive(createFirstVersion('schema/create'));
 
         $flag = Flag::factory()->create();
         $flag->delete();
@@ -380,7 +365,7 @@ describe('Versioned Content has its History tracked correctly without Model Even
 
         expect((string) $item->version->number)->toBe('1.0.0');
 
-        createPatchVersion('schema/create_for_model');
+        createPatchVersion('schema/create');
 
         expect(History::query()->where('operation', Operation::Restored)->count())->toBe(1);
     });
@@ -413,12 +398,13 @@ describe('Versioned Content has its History tracked correctly without Model Even
     });
 });
 
-describe('Versioned Content has its History tracked correctly with Model Events', function () {
+describe('Versioned Content has its History tracked correctly when copying by Model', function () {
     beforeEach(function () {
-        config()->set('snapshots.copier', ModelCopier::class);
+        config()->set('snapshots.release.copy.job', CopyModel::class);
+        config()->set('snapshots.observers.history', HistoryObserver::class);
 
         artisan('migrate', [
-            '--path' => migrationPath('schema/create_for_model'),
+            '--path' => migrationPath('schema/create'),
             '--realpath' => true,
         ])->run();
     });
@@ -434,7 +420,7 @@ describe('Versioned Content has its History tracked correctly with Model Events'
         expect($item->operation)->toBe(Operation::Created);
         expect($item->version)->toBeNull();
 
-        createFirstVersion('schema/create_for_model');
+        createFirstVersion('schema/create');
 
         expect(History::query()->count())->toBe(2);
 
@@ -453,124 +439,349 @@ describe('Versioned Content has its History tracked correctly with Model Events'
         expect($item->version)->toBeNull();
 
         Document::factory()->create();
-        versions()->setActive(createMinorVersion('schema/create_for_model'));
+        versions()->setActive(createMinorVersion('schema/create'));
 
-        // Now we have 2 created history items, and 2 snapshotted history items for the first
-        // document, and 1 snapshotted history item for the second document.
+        // Now we have 1 created history items and 2 snapshotted history items for the first
+        // document, and 1 created history item and 1 snapshotted history item for the second document.
         expect(History::query()->where('operation', Operation::Created)->count())->toBe(2);
         expect(History::query()->where('operation', Operation::Snapshotted)->count())->toBe(3);
     });
-});
-
-describe('Unversioned Content has its History tracked correctly', function () {
-    beforeEach(function () {
-        artisan('migrate', [
-            '--path' => migrationPath('history'),
-            '--realpath' => true,
-        ])->run();
-    });
-
-    it('tracks Create Operations correctly', function () {
-        Image::factory()->create();
-
-        expect(History::query()->count())->toBe(1);
-        expect($item = History::query()->first())->toBeInstanceOf(History::class);
-        expect($item->operation)->toBe(Operation::Created);
-    });
 
     it('tracks Update Operations correctly', function () {
-        $image = Image::factory()->create();
-        $image->src = $image->src.'?tracking=123';
-        $image->save();
+        $document = Document::factory()->create();
+        expect(History::query()->count())->toBe(1);
+
+        $document->update(['title' => $document->title.' – Updated']);
+        expect(History::query()->count())->toBe(2);
+
+        createFirstVersion('schema/create');
+
+        $created = History::query()
+            ->where('operation', Operation::Created)
+            ->get();
+
+        expect($created)->toHaveCount(1);
+        expect($created = $created->first())->toBeInstanceOf(History::class);
+        expect((string) $created->version->number)->toBe('1.0.0');
+        expect($created->trackable_id)->toBe($document->id);
+
+        $updated = History::query()
+            ->where('operation', Operation::Updated)
+            ->get();
+
+        expect($updated)->toHaveCount(1);
+        expect($updated = $updated->first())->toBeInstanceOf(History::class);
+        expect((string) $updated->version->number)->toBe('1.0.0');
+        expect($updated->trackable_id)->toBe($document->id);
+
+        $snapshotted = History::query()
+            ->where('operation', Operation::Snapshotted)
+            ->get();
+
+        expect($snapshotted)->toHaveCount(1);
+        expect($snapshotted = $snapshotted->first())->toBeInstanceOf(History::class);
+        expect($snapshotted->version)->toBeNull();
+        expect($snapshotted->trackable_id)->toBe($document->id);
+    });
+
+    it('tracks Deleted Operations for models', function () {
+        $document = Document::factory()->create();
+        expect(History::query()->count())->toBe(1);
+
+        $document->delete();
+        expect(History::query()->count())->toBe(2);
+
+        createFirstVersion('schema/create');
+
+        $created = History::query()
+            ->where('operation', Operation::Created)
+            ->get();
+
+        expect($created)->toHaveCount(1);
+        expect($created = $created->first())->toBeInstanceOf(History::class);
+        expect((string) $created->version->number)->toBe('1.0.0');
+        expect($created->trackable_id)->toBe($document->id);
+
+        $deleted = History::query()
+            ->where('operation', Operation::Deleted)
+            ->get();
+
+        expect($deleted)->toHaveCount(1);
+        expect($deleted = $deleted->first())->toBeInstanceOf(History::class);
+        expect((string) $deleted->version->number)->toBe('1.0.0');
+        expect($deleted->trackable_id)->toBe($document->id);
+
+        $snapshotted = History::query()
+            ->where('operation', Operation::Snapshotted)
+            ->get();
+
+        expect($snapshotted)->toHaveCount(0);
+    });
+
+    it('tracks Deleted Operations for SoftDeleting models which are force deleted', function () {
+        $flag = Flag::factory()->create();
+        expect(History::query()->count())->toBe(1);
+
+        $flag->forceDelete();
+        expect(History::query()->count())->toBe(2);
+
+        createFirstVersion('schema/create');
+
+        $created = History::query()
+            ->where('operation', Operation::Created)
+            ->get();
+
+        expect($created)->toHaveCount(1);
+        expect($created = $created->first())->toBeInstanceOf(History::class);
+        expect((string) $created->version->number)->toBe('1.0.0');
+        expect($created->trackable_id)->toBe($flag->id);
+
+        $deleted = History::query()
+            ->where('operation', Operation::Deleted)
+            ->get();
+
+        expect($deleted)->toHaveCount(1);
+        expect($deleted = $deleted->first())->toBeInstanceOf(History::class);
+        expect((string) $deleted->version->number)->toBe('1.0.0');
+        expect($deleted->trackable_id)->toBe($flag->id);
+
+        $snapshotted = History::query()
+            ->where('operation', Operation::Snapshotted)
+            ->get();
+
+        expect($snapshotted)->toHaveCount(0);
+    });
+
+    it('tracks SoftDeleted Operations for SoftDeleting models', function () {
+        $flag = Flag::factory()->create();
+        expect(History::query()->count())->toBe(1);
+
+        $flag->delete();
+        expect(History::query()->count())->toBe(2);
+
+        createFirstVersion('schema/create');
+
+        $created = History::query()
+            ->where('operation', Operation::Created)
+            ->get();
+
+        expect($created)->toHaveCount(1);
+        expect($created = $created->first())->toBeInstanceOf(History::class);
+        expect((string) $created->version->number)->toBe('1.0.0');
+        expect($created->trackable_id)->toBe($flag->id);
+
+        $deleted = History::query()
+            ->where('operation', Operation::SoftDeleted)
+            ->get();
+
+        expect($deleted)->toHaveCount(1);
+        expect($deleted = $deleted->first())->toBeInstanceOf(History::class);
+        expect((string) $deleted->version->number)->toBe('1.0.0');
+        expect($deleted->trackable_id)->toBe($flag->id);
+
+        $snapshotted = History::query()
+            ->where('operation', Operation::Snapshotted)
+            ->get();
+
+        expect($snapshotted)->toHaveCount(1);
+        expect($snapshotted = $snapshotted->first())->toBeInstanceOf(History::class);
+        expect($snapshotted->version)->toBeNull();
+        expect($snapshotted->trackable_id)->toBe($flag->id);
+    });
+
+    it('tracks Restored Operations for SoftDeleting models', function () {
+        $flag = Flag::factory()->create();
+        expect(History::query()->count())->toBe(1);
+
+        $flag->delete();
+        expect(History::query()->count())->toBe(2);
+
+        createFirstVersion('schema/create');
+
+        $flag->restore();
+        expect(History::query()->count())->toBe(4);
+
+        $created = History::query()
+            ->where('operation', Operation::Created)
+            ->get();
+
+        expect($created)->toHaveCount(1);
+        expect($created = $created->first())->toBeInstanceOf(History::class);
+        expect((string) $created->version->number)->toBe('1.0.0');
+        expect($created->trackable_id)->toBe($flag->id);
+
+        $deleted = History::query()
+            ->where('operation', Operation::SoftDeleted)
+            ->get();
+
+        expect($deleted)->toHaveCount(1);
+        expect($deleted = $deleted->first())->toBeInstanceOf(History::class);
+        expect((string) $deleted->version->number)->toBe('1.0.0');
+        expect($deleted->trackable_id)->toBe($flag->id);
+
+        $snapshotted = History::query()
+            ->where('operation', Operation::Snapshotted)
+            ->get();
+
+        expect($snapshotted)->toHaveCount(1);
+        expect($snapshotted = $snapshotted->first())->toBeInstanceOf(History::class);
+        expect($snapshotted->version)->toBeNull();
+        expect($snapshotted->trackable_id)->toBe($flag->id);
+
+        $restored = History::query()
+            ->where('operation', Operation::Restored)
+            ->get();
+
+        expect($restored)->toHaveCount(1);
+        expect($restored = $restored->first())->toBeInstanceOf(History::class);
+        expect($restored->version)->toBeNull();
+        expect($restored->trackable_id)->toBe($flag->id);
+        expect($restored->causer->email)->toBe('admin@app.test');
+    });
+
+    it('tracks Create Operations correctly while a version is active', function () {
+        versions()->setActive(createFirstVersion('schema/create'));
+
+        Document::factory()->create();
+
+        expect(History::query()->count())->toBe(1);
+
+        /** @var History $item */
+        $item = History::query()->first();
+
+        expect($item->operation)->toBe(Operation::Created);
+        expect((string) $item->version->number)->toBe('1.0.0');
+
+        createPatchVersion('schema/create');
+
+        expect(History::query()->count())->toBe(1);
+    });
+
+    it('tracks Update Operations correctly while a version is active', function () {
+        versions()->setActive(createFirstVersion('schema/create'));
+
+        $document = Document::factory()->create();
+        $document->update(['title' => $document->title.' – Updated']);
+
+        expect(History::query()->where('operation', Operation::Updated)->count())->toBe(1);
+
+        /** @var History $item */
+        $item = History::query()
+            ->where('operation', Operation::Updated)
+            ->first();
+
+        expect((string) $item->version->number)->toBe('1.0.0');
+
+        createPatchVersion('schema/create');
 
         expect(History::query()->where('operation', Operation::Updated)->count())->toBe(1);
     });
 
-    it('tracks Deleted Operations for models', function () {
-        $image = Image::factory()->create();
-        $image->delete();
+    it('tracks Deleted Operations for models while a version is active', function () {
+        versions()->setActive(createFirstVersion('schema/create'));
+
+        $document = Document::factory()->create();
+        $document->delete();
+
+        expect(History::query()->where('operation', Operation::Deleted)->count())->toBe(1);
+
+        /** @var History $item */
+        $item = History::query()
+            ->where('operation', Operation::Deleted)
+            ->first();
+
+        expect((string) $item->version->number)->toBe('1.0.0');
+
+        createPatchVersion('schema/create');
 
         expect(History::query()->where('operation', Operation::Deleted)->count())->toBe(1);
     });
 
-    it('tracks Deleted Operations for SoftDeleting models which are force deleted', function () {
-        $company = Company::factory()->create();
-        $company->forceDelete();
+    it('tracks Deleted Operations for SoftDeleting models which are force deleted while a version is active', function () {
+        versions()->setActive(createFirstVersion('schema/create'));
+
+        $flag = Flag::factory()->create();
+        $flag->forceDelete();
+
+        expect(History::query()->where('operation', Operation::Deleted)->count())->toBe(1);
+
+        /** @var History $item */
+        $item = History::query()
+            ->where('operation', Operation::Deleted)
+            ->first();
+
+        expect((string) $item->version->number)->toBe('1.0.0');
+
+        createPatchVersion('schema/create');
 
         expect(History::query()->where('operation', Operation::Deleted)->count())->toBe(1);
     });
 
-    it('tracks SoftDeleted Operations for SoftDeleting models', function () {
-        $company = Company::factory()->create();
-        $company->delete();
+    it('tracks SoftDeleted Operations for SoftDeleting models while a version is active', function () {
+        versions()->setActive(createFirstVersion('schema/create'));
+
+        $flag = Flag::factory()->create();
+        $flag->delete();
+
+        expect(History::query()->where('operation', Operation::SoftDeleted)->count())->toBe(1);
+
+        /** @var History $item */
+        $item = History::query()
+            ->where('operation', Operation::SoftDeleted)
+            ->first();
+
+        expect((string) $item->version->number)->toBe('1.0.0');
+
+        createPatchVersion('schema/create');
 
         expect(History::query()->where('operation', Operation::SoftDeleted)->count())->toBe(1);
     });
 
-    it('tracks Restored Operations for SoftDeleting models', function () {
-        $company = Company::factory()->create();
-        $company->delete();
-        $company->restore();
+    it('tracks Restored Operations for SoftDeleting models while a version is active', function () {
+        versions()->setActive(createFirstVersion('schema/create'));
+
+        $flag = Flag::factory()->create();
+        $flag->delete();
+        $flag->restore();
+
+        expect(History::query()->where('operation', Operation::Restored)->count())->toBe(1);
+
+        /** @var History $item */
+        $item = History::query()
+            ->where('operation', Operation::Restored)
+            ->first();
+
+        expect((string) $item->version->number)->toBe('1.0.0');
+
+        createPatchVersion('schema/create');
 
         expect(History::query()->where('operation', Operation::Restored)->count())->toBe(1);
     });
-});
 
-describe('History Labeling handles bad configuration and arguments', function () {
-    it('throws an exception when the causer does not implement the causer interface', function () {
-        $badUser = new \Illuminate\Foundation\Auth\User;
-        Auth::setUser($badUser);
+    it('tracks SoftDeleted Operations for SoftDeleting models when a model is created as deleted', function () {
+        $flag = Flag::factory()->create(['deleted_at' => now()]);
 
-        artisan('migrate', [
-            '--path' => migrationPath('history'),
-            '--realpath' => true,
-        ])->run();
+        expect(History::query()->where('operation', Operation::Created)->first())->toBeNull();
 
-        Image::factory()->create();
-    })->throws(CauserException::class);
-});
+        $delated = History::query()
+            ->where('operation', Operation::SoftDeleted)
+            ->first();
 
-describe('Trackable models have a correct hidden property', function () {
-    beforeEach(function () {
-        artisan('migrate', [
-            '--path' => migrationPath('history'),
-            '--realpath' => true,
-        ])->run();
+        expect($delated)->not->toBeNull();
+        expect($delated->trackable_id)->toBe($flag->id);
     });
 
-    it('shows the hidden attribute correctly for non-soft-deleting models', function () {
-        $image = Image::factory()->create();
+    it('tracks SoftDeleted Operations for SoftDeleting models when a model is updated with deleted timestamp set', function () {
+        $flag = Flag::factory()->create();
+        $flag->update(['deleted_at' => now()]);
 
-        expect($image->hidden)->toBeFalse();
+        expect(History::query()->where('operation', Operation::Updated)->first())->toBeNull();
 
-        $image->delete();
+        $delated = History::query()
+            ->where('operation', Operation::SoftDeleted)
+            ->first();
 
-        expect($image->hidden)->toBeTrue();
-    });
-
-    it('shows the hidden attribute correctly for soft-deleting models', function () {
-        $company = Company::factory()->create();
-
-        expect($company->hidden)->toBeFalse();
-
-        $company->delete();
-
-        expect($company->hidden)->toBeTrue();
-    });
-});
-
-describe('Trackable models do not log hidden model attributes', function () {
-    beforeEach(function () {
-        artisan('migrate', [
-            '--path' => migrationPath('history'),
-            '--realpath' => true,
-        ])->run();
-    });
-
-    it('does not log hidden attributes', function () {
-        Company::factory()->create();
-
-        expect($item = History::query()->first())->toBeInstanceOf(History::class);
-        expect($item->to)->not->toHaveKey('secret');
+        expect($delated)->not->toBeNull();
+        expect($delated->trackable_id)->toBe($flag->id);
     });
 });

@@ -2,30 +2,11 @@
 
 namespace Plank\Snapshots\Migrator;
 
-use Illuminate\Database\ConnectionResolverInterface as Resolver;
 use Illuminate\Database\Migrations\DatabaseMigrationRepository;
-use Plank\Snapshots\Contracts\ManagesVersions;
+use Plank\Snapshots\Facades\Versions;
 
 class SnapshotMigrationRepository extends DatabaseMigrationRepository
 {
-    protected ManagesVersions $versions;
-
-    /**
-     * Create a new database migration repository instance.
-     *
-     * @param  string  $table
-     * @return void
-     */
-    public function __construct(
-        Resolver $resolver,
-        $table,
-        ManagesVersions $versions
-    ) {
-        $this->versions = $versions;
-
-        parent::__construct($resolver, $table);
-    }
-
     /**
      * Log that a migration was run.
      *
@@ -35,7 +16,7 @@ class SnapshotMigrationRepository extends DatabaseMigrationRepository
      */
     public function log($file, $batch)
     {
-        if ($active = $this->versions->active()) {
+        if ($active = Versions::active()) {
             $file = $active->key()->prefix($file);
         }
 

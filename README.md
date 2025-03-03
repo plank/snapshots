@@ -74,21 +74,16 @@ Middleware example:
 namespace App\Http\Middleware;
 
 use Closure;
-use Plank\Snapshots\Contracts\ManagesVersions;
+use Plank\Snapshots\Facades\Versions;
 
 class SetActiveVersion
 {
-    public function __construct(
-        protected ManagesVersions $versions
-    ) {
-    }
-
     public function handle($request, Closure $next)
     {
         $version = $request->route('version');
 
-        if ($version = $this->versions->byKey($version)) {
-            $this->versions->setActive($version);
+        if ($version = Versions::byKey($version)) {
+            Versions::setActive($version);
         }
 
         return $next($request);

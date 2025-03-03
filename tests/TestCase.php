@@ -64,8 +64,9 @@ class TestCase extends Orchestra
     public function getEnvironmentSetUp($app)
     {
         $app['config']->set('database.default', 'testing');
-        $app['config']->set('snapshots.history.observer', null);
-        $app['config']->set('snapshots.history.labeler', null);
+        $app['config']->set('queue.batching.database', 'testing');
+        $app['config']->set('snapshots.observers.history', null);
+        $app['config']->set('schema-events.listeners.finished', null);
         $app['config']->set('model-resolver.repository', ModelRepository::class);
     }
 }

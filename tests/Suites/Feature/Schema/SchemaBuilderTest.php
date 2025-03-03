@@ -19,9 +19,11 @@ describe('The snapshot schema prefixes tables appropriately', function () {
 
     it('migrates the declared table before the versions table has been migrated', function () {
         DB::table('migrations')->truncate();
+
         usingSnapshotSchema(function (SchemaBuilder $schema) {
             $schema->drop('versions');
             $schema->drop('documents');
+            $schema->drop('flags');
         });
 
         artisan('migrate', [
@@ -58,17 +60,17 @@ describe('The snapshot schema prefixes tables appropriately', function () {
         ]);
     });
 
-    it('does does not re-run evoloving migrations for versions', function () {
+    it('does not re-run snapshot migrations', function () {
         createFirstVersion('schema/create');
 
-        expect(DB::table('migrations')->count())->toBe(5);
+        expect(DB::table('migrations')->count())->toBe(8);
 
         artisan('migrate', [
             '--path' => migrationPath('schema/create'),
             '--realpath' => true,
         ])->run();
 
-        expect(DB::table('migrations')->count())->toBe(5);
+        expect(DB::table('migrations')->count())->toBe(8);
     });
 
     it('creates new tables for new versions', function () {
@@ -88,7 +90,7 @@ describe('The snapshot schema prefixes tables appropriately', function () {
     });
 
     it('creates new tables for models for new versions', function () {
-        createFirstVersion('schema/create_for_model');
+        createFirstVersion('schema/create');
 
         assertDatabaseHas('migrations', [
             'migration' => 'v1_0_0_create_documents_table',
@@ -99,7 +101,7 @@ describe('The snapshot schema prefixes tables appropriately', function () {
             expect($schema->hasTable('documents'))->toBeTrue();
         });
 
-        createMinorVersion('schema/create_for_model');
+        createMinorVersion('schema/create');
 
         assertDatabaseHas('migrations', [
             'migration' => 'v1_1_0_create_documents_table',

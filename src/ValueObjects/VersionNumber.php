@@ -77,7 +77,7 @@ class VersionNumber implements VersionKey
 
     public function prefix(string $string): string
     {
-        return $this->key().'_'.$this->strip($string);
+        return $this->key().'_'.static::strip($string);
     }
 
     public static function strip(string $string): string

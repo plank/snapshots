@@ -1,53 +1,68 @@
 <?php
 
-namespace Plank\Snapshots\Listeners;
+namespace Plank\Snapshots\Jobs;
 
+use Illuminate\Bus\Batchable;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Collection;
-use Plank\LaravelModelResolver\Facades\Models;
 use Plank\Snapshots\Contracts\CausesChanges;
-use Plank\Snapshots\Contracts\ManagesVersions;
-use Plank\Snapshots\Contracts\ResolvesCauser;
-use Plank\Snapshots\Contracts\Trackable;
+use Plank\Snapshots\Contracts\Version;
 use Plank\Snapshots\Enums\Operation;
-use Plank\Snapshots\Events\TableCopied;
+use Plank\Snapshots\Facades\Causer;
+use Plank\Snapshots\Facades\Versions;
 use Plank\Snapshots\Models\History;
 
-class LabelHistory
+abstract class Copier implements ShouldQueue
 {
+    use Batchable;
+    use Dispatchable;
+    use InteractsWithQueue;
+    use Queueable;
+    use SerializesModels;
+
     public function __construct(
-        protected ManagesVersions $versions,
+        public Version&Model $version,
+        public string $table,
     ) {}
 
-    public function handle(TableCopied $event)
+    abstract public function handle();
+
+    /**
+     * @param  class-string<Model&Trackable>  $model
+     */
+    protected function writeHistory(string $model)
     {
-        $model = Models::fromTable($event->table);
-
-        if ($model === null) {
-            return;
-        }
-
-        $version = $this->versions->byKey($event->table);
-
         /** @var class-string<History>|null */
         $history = config()->get('snapshots.models.history');
 
+        /** @var CausesChanges|null $causer */
+        $causer = Causer::active();
+
+        $version = $this->version;
+        $working = Versions::working($this->version);
+
         $history::query()
             ->where('trackable_type', $model)
-            ->whereNull('version_id')
+            ->where('version_id', $working?->getKey())
             ->cursor()
             ->groupBy('trackable_id')
-            ->each(function (Collection $items) use ($version) {
+            ->each(function (Collection $items) use ($version, $history, $causer) {
                 // Move all History items from the working version to the newly created version
-                $items->each(function (History $item) use ($version) {
-                    History::withoutTimestamps(function () use ($item, $version) {
+                $items->each(function (History $item) use ($version, $history) {
+                    $history::withoutTimestamps(function () use ($item, $version) {
                         $item->updateQuietly([
                             'version_id' => $version->getKey(),
                         ]);
                     });
                 });
 
-                $this->createSnapshottedHistoryItem($items->sortByDesc('created_at')->first());
+                $this->createSnapshottedHistoryItem($items->sortByDesc('created_at')->first(), $history, $causer);
             });
     }
 
@@ -55,7 +70,7 @@ class LabelHistory
      * In the working version, create a new History item that represents the state of the model
      * as the starting point for new changes since the newly created version.
      */
-    protected function createSnapshottedHistoryItem(History $item): void
+    protected function createSnapshottedHistoryItem(History $item, string $history, ?CausesChanges $causer): void
     {
         $softDeletes = in_array(SoftDeletes::class, class_uses_recursive($item->trackable_type));
 
@@ -69,12 +84,6 @@ class LabelHistory
             return;
         }
 
-        /** @var CausesChanges|null $causer */
-        $causer = app(ResolvesCauser::class)->active();
-
-        /** @var class-string<History>|null $history */
-        $history = config()->get('snapshots.models.history');
-
         $data = [
             'operation' => Operation::Snapshotted,
             'causer_id' => $causer?->getKey(),
@@ -86,7 +95,7 @@ class LabelHistory
             'to' => $item->to,
         ];
 
-        if (config()->get('snapshots.history.identity')) {
+        if (config()->get('snapshots.observers.identity')) {
             $data['hash'] = $trackable->newHash();
         }
 
