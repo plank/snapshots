@@ -30,17 +30,22 @@ interface ManagesVersions
     public function active(): ?Version;
 
     /**
+     * Retrieve the latest version
+     */
+    public function latest(): ?Version;
+
+    /**
+     * Retrieve the working version for a given version.
+     */
+    public function working(?Version $version): ?Version;
+
+    /**
      * @template TReturn
      *
      * @param callable(?Version $version = null): TReturn $callback
      * @return TReturn
      */
     public function withVersionActive(string|null|VersionKey|Version $version, Closure $callback): mixed;
-
-    /**
-     * Retrieve the latest version
-     */
-    public function latest(): ?Version;
 
     /**
      * Find a version by its key

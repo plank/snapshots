@@ -13,6 +13,7 @@ use Plank\Snapshots\Contracts\Version;
  * @method static mixed withVersionActive(string|VersionNumber|Version|null $version, callable $callback)
  * @method static Version|null active()
  * @method static Version|null latest()
+ * @method static Version|null working(Version|null $version)
  * @method static Version|null find($key)
  * @method static Version|null byNumber(string $number)
  * @method static Collection all()
