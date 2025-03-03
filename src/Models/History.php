@@ -25,6 +25,8 @@ class History extends MorphPivot
 
     protected $guarded = ['id'];
 
+    public $incrementing = true;
+
     protected $casts = [
         'operation' => Operation::class,
         'from' => 'json',
