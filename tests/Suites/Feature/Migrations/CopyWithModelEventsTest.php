@@ -1,19 +1,16 @@
 <?php
 
-use Illuminate\Support\Facades\Event;
-use Plank\LaravelSchemaEvents\Events\TableCreated;
-use Plank\Snapshots\Listeners\ModelCopier;
+use Plank\Snapshots\Jobs\CopyModel;
 use Plank\Snapshots\Tests\Models\Document;
 
 use function Pest\Laravel\artisan;
 
 describe('The Copier correctly copies data with Model Events', function () {
     beforeEach(function () {
-        Event::forget(TableCreated::class);
-        Event::listen(TableCreated::class, ModelCopier::class);
+        config()->set('snapshots.release.copy.job', CopyModel::class);
 
         artisan('migrate', [
-            '--path' => migrationPath('schema/create_for_model'),
+            '--path' => migrationPath('schema/create'),
             '--realpath' => true,
         ])->run();
     });
@@ -21,7 +18,7 @@ describe('The Copier correctly copies data with Model Events', function () {
     it('copies model data correctly for new versions', function () {
         $documents = Document::factory()->count(3)->create();
 
-        versions()->setActive(createFirstVersion('schema/create_for_model'));
+        versions()->setActive(createFirstVersion('schema/create'));
 
         expect((new Document)->getTable())->toBe('v1_0_0_documents');
 

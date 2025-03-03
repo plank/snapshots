@@ -11,7 +11,7 @@ use function Pest\Laravel\artisan;
 use function Pest\Laravel\seed;
 
 beforeEach(function () {
-    config()->set('snapshots.history.observer', HistoryObserver::class);
+    config()->set('snapshots.observers.history', HistoryObserver::class);
 });
 
 describe('Identity is accurately tracked across versions and relationships', function () {
@@ -20,7 +20,7 @@ describe('Identity is accurately tracked across versions and relationships', fun
      * Version | Operation     | Visible
      */
     beforeEach(function () {
-        config()->set('snapshots.history.observer', HistoryObserver::class);
+        config()->set('snapshots.observers.history', HistoryObserver::class);
 
         artisan('migrate', [
             '--path' => migrationPath('query'),

@@ -15,8 +15,8 @@ describe('SnapshotBlueprint uses versions for named indexes', function () {
     });
 
     it('can drop named indexes from tables', function () {
-
         $indexes = Collection::wrap(DB::select("PRAGMA index_list('documents')"));
+
         expect($indexes)->toHaveCount(2);
         expect($indexes->pluck('name'))->toContain('idx_title');
 
