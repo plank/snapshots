@@ -22,7 +22,7 @@ trait HasHistory
 
     public static function bootHasHistory(): void
     {
-        if ($observer = config()->get('snapshots.history.observer')) {
+        if ($observer = config()->get('snapshots.observers.history')) {
             static::observe($observer);
         }
     }
@@ -84,5 +84,36 @@ trait HasHistory
                 return $item;
             })
             ->reject(fn (History $item) => $item->trackable === null);
+    }
+
+    public function trackableAttributes(): array
+    {
+        return $this->trackableArray(
+            $this->getAttributes(),
+            $this->getHidden(),
+            $this->getVisible(),
+        );
+    }
+
+    public function trackableOriginal(): array
+    {
+        return $this->trackableArray(
+            $this->getOriginal(),
+            $this->getHidden(),
+            $this->getVisible(),
+        );
+    }
+
+    protected function trackableArray(array $attributes, array $hidden, array $visible): array
+    {
+        if (count($visible) > 0) {
+            $attributes = array_intersect_key($attributes, array_flip($visible));
+        }
+
+        if (count($hidden) > 0) {
+            $attributes = array_diff_key($attributes, array_flip($hidden));
+        }
+
+        return $attributes;
     }
 }

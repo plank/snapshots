@@ -1,11 +1,6 @@
 <?php
 
-use Illuminate\Support\Facades\Event;
-use Plank\LaravelSchemaEvents\Events\TableCreated;
 use Plank\Snapshots\Enums\Operation;
-use Plank\Snapshots\Events\TableCopied;
-use Plank\Snapshots\Listeners\LabelHistory;
-use Plank\Snapshots\Listeners\ModelCopier;
 use Plank\Snapshots\Models\History;
 use Plank\Snapshots\Observers\HistoryObserver;
 use Plank\Snapshots\Tests\Models\Flag;
@@ -13,13 +8,7 @@ use Plank\Snapshots\Tests\Models\Flag;
 use function Pest\Laravel\artisan;
 
 beforeEach(function () {
-    config()->set('snapshots.history.observer', HistoryObserver::class);
-
-    Event::forget(TableCreated::class);
-    Event::listen(TableCreated::class, ModelCopier::class);
-
-    Event::forget(TableCopied::class);
-    Event::listen(TableCopied::class, LabelHistory::class);
+    config()->set('snapshots.observers.history', HistoryObserver::class);
 });
 
 describe('The visiblity accurately reflects all versions where content is visible', function () {
@@ -43,48 +32,48 @@ describe('The visiblity accurately reflects all versions where content is visibl
      */
     beforeEach(function () {
         artisan('migrate', [
-            '--path' => migrationPath('schema/create_for_model'),
+            '--path' => migrationPath('schema/create'),
             '--realpath' => true,
         ])->run();
 
         $flag = Flag::factory()->create();
 
         // 1.0.0
-        createFirstVersion('schema/create_for_model');
+        createFirstVersion('schema/create');
 
         $flag->update(['name' => $flag->name.' – patched']);
 
         // 1.0.1
-        createPatchVersion('schema/create_for_model');
+        createPatchVersion('schema/create');
 
         // 1.1.0
-        createMinorVersion('schema/create_for_model');
+        createMinorVersion('schema/create');
 
         $flag->delete();
 
         // 2.0.0
-        createMajorVersion('schema/create_for_model');
+        createMajorVersion('schema/create');
 
         // 2.1.0
-        createMinorVersion('schema/create_for_model');
+        createMinorVersion('schema/create');
 
         $flag->restore();
 
         // 2.2.0
-        createMinorVersion('schema/create_for_model');
+        createMinorVersion('schema/create');
 
         $flag->update(['name' => $flag->name.' – patched again']);
 
         // 2.2.1
-        createPatchVersion('schema/create_for_model');
+        createPatchVersion('schema/create');
 
         $flag->forceDelete();
 
         // 3.0.0
-        createMajorVersion('schema/create_for_model');
+        createMajorVersion('schema/create');
 
         // 4.0.0
-        createMajorVersion('schema/create_for_model');
+        createMajorVersion('schema/create');
     });
 
     it('shows the correct visibility for each version', function () {

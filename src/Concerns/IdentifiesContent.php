@@ -20,11 +20,11 @@ trait IdentifiesContent
     public static function bootIdentifiesContent(): void
     {
         // Identification requires history to be enabled
-        if (! config()->get('snapshots.history.observer', false)) {
+        if (! config()->get('snapshots.observers.history', false)) {
             return;
         }
 
-        if ($observer = config()->get('snapshots.history.identity')) {
+        if ($observer = config()->get('snapshots.observers.identity')) {
             static::observe($observer);
         }
     }

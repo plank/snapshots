@@ -55,6 +55,25 @@ class VersionRepository implements ManagesVersions
     }
 
     /**
+     * {@inheritDoc}
+     */
+    public function latest(): (Version&Model)|null
+    {
+        return $this->model()
+            ->query()
+            ->latest()
+            ->first();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function working(?Version $version): ?Version
+    {
+        return null;
+    }
+
+    /**
      * @template TReturn
      *
      * @param callable(?Version $version = null): TReturn $callback
@@ -71,17 +90,6 @@ class VersionRepository implements ManagesVersions
         }
 
         return $result;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function latest(): (Version&Model)|null
-    {
-        return $this->model()
-            ->query()
-            ->latest()
-            ->first();
     }
 
     /**

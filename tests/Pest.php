@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Builder as SchemaBuilder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use Plank\Snapshots\Contracts\ManagesVersions;
+use Plank\Snapshots\Facades\Versions;
 use Plank\Snapshots\Models\Version;
 use Plank\Snapshots\Repository\VersionRepository;
 use Plank\Snapshots\Tests\TestCase;
@@ -15,7 +15,7 @@ uses(TestCase::class)->in(__DIR__);
 
 function versions(): VersionRepository
 {
-    return app(ManagesVersions::class);
+    return Versions::getFacadeRoot();
 }
 
 function version(string|VersionNumber $number): Version
