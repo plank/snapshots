@@ -6,7 +6,7 @@ use Illuminate\Database\Connection;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Database\SQLiteConnection;
 use Illuminate\Foundation\Application;
-use Plank\Snapshots\Contracts\ManagesVersions;
+use Plank\Snapshots\Facades\Versions;
 use Plank\Snapshots\Migrator\Blueprint\SnapshotBlueprint;
 
 class SnapshotConnectionInitializer
@@ -14,13 +14,12 @@ class SnapshotConnectionInitializer
     public static function initialize(
         Application $app,
         DatabaseManager $db,
-        ManagesVersions $versions,
         string $name,
     ) {
         $connection = $db->connection($name);
         $previousTablePrefix = $connection->getTablePrefix();
 
-        $prefix = ($active = $versions->active())
+        $prefix = ($active = Versions::active())
             ? ($active->key()->key().'_'.$previousTablePrefix)
             : $previousTablePrefix;
 

@@ -3,20 +3,16 @@
 namespace Plank\Snapshots\Observers;
 
 use Illuminate\Support\Facades\Event;
-use Plank\Snapshots\Contracts\ManagesVersions;
 use Plank\Snapshots\Events\VersionCreated;
 use Plank\Snapshots\Exceptions\MigrationInProgressException;
+use Plank\Snapshots\Facades\Versions;
 use Plank\Snapshots\Models\Version;
 
 class VersionObserver
 {
-    public function __construct(
-        protected ManagesVersions $versions
-    ) {}
-
     public function creating(Version $version)
     {
-        $previous = $version->previous ?? $this->versions->latest();
+        $previous = $version->previous ?? Versions::latest();
 
         if ($previous === null) {
             return;

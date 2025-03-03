@@ -4,31 +4,15 @@ namespace Plank\Snapshots\Observers;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Plank\Snapshots\Contracts\CausesChanges;
-use Plank\Snapshots\Contracts\ManagesVersions;
-use Plank\Snapshots\Contracts\ResolvesCauser;
 use Plank\Snapshots\Contracts\Trackable;
-use Plank\Snapshots\Contracts\Version;
 use Plank\Snapshots\Contracts\Versioned;
 use Plank\Snapshots\Enums\Operation;
+use Plank\Snapshots\Facades\Causer;
+use Plank\Snapshots\Facades\Versions;
 use Plank\Snapshots\Models\History;
 
 class HistoryObserver
 {
-    protected ?Version $active = null;
-
-    protected ?ManagesVersions $versions = null;
-
-    protected ?CausesChanges $causer = null;
-
-    public function __construct(
-        ManagesVersions $versions,
-        ResolvesCauser $causers
-    ) {
-        $this->versions = $versions;
-        $this->causer = $causers->active();
-    }
-
     public function created(Model&Trackable $model)
     {
         $softDeletes = in_array(SoftDeletes::class, class_uses_recursive($model));
@@ -44,16 +28,16 @@ class HistoryObserver
 
         $data = [
             'operation' => Operation::Created,
-            'causer_id' => $this->causer?->getKey(),
-            'causer_type' => $this->causer?->getMorphClass(),
+            'causer_id' => Causer::active()?->getKey(),
+            'causer_type' => Causer::active()?->getMorphClass(),
             'version_id' => $this->activeVersionId($model),
             'trackable_id' => $model->getKey(),
             'trackable_type' => $model->getMorphClass(),
             'from' => null,
-            'to' => $this->getLoggableAttributes($model),
+            'to' => $model->trackableAttributes(),
         ];
 
-        if (config()->get('snapshots.history.identity')) {
+        if (config()->get('snapshots.observers.identity')) {
             $data['hash'] = $model->newHash();
         }
 
@@ -82,16 +66,16 @@ class HistoryObserver
 
         $data = [
             'operation' => Operation::Updated,
-            'causer_id' => $this->causer?->getKey(),
-            'causer_type' => $this->causer?->getMorphClass(),
+            'causer_id' => Causer::active()?->getKey(),
+            'causer_type' => Causer::active()?->getMorphClass(),
             'version_id' => $this->activeVersionId($model),
             'trackable_id' => $model->getKey(),
             'trackable_type' => $model->getMorphClass(),
-            'from' => $this->getLoggableOriginal($model),
-            'to' => $this->getLoggableAttributes($model),
+            'from' => $model->trackableOriginal(),
+            'to' => $model->trackableAttributes(),
         ];
 
-        if (config()->get('snapshots.history.identity')) {
+        if (config()->get('snapshots.observers.identity')) {
             $data['hash'] = $model->newHash();
         }
 
@@ -111,16 +95,16 @@ class HistoryObserver
 
         $data = [
             'operation' => $softDeletes ? Operation::SoftDeleted : Operation::Deleted,
-            'causer_id' => $this->causer?->getKey(),
-            'causer_type' => $this->causer?->getMorphClass(),
+            'causer_id' => Causer::active()?->getKey(),
+            'causer_type' => Causer::active()?->getMorphClass(),
             'version_id' => $this->activeVersionId($model),
             'trackable_id' => $model->getKey(),
             'trackable_type' => $model->getMorphClass(),
-            'from' => $this->getLoggableOriginal($model),
-            'to' => $softDeletes ? $this->getLoggableAttributes($model) : null,
+            'from' => $model->trackableOriginal(),
+            'to' => $softDeletes ? $model->trackableAttributes() : null,
         ];
 
-        if (config()->get('snapshots.history.identity')) {
+        if (config()->get('snapshots.observers.identity')) {
             $data['hash'] = $softDeletes ? $model->newHash() : null;
         }
 
@@ -134,16 +118,16 @@ class HistoryObserver
 
         $data = [
             'operation' => Operation::Restored,
-            'causer_id' => $this->causer?->getKey(),
-            'causer_type' => $this->causer?->getMorphClass(),
+            'causer_id' => Causer::active()?->getKey(),
+            'causer_type' => Causer::active()?->getMorphClass(),
             'version_id' => $this->activeVersionId($model),
             'trackable_id' => $model->getKey(),
             'trackable_type' => $model->getMorphClass(),
-            'from' => $this->getLoggableOriginal($model),
-            'to' => $this->getLoggableAttributes($model),
+            'from' => $model->trackableOriginal(),
+            'to' => $model->trackableAttributes(),
         ];
 
-        if (config()->get('snapshots.history.identity')) {
+        if (config()->get('snapshots.observers.identity')) {
             $data['hash'] = $model->newHash();
         }
 
@@ -157,16 +141,16 @@ class HistoryObserver
 
         $data = [
             'operation' => Operation::Deleted,
-            'causer_id' => $this->causer?->getKey(),
-            'causer_type' => $this->causer?->getMorphClass(),
+            'causer_id' => Causer::active()?->getKey(),
+            'causer_type' => Causer::active()?->getMorphClass(),
             'version_id' => $this->activeVersionId($model),
             'trackable_id' => $model->getKey(),
             'trackable_type' => $model->getMorphClass(),
-            'from' => $this->getLoggableOriginal($model),
+            'from' => $model->trackableOriginal(),
             'to' => null,
         ];
 
-        if (config()->get('snapshots.history.identity')) {
+        if (config()->get('snapshots.observers.identity')) {
             $data['hash'] = null;
         }
 
@@ -176,7 +160,7 @@ class HistoryObserver
     protected function activeVersionId(Model&Trackable $model): int|string|null
     {
         if ($model instanceof Versioned) {
-            return $this->versions->active()?->getKey();
+            return Versions::active()?->getKey();
         }
 
         return null;

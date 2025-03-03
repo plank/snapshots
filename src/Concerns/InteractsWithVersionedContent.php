@@ -6,7 +6,6 @@ use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Plank\Snapshots\Contracts\Identifiable;
 use Plank\Snapshots\Contracts\Identifying;
-use Plank\Snapshots\Contracts\ManagesVersions;
 use Plank\Snapshots\Contracts\Versioned;
 use Plank\Snapshots\Facades\Versions;
 
@@ -16,8 +15,6 @@ use Plank\Snapshots\Facades\Versions;
 trait InteractsWithVersionedContent
 {
     use HasIdentifyingRelationships;
-
-    protected ManagesVersions $versions;
 
     protected function newBelongsToMany(
         Builder $query,

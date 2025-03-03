@@ -16,14 +16,12 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use Plank\Snapshots\Contracts\ManagesVersions;
 use Plank\Snapshots\Contracts\Version;
 use Plank\Snapshots\Contracts\VersionKey;
+use Plank\Snapshots\Facades\Versions;
 
 class SnapshotMigrator extends Migrator
 {
-    protected ManagesVersions $versions;
-
     /**
      * @var DatabaseManager
      */
@@ -36,12 +34,10 @@ class SnapshotMigrator extends Migrator
         DatabaseManager $resolver,
         Filesystem $files,
         ?Dispatcher $dispatcher,
-        ManagesVersions $versions,
         Application $app,
     ) {
         parent::__construct($repository, $resolver, $files, $dispatcher);
 
-        $this->versions = $versions;
         $this->app = $app;
     }
 
@@ -63,7 +59,7 @@ class SnapshotMigrator extends Migrator
                     return $this->versionedFile(in_array($name, $ran) ? null : $file);
                 }
 
-                return $this->versions->all()
+                return Versions::all()
                     ->map(function (Version $version) use ($file, $ran) {
                         $name = $this->addMigrationPrefix($version, $this->getMigrationName($file));
 
@@ -86,7 +82,7 @@ class SnapshotMigrator extends Migrator
     {
         return $this->usingConnectionSchema(
             $this->resolver->connection(),
-            fn () => $this->versions->model()->hasBeenMigrated()
+            fn () => Versions::model()->hasBeenMigrated()
         );
     }
 
@@ -126,8 +122,8 @@ class SnapshotMigrator extends Migrator
             $this->resolver->purge($migration->getConnection());
         }
 
-        $this->versions->withVersionActive(
-            $versionKey ? $this->versions->find($versionKey) : null,
+        Versions::withVersionActive(
+            $versionKey ? Versions::find($versionKey) : null,
             fn () => parent::runUp($file, $batch, $pretend)
         );
 
@@ -217,8 +213,8 @@ class SnapshotMigrator extends Migrator
             $this->resolver->purge($instance->getConnection());
         }
 
-        $this->versions->withVersionActive(
-            $this->versions->byKey($migration->migration),
+        Versions::withVersionActive(
+            Versions::byKey($migration->migration),
             fn () => parent::runDown($file, $migration, $pretend),
         );
 
