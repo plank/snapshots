@@ -56,50 +56,53 @@ return [
 
     /*
     |---------------------------------------------------------------------------
-    | Migrate on Version Creation
+    | Observers
     |--------------------------------------------------------------------------
     |
-    | This option determines whether or not to run the migrations when a new version
-    | is created. If set to false, you will need to handle the migrations in your app code.
-    */
-    'auto_migrator' => \Plank\Snapshots\Listeners\SnapshotDatabase::class,
-
-    /*
-    |---------------------------------------------------------------------------
-    | Table Data Copying
-    |--------------------------------------------------------------------------
-    |
-    | When provided, the class will be used to automatically copy data from the the working
-    | version to the newly created versions.
-    */
-    'copier' => \Plank\Snapshots\Listeners\TableCopier::class,
-
-    /*
-    |---------------------------------------------------------------------------
-    | History
-    |--------------------------------------------------------------------------
-    |
-    | To disable History Tracking, set this option to null. Otherwise, you must define
-    | both the Observer and Labeler classes.
-    |
-    | Observer:
-    | This is the Model Observer which will be used to track the History of changes which
-    | occur on the content.
-    |
-    | Labeler:
-    | As the package assumes "no active version" as the default approach to working on content,
-    | when a new version is created we make sure all of the History events that occured on the
-    | working version also get migrated to the newly created version.
+    | History:
+    | This Observer is used to track the History of changes to content. Set to `null` to
+    | disable history tracking.
     |
     | Identity:
-    | This is the Model Observer which will be used to track the Identity of the content. It also
-    | acts as a flag to fully enable or disable the identity management feature. Set to `null` to
-    | disable all hash tracking.
+    | This Observer is used to track the Identity of the content. Set to `null` to
+    | disable identity tracking.
     |
     */
-    'history' => [
-        'observer' => \Plank\Snapshots\Observers\HistoryObserver::class,
-        'labeler' => \Plank\Snapshots\Listeners\LabelHistory::class,
+    'observers' => [
+        'history' => \Plank\Snapshots\Observers\HistoryObserver::class,
         'identity' => \Plank\Snapshots\Observers\IdentityObserver::class,
+    ],
+
+    /*
+    |---------------------------------------------------------------------------
+    | Release
+    |--------------------------------------------------------------------------
+    |
+    | `migrate`
+    | This option determines whether or not to run the migrations when a new version
+    | is created. If set to false, the application code will need to handle migrations.
+    |
+    | `copy`
+    | When provided, these settings will be used to automatically copy data to newly
+    | created versions.
+    |
+    | listener:
+    | The VersionMigrated listener is responsible for dispatching data copying jobs
+    |
+    | job:
+    | Handles actually copying the data to the newly created version. Data copying
+    | jobs are dispatched with two arguments $version and $table.
+    |
+    | queue:
+    | The queue you want data copying to occur on
+    |
+    */
+    'release' => [
+        'listener' => \Plank\Snapshots\Listeners\ReleaseVersion::class,
+        'copy' => [
+            'listener' => \Plank\Snapshots\Listeners\CopyData::class,
+            'job' => \Plank\Snapshots\Jobs\CopyTable::class,
+            'queue' => 'sync',
+        ],
     ],
 ];

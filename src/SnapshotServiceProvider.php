@@ -8,12 +8,11 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Grammars\Grammar;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Event;
-use Plank\LaravelSchemaEvents\Events\TableCreated;
 use Plank\Snapshots\Connection\SnapshotConnectionInitializer;
 use Plank\Snapshots\Contracts\ManagesVersions;
 use Plank\Snapshots\Contracts\ResolvesCauser;
-use Plank\Snapshots\Events\TableCopied;
 use Plank\Snapshots\Events\VersionCreated;
+use Plank\Snapshots\Events\VersionMigrated;
 use Plank\Snapshots\Migrator\Blueprint\Macros\DropUnversionedForeignKey;
 use Plank\Snapshots\Migrator\Blueprint\Macros\UnversionedForeignKey;
 use Plank\Snapshots\Migrator\Blueprint\SnapshotBlueprint;
@@ -101,7 +100,6 @@ class SnapshotServiceProvider extends PackageServiceProvider
         });
 
         $this->app->extend('migrator', function (Migrator $migrator, Application $app) {
-            $versions = $app[ManagesVersions::class];
             $db = $app['db'];
 
             foreach ($app['config']->get('database.connections') as $name => $config) {
@@ -112,7 +110,6 @@ class SnapshotServiceProvider extends PackageServiceProvider
                 $db->extend($name.'_snapshots', fn () => SnapshotConnectionInitializer::initialize(
                     $app,
                     $db,
-                    $versions,
                     $name
                 ));
             }
@@ -122,7 +119,6 @@ class SnapshotServiceProvider extends PackageServiceProvider
                 $db,
                 $app['files'],
                 $app['events'],
-                $versions,
                 $app
             );
         });
@@ -140,16 +136,12 @@ class SnapshotServiceProvider extends PackageServiceProvider
 
     protected function listenToEvents(): self
     {
-        if ($migrator = config()->get('snapshots.auto_migrator')) {
+        if ($migrator = config()->get('snapshots.release.listener')) {
             Event::listen(VersionCreated::class, $migrator);
         }
 
-        if ($copier = config()->get('snapshots.copier')) {
-            Event::listen(TableCreated::class, $copier);
-        }
-
-        if ($labeler = config()->get('snapshots.history.labeler')) {
-            Event::listen(TableCopied::class, $labeler);
+        if ($copier = config()->get('snapshots.release.copy.listener')) {
+            Event::listen(VersionMigrated::class, $copier);
         }
 
         return $this;
