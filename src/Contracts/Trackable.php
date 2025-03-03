@@ -29,6 +29,16 @@ interface Trackable extends Identifiable
     public function hidden(): Attribute;
 
     /**
+     * Get a set of attributes for the model which are safe to track
+     */
+    public function trackableAttributes(): array;
+
+    /**
+     * Get a the original set of attributes for the model which are safe to track
+     */
+    public function trackableOriginal(): array;
+
+    /**
      * Get the class name for polymorphic relations.
      *
      * @return string
