@@ -23,7 +23,7 @@
         "illuminate/contracts": "^10",
         "plank/laravel-hush": "^10.1",
         "plank/laravel-model-resolver": "^10.0",
-        "plank/laravel-schema-events": "^10.1.3",
+        "plank/laravel-schema-events": "^10.2",
         "spatie/laravel-package-tools": "^1.14.0"
     },
     "require-dev": {
