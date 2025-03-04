@@ -16,13 +16,9 @@ class CopyModel extends Copier
     {
         $model = Models::fromTable($this->table);
 
-        if ($model === null) {
+        if ($model === null || ! is_a($model, Versioned::class, true)) {
             $this->batch()->add(new CopyTable($this->version, $this->table));
 
-            return;
-        }
-
-        if (! is_a($model, Versioned::class, true)) {
             return;
         }
 
