@@ -15,7 +15,7 @@ class ReleaseVersion
     public function handle(VersionCreated $event)
     {
         // Flush any previously recorded events
-        SchemaEvents::get();
+        SchemaEvents::flush();
 
         if (Artisan::call('migrate') !== 0) {
             throw MigrationFailedException::create($event->version);
