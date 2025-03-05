@@ -51,16 +51,15 @@ trait IdentifiedContent
 
     public function modelHash(): string
     {
-        $attributes = $this->getAttributes();
         $hidden = $this->getHidden();
         $visible = $this->getVisible();
 
-        $identity = Collection::make($attributes)
+        $identity = Collection::make($this->attributes)
             ->except(static::nonIdentifyingAttributes())
             ->except($hidden)
-            ->when($visible, fn ($collection) => $collection->only($visible))
+            ->when($visible, fn ($attributes) => $attributes->only($visible))
             ->sortKeys()
-            ->map(fn ($value, $key) => $key.':'.($value ?? 'null'))
+            ->map(fn ($value, $key) => $key.':'.json_encode($value))
             ->implode(', ');
 
         return md5($identity);
