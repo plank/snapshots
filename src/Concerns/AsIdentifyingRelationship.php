@@ -12,6 +12,14 @@ use Plank\Snapshots\Contracts\Identifiable;
  */
 trait AsIdentifyingRelationship
 {
+    /**
+     * Attach a model to the parent.
+     *
+     * @param  mixed  $id
+     * @param  array  $attributes
+     * @param  bool  $touch
+     * @return void
+     */
     public function attach($id, array $attributes = [], $touch = true)
     {
         parent::attach($id, $attributes, $touch);
@@ -19,11 +27,20 @@ trait AsIdentifyingRelationship
         $this->updateIdentities($id);
     }
 
+    /**
+     * Detach models from the relationship.
+     *
+     * @param  mixed  $ids
+     * @param  bool  $touch
+     * @return int
+     */
     public function detach($ids = null, $touch = true)
     {
-        parent::detach($ids, $touch);
+        $result = parent::detach($ids, $touch);
 
         $this->updateIdentities($ids);
+
+        return $result;
     }
 
     protected function updateIdentities($ids)
