@@ -16,7 +16,6 @@ trait AsIdentifyingRelationship
      * Attach a model to the parent.
      *
      * @param  mixed  $id
-     * @param  array  $attributes
      * @param  bool  $touch
      * @return void
      */
