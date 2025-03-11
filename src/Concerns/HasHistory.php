@@ -89,7 +89,7 @@ trait HasHistory
     public function trackableAttributes(): array
     {
         return $this->trackableArray(
-            $this->getAttributes(),
+            $this->attributes,
             $this->getHidden(),
             $this->getVisible(),
         );
@@ -98,7 +98,7 @@ trait HasHistory
     public function trackableOriginal(): array
     {
         return $this->trackableArray(
-            $this->getOriginal(),
+            $this->original,
             $this->getHidden(),
             $this->getVisible(),
         );
