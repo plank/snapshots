@@ -3,14 +3,15 @@
 namespace Plank\Snapshots\ValueObjects;
 
 use Plank\Snapshots\Contracts\VersionKey;
+use Throwable;
 
 class VersionNumber implements VersionKey
 {
-    protected const DOT_REGEX = '/(\d+\.\d+\.\d+)/';
+    protected const DOT_REGEX = '/(v{0,1})(\d+)\.(\d+)\.(\d+)/';
 
-    protected const KEY_REGEX = '/(v{0,1}\d+\_\d+\_\d+)/';
+    protected const SNAKE_REGEX = '/(v{0,1})(\d+)_(\d+)_(\d+)/';
 
-    protected const MIGRATION_REGEX = '/(v{0,1}\d+\_\d+\_\d+)/';
+    protected const KEBAB_REGEX = '/(v{0,1})(\d+)-(\d+)-(\d+)/';
 
     public function __construct(
         protected int $major,
@@ -20,72 +21,71 @@ class VersionNumber implements VersionKey
 
     public static function fromString(string $string): static
     {
-        if (preg_match(static::DOT_REGEX, $string) === 1) {
-            return static::fromVersionString($string);
-        }
-
-        if (preg_match(static::KEY_REGEX, $string) === 1) {
-            return static::fromKeyString($string);
-        }
-
-        if (preg_match(static::MIGRATION_REGEX, $string) === 1) {
-            return static::fromMigrationString($string);
-        }
-
-        throw new \InvalidArgumentException('Invalid version: '.$string);
-    }
-
-    public static function fromMigrationString(string $name): static
-    {
         $matches = [];
 
-        if (preg_match(static::MIGRATION_REGEX, $name, $matches) === 1) {
-            [$major, $minor, $patch] = explode('_', $matches[1]);
-        } else {
-            throw new \InvalidArgumentException('Invalid version: '.$name);
-        }
+        try {
+            if (preg_match(static::DOT_REGEX, $string, $matches) === 1) {
+                return static::fromMatches($matches);
+            }
 
-        return new static(str($major)->after('v')->toInteger(), (int) $minor, (int) $patch);
+            if (preg_match(static::SNAKE_REGEX, $string, $matches) === 1) {
+                return static::fromMatches($matches);
+            }
+
+            if (preg_match(static::KEBAB_REGEX, $string, $matches) === 1) {
+                return static::fromMatches($matches);
+            }
+
+            throw new \InvalidArgumentException;
+        } catch (Throwable) {
+            throw new \InvalidArgumentException('Invalid version: '.$string);
+        }
     }
 
-    public static function fromVersionString(string $version): static
+    protected static function fromMatches(array $matches): static
     {
-        if (preg_match(static::DOT_REGEX, $version) === 1) {
-            [$major, $minor, $patch] = explode('.', $version);
-        } else {
-            throw new \InvalidArgumentException('Invalid version number: '.$version);
+        if (count($matches) !== 5) {
+            throw new \InvalidArgumentException;
         }
-
-        return new static((int) $major, (int) $minor, (int) $patch);
+    
+        return new static(
+            major: (int) $matches[2],
+            minor: (int) $matches[3],
+            patch: (int) $matches[4],
+        );
     }
 
-    public static function fromKeyString(string $key): static
+    public function toString(): string
     {
-        if (preg_match(static::KEY_REGEX, $key) === 1) {
-            [$major, $minor, $patch] = explode('_', $key);
-        } else {
-            throw new \InvalidArgumentException('Invalid version key: '.$key);
-        }
-
-        return new static(str($major)->after('v')->toInteger(), (int) $minor, (int) $patch);
+        return $this->major.'.'.$this->minor.'.'.$this->patch;
     }
 
-    public function key(): string
+    public function snake(): string
     {
-        return 'v'.$this->major.'_'.$this->minor.'_'.$this->patch;
+        return $this->major.'_'.$this->minor.'_'.$this->patch;
+    }
+
+    public function kebab(): string
+    {
+        return $this->major.'-'.$this->minor.'-'.$this->patch;
+    }
+
+    public function __toString(): string
+    {
+        return $this->toString();
     }
 
     public function prefix(string $string): string
     {
-        return $this->key().'_'.static::strip($string);
+        return 'v'.$this->snake().'_'.static::strip($string);
     }
 
     public static function strip(string $string): string
     {
         return str($string)
             ->replaceMatches(static::DOT_REGEX, '')
-            ->replaceMatches(static::KEY_REGEX, '')
-            ->replaceMatches(static::MIGRATION_REGEX, '')
+            ->replaceMatches(static::SNAKE_REGEX, '')
+            ->replaceMatches(static::KEBAB_REGEX, '')
             ->trim(' _.-')
             ->toString();
     }
@@ -93,7 +93,8 @@ class VersionNumber implements VersionKey
     protected static function isValidVersionString(string $version)
     {
         return preg_match(static::DOT_REGEX, $version) === 1
-            || preg_match(static::KEY_REGEX, $version) === 1;
+            || preg_match(static::SNAKE_REGEX, $version) === 1
+            || preg_match(static::KEBAB_REGEX, $version) === 1;
     }
 
     public function major(): int
@@ -124,11 +125,6 @@ class VersionNumber implements VersionKey
     public function nextPatch(): self
     {
         return new static($this->major, $this->minor, $this->patch + 1);
-    }
-
-    public function kebab(): string
-    {
-        return $this->major.'-'.$this->minor.'-'.$this->patch;
     }
 
     public function isGreaterThan(VersionKey|string $other): bool
@@ -172,16 +168,11 @@ class VersionNumber implements VersionKey
             return $version;
         }
 
-        return static::fromVersionString($version);
+        return static::fromString($version);
     }
 
     protected function compare(self $other): int
     {
         return version_compare((string) $this, (string) $other);
-    }
-
-    public function __toString(): string
-    {
-        return $this->major.'.'.$this->minor.'.'.$this->patch;
     }
 }
