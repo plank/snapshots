@@ -47,7 +47,7 @@ class VersionNumber implements VersionKey
         if (count($matches) !== 5) {
             throw new \InvalidArgumentException;
         }
-    
+
         return new static(
             major: (int) $matches[2],
             minor: (int) $matches[3],
