@@ -30,9 +30,11 @@ class Version extends Model implements VersionContract
      */
     public function __construct(array $attributes = [])
     {
-        $this->mergeCasts([
-            static::keyColumn() => AsVersionNumber::class,
-        ]);
+        if (! $this->hasCast(static::keyColumn())) {
+            $this->mergeCasts([
+                static::keyColumn() => AsVersionNumber::class,
+            ]);
+        }
 
         parent::__construct($attributes);
     }
