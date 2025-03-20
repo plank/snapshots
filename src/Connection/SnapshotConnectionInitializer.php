@@ -17,11 +17,11 @@ class SnapshotConnectionInitializer
         string $name,
     ) {
         $connection = $db->connection($name);
-        $previousTablePrefix = $connection->getTablePrefix();
+        $configuredPrefix = $connection->getTablePrefix();
 
         $prefix = ($active = Versions::active())
-            ? ($active->key()->key().'_'.$previousTablePrefix)
-            : $previousTablePrefix;
+            ? $active->key()->prefix($configuredPrefix)
+            : $configuredPrefix;
 
         $config = $connection->getConfig();
         $config['prefix_indexes'] = true;
