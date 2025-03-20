@@ -30,7 +30,7 @@ class Version extends Model implements VersionContract
      */
     public function __construct(array $attributes = [])
     {
-        if (!$this->hasCast(static::keyColumn())) {
+        if (! $this->hasCast(static::keyColumn())) {
             $this->mergeCasts([
                 static::keyColumn() => AsVersionNumber::class,
             ]);
