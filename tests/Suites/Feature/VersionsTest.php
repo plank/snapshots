@@ -19,7 +19,7 @@ describe('Versions are migrated correctly', function () {
         createFirstVersion();
         createPatchVersion();
 
-        expect(versions()->latest()->number)->toEqual(VersionNumber::fromVersionString('1.0.1'));
+        expect(versions()->latest()->number)->toEqual(VersionNumber::fromString('1.0.1'));
     });
 
     it('throws an error when trying to cast the version number to a nonstring or value object', function () {
