@@ -23,6 +23,11 @@ class Version extends Model implements VersionContract
 
     protected $guarded = [];
 
+    protected $casts = [
+        'migrated' => 'boolean',
+        'copied' => 'boolean',
+    ];
+
     /**
      * Create a new Eloquent model instance.
      *
