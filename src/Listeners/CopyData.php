@@ -3,6 +3,8 @@
 namespace Plank\Snapshots\Listeners;
 
 use Illuminate\Support\Facades\Bus;
+use Illuminate\Support\Facades\Event;
+use Plank\Snapshots\Events\DataCopied;
 use Plank\Snapshots\Events\VersionMigrated;
 
 class CopyData
@@ -15,6 +17,8 @@ class CopyData
                 $version = $event->version;
                 $version->copied = true;
                 $version->save();
+
+                Event::dispatch(new DataCopied($version));
             })
             ->dispatch();
     }
