@@ -36,14 +36,17 @@ class ModelRepository extends BaseModelRepository
      * @param  class-string<VersionKey>  $keyClass
      * @return array<string, class-string|null>
      */
-    protected static function getTableMapping(string $class): array
+    protected static function getTableMapping(string $class): ?array
     {
         try {
             $model = new $class;
 
-            return [static::$keyClass::strip($model->getTable()) => $class];
+            return [
+                static::$keyClass::strip($model->getTable()),
+                $class,
+            ];
         } catch (Throwable) {
-            return [$class => null];
+            return null;
         }
     }
 }
