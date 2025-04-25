@@ -31,8 +31,6 @@ class SnapshotSQLiteGrammar extends SQLiteGrammar
     /**
      * Compile a foreign key command.
      *
-     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @param  \Illuminate\Support\Fluent  $command
      * @return string
      */
     public function compileUnversionedForeign(Blueprint $blueprint, Fluent $command)

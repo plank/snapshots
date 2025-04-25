@@ -12,8 +12,6 @@ class SnapshotGrammar extends Grammar
     /**
      * Compile an unversioned foreign key command.
      *
-     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @param  \Illuminate\Support\Fluent  $command
      * @return string
      */
     public function compileUnversionedForeign(Blueprint $blueprint, Fluent $command)
@@ -55,8 +53,6 @@ class SnapshotGrammar extends Grammar
     /**
      * Compile a drop unversioned foreign key command.
      *
-     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @param  \Illuminate\Support\Fluent  $command
      * @return string
      */
     public function compileDropForeign(Blueprint $blueprint, Fluent $command)
