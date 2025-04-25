@@ -4,7 +4,7 @@ namespace Plank\Snapshots\Migrator\Blueprint\Macros;
 
 use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Fluent;
+use Illuminate\Database\Schema\ForeignKeyDefinition;
 use Plank\Snapshots\Contracts\VersionKey;
 
 /**
@@ -19,17 +19,10 @@ class UnversionedForeignKey
         /** @var class-string<VersionKey> $keyClass */
         $keyClass = config('snapshots.value_objects.version_key');
 
-        return function (Blueprint $blueprint, Fluent $command, Connection $connection) use ($keyClass) {
-            $previousPrefix = $this->getTablePrefix();
+        return function (Blueprint $blueprint, ForeignKeyDefinition $foreign, Connection $connection) use ($keyClass) {
+            $foreign->on($keyClass::strip($foreign->on));
 
-            try {
-                $this->setTablePrefix($keyClass::strip($previousPrefix));
-                $sql = $this->compileForeign($blueprint, $command, $connection);
-
-                return $sql;
-            } finally {
-                $this->setTablePrefix($previousPrefix);
-            }
+            return $this->compileForeign($blueprint, $foreign, $connection);
         };
     }
 }
