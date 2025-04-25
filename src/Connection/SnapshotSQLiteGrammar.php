@@ -3,9 +3,11 @@
 namespace Plank\Snapshots\Connection;
 
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Schema\ForeignKeyDefinition;
 use Illuminate\Database\Schema\Grammars\SQLiteGrammar;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Fluent;
+use Plank\Snapshots\Contracts\VersionKey;
 
 class SnapshotSQLiteGrammar extends SQLiteGrammar
 {
@@ -34,24 +36,16 @@ class SnapshotSQLiteGrammar extends SQLiteGrammar
      */
     protected function addUnversionedForeignKeys($foreignKeys)
     {
-        return (new Collection($foreignKeys))->reduce(function ($sql, $foreign) {
+        return (new Collection($foreignKeys))->reduce(function ($sql, ForeignKeyDefinition $foreign) {
+            /** @var class-string<VersionKey> $keyClass */
+            $keyClass = config('snapshots.value_objects.version_key');
+
+            $foreign->on($keyClass::strip($foreign->on));
+
             // Once we have all the foreign key commands for the table creation statement
             // we'll loop through each of them and add them to the create table SQL we
             // are building, since SQLite needs foreign keys on the tables creation.
-            return $sql.$this->withoutPrefix(fn () => $this->getForeignKey($foreign));
+            return $sql.$this->getForeignKey($foreign);
         }, '');
-    }
-
-    protected function withoutPrefix(\Closure $callback)
-    {
-        try {
-            $keyClass = config('snapshots.value_objects.version_key');
-            $previousPrefix = $this->getTablePrefix();
-            $this->setTablePrefix($keyClass::strip($previousPrefix));
-
-            return $callback();
-        } finally {
-            $this->setTablePrefix($previousPrefix);
-        }
     }
 }
