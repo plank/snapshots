@@ -41,6 +41,10 @@ class SnapshotConnectionInitializer
             $grammar = (new SnapshotSQLiteGrammar)->setConnection($prefixed);
             $grammar->setTablePrefix($prefix);
             $prefixed->setSchemaGrammar($grammar);
+        } else {
+            $grammar = (new SnapshotGrammar)->setConnection($prefixed);
+            $grammar->setTablePrefix($prefix);
+            $prefixed->setSchemaGrammar($grammar);
         }
 
         $prefixed->reconnectIfMissingConnection();
