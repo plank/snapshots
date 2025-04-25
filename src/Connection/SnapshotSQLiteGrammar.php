@@ -40,7 +40,7 @@ class SnapshotSQLiteGrammar extends SQLiteGrammar
 
         $foreigns = $this->getCommandsByName($blueprint, 'unversionedForeign');
 
-        return collect($foreigns)->reduce(function (string $sql, ForeignKeyDefinition $foreign) use ($keyClass) {
+        return collect($foreigns)->reduce(function (?string $sql, ForeignKeyDefinition $foreign) use ($keyClass) {
             // Once we have all the foreign key commands for the table creation statement
             // we'll loop through each of them and add them to the create table SQL we
             // are building, since SQLite needs foreign keys on the tables creation.
