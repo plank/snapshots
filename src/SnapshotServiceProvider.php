@@ -5,7 +5,6 @@ namespace Plank\Snapshots;
 use Illuminate\Database\Migrations\DatabaseMigrationRepository;
 use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Database\Schema\Grammars\Grammar;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Event;
 use Plank\Snapshots\Connection\SnapshotConnectionInitializer;
@@ -13,8 +12,6 @@ use Plank\Snapshots\Contracts\ManagesVersions;
 use Plank\Snapshots\Contracts\ResolvesCauser;
 use Plank\Snapshots\Events\VersionCreated;
 use Plank\Snapshots\Events\VersionMigrated;
-use Plank\Snapshots\Migrator\Blueprint\Macros\DropUnversionedForeignKey;
-use Plank\Snapshots\Migrator\Blueprint\Macros\UnversionedForeignKey;
 use Plank\Snapshots\Migrator\Blueprint\SnapshotBlueprint;
 use Plank\Snapshots\Migrator\SnapshotMigrationRepository;
 use Plank\Snapshots\Migrator\SnapshotMigrator;
@@ -64,7 +61,6 @@ class SnapshotServiceProvider extends PackageServiceProvider
     {
         $this->bindRepositories()
             ->bindMigrator()
-            ->registerGrammarMacros()
             ->listenToEvents();
     }
 
@@ -122,14 +118,6 @@ class SnapshotServiceProvider extends PackageServiceProvider
                 $app
             );
         });
-
-        return $this;
-    }
-
-    protected function registerGrammarMacros(): self
-    {
-        Grammar::macro('compileUnversionedForeign', app(UnversionedForeignKey::class)());
-        Grammar::macro('compileDropUnversionedForeign', app(DropUnversionedForeignKey::class)());
 
         return $this;
     }
