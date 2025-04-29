@@ -16,6 +16,9 @@
     backupStaticProperties="false"
 >
     <testsuites>
+        <testsuite name="Arch Tests">
+            <directory>tests/Suites/Arch</directory>
+        </testsuite>
         <testsuite name="Features Tests">
             <directory>tests/Suites/Feature</directory>
         </testsuite>
@@ -28,13 +31,13 @@
     </testsuites>
     <coverage>
         <report>
-            <html outputDirectory="build/coverage"/>
-            <text outputFile="build/coverage.txt"/>
-            <clover outputFile="build/logs/clover.xml"/>
+            <html outputDirectory="build/coverage" />
+            <text outputFile="build/coverage.txt" />
+            <clover outputFile="build/logs/clover.xml" />
         </report>
     </coverage>
     <logging>
-        <junit outputFile="build/report.junit.xml"/>
+        <junit outputFile="build/report.junit.xml" />
     </logging>
     <source>
         <include>
