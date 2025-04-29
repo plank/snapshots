@@ -7,10 +7,13 @@ use Illuminate\Database\Schema\ForeignKeyDefinition;
 use Illuminate\Database\Schema\Grammars\SQLiteGrammar;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Fluent;
+use Plank\Snapshots\Concerns\HasUnversionedForeignKeys;
 use Plank\Snapshots\Contracts\VersionKey;
 
 class SnapshotSQLiteGrammar extends SQLiteGrammar
 {
+    use HasUnversionedForeignKeys;
+
     /**
      * Compile a create table command.
      *

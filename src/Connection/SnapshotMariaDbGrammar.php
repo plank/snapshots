@@ -2,10 +2,10 @@
 
 namespace Plank\Snapshots\Connection;
 
-use Illuminate\Database\Schema\Grammars\Grammar;
+use Illuminate\Database\Schema\Grammars\MariaDbGrammar;
 use Plank\Snapshots\Concerns\HasUnversionedForeignKeys;
 
-class SnapshotGrammar extends Grammar
+class SnapshotMariaDbGrammar extends MariaDbGrammar
 {
     use HasUnversionedForeignKeys;
 }
