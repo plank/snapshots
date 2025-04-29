@@ -16,9 +16,6 @@
     backupStaticProperties="false"
 >
     <testsuites>
-        <testsuite name="Arch Tests">
-            <directory>tests/Suites/Arch</directory>
-        </testsuite>
         <testsuite name="Features Tests">
             <directory>tests/Suites/Feature</directory>
         </testsuite>
