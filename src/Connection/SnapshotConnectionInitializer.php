@@ -4,7 +4,11 @@ namespace Plank\Snapshots\Connection;
 
 use Illuminate\Database\Connection;
 use Illuminate\Database\DatabaseManager;
+use Illuminate\Database\MariaDbConnection;
+use Illuminate\Database\MySqlConnection;
+use Illuminate\Database\PostgresConnection;
 use Illuminate\Database\SQLiteConnection;
+use Illuminate\Database\SqlServerConnection;
 use Illuminate\Foundation\Application;
 use Plank\Snapshots\Facades\Versions;
 use Plank\Snapshots\Migrator\Blueprint\SnapshotBlueprint;
@@ -37,8 +41,24 @@ class SnapshotConnectionInitializer
             $config,
         );
 
-        if ($prefixed instanceof SQLiteConnection) {
+        if ($prefixed instanceof MySqlConnection) {
+            $grammar = (new SnapshotMySqlGrammar)->setConnection($prefixed);
+            $grammar->setTablePrefix($prefix);
+            $prefixed->setSchemaGrammar($grammar);
+        } elseif ($prefixed instanceof SQLiteConnection) {
             $grammar = (new SnapshotSQLiteGrammar)->setConnection($prefixed);
+            $grammar->setTablePrefix($prefix);
+            $prefixed->setSchemaGrammar($grammar);
+        } elseif ($prefixed instanceof PostgresConnection) {
+            $grammar = (new SnapshotPostgresGrammar)->setConnection($prefixed);
+            $grammar->setTablePrefix($prefix);
+            $prefixed->setSchemaGrammar($grammar);
+        } elseif ($prefixed instanceof MariaDbConnection) {
+            $grammar = (new SnapshotMariaDbGrammar)->setConnection($prefixed);
+            $grammar->setTablePrefix($prefix);
+            $prefixed->setSchemaGrammar($grammar);
+        } elseif ($prefixed instanceof SqlServerConnection) {
+            $grammar = (new SnapshotSqlServerGrammar)->setConnection($prefixed);
             $grammar->setTablePrefix($prefix);
             $prefixed->setSchemaGrammar($grammar);
         } else {

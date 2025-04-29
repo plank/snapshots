@@ -2,10 +2,10 @@
 
 namespace Plank\Snapshots\Connection;
 
-use Illuminate\Database\Schema\Grammars\Grammar;
+use Illuminate\Database\Schema\Grammars\MySqlGrammar;
 use Plank\Snapshots\Concerns\HasUnversionedForeignKeys;
 
-class SnapshotGrammar extends Grammar
+class SnapshotMySqlGrammar extends MySqlGrammar
 {
     use HasUnversionedForeignKeys;
 }

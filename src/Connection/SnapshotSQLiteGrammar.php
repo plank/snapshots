@@ -5,10 +5,13 @@ namespace Plank\Snapshots\Connection;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Grammars\SQLiteGrammar;
 use Illuminate\Support\Fluent;
+use Plank\Snapshots\Concerns\HasUnversionedForeignKeys;
 use Plank\Snapshots\Contracts\VersionKey;
 
 class SnapshotSQLiteGrammar extends SQLiteGrammar
 {
+    use HasUnversionedForeignKeys;
+
     /**
      * Compile a create table command.
      *

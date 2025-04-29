@@ -2,10 +2,10 @@
 
 namespace Plank\Snapshots\Connection;
 
-use Illuminate\Database\Schema\Grammars\Grammar;
+use Illuminate\Database\Schema\Grammars\PostgresGrammar;
 use Plank\Snapshots\Concerns\HasUnversionedForeignKeys;
 
-class SnapshotGrammar extends Grammar
+class SnapshotPostgresGrammar extends PostgresGrammar
 {
     use HasUnversionedForeignKeys;
 }
