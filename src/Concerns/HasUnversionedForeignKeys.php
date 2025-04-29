@@ -46,8 +46,6 @@ trait HasUnversionedForeignKeys
             $sql .= " on update {$command->onUpdate}";
         }
 
-        dd($sql);
-
         return $sql;
     }
 
