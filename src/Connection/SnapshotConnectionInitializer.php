@@ -41,7 +41,7 @@ class SnapshotConnectionInitializer
             $config,
         );
 
-        if  ($prefixed instanceof MySqlConnection) {
+        if ($prefixed instanceof MySqlConnection) {
             $grammar = (new SnapshotMySqlGrammar)->setConnection($prefixed);
             $grammar->setTablePrefix($prefix);
             $prefixed->setSchemaGrammar($grammar);

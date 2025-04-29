@@ -47,6 +47,7 @@ trait HasUnversionedForeignKeys
         }
 
         dd($sql);
+
         return $sql;
     }
 
