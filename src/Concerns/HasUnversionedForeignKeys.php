@@ -31,7 +31,7 @@ trait HasUnversionedForeignKeys
         // main portion of the SQL statement and this SQL will almost be done.
         $sql .= sprintf('foreign key (%s) references %s (%s)',
             $this->columnize($command->columns),
-            $this->wrapTable($keyClass::strip($command->on)),
+            $keyClass::strip($this->wrapTable($command->on)),
             $this->columnize((array) $command->references)
         );
 
