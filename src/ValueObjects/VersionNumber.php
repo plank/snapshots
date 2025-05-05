@@ -7,11 +7,11 @@ use Throwable;
 
 class VersionNumber implements VersionKey
 {
-    protected const DOT_REGEX = '/(v{0,1})(\d+)\.(\d+)\.(\d+)/';
+    protected const DOT_REGEX = '/(v{0,1})(\d+)\.(\d+)\.(\d+)/i';
 
-    protected const SNAKE_REGEX = '/(v{0,1})(\d+)_(\d+)_(\d+)/';
+    protected const SNAKE_REGEX = '/(v{0,1})(\d+)_(\d+)_(\d+)/i';
 
-    protected const KEBAB_REGEX = '/(v{0,1})(\d+)-(\d+)-(\d+)/';
+    protected const KEBAB_REGEX = '/(v{0,1})(\d+)-(\d+)-(\d+)/i';
 
     public function __construct(
         protected int $major,
@@ -82,10 +82,25 @@ class VersionNumber implements VersionKey
 
     public static function strip(string $string): string
     {
+        $stripDot = str(static::DOT_REGEX)
+            ->beforeLast('/i')
+            ->append('[\.]{0,1}/i')
+            ->value();
+
+        $stripSnake = str(static::SNAKE_REGEX)
+            ->beforeLast('/i')
+            ->append('_{0,1}/i')
+            ->value();
+
+        $stripKebab = str(static::KEBAB_REGEX)
+            ->beforeLast('/i')
+            ->append('_{0,1}/i')
+            ->value();
+
         return str($string)
-            ->replaceMatches(static::DOT_REGEX, '')
-            ->replaceMatches(static::SNAKE_REGEX, '')
-            ->replaceMatches(static::KEBAB_REGEX, '')
+            ->replaceMatches($stripDot, '')
+            ->replaceMatches($stripSnake, '')
+            ->replaceMatches($stripKebab, '')
             ->trim(' _.-')
             ->toString();
     }
