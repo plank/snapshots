@@ -94,7 +94,7 @@ class VersionNumber implements VersionKey
 
         $stripKebab = str(static::KEBAB_REGEX)
             ->beforeLast('/i')
-            ->append('_{0,1}/i')
+            ->append('-{0,1}/i')
             ->value();
 
         return str($string)
