@@ -1,12 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Event;
 use Plank\Snapshots\Contracts\ManagesVersions;
 use Plank\Snapshots\Contracts\Version;
-use Plank\Snapshots\Events\DataCopied;
 use Plank\Snapshots\Repository\VersionRepository;
-use Plank\Snapshots\Tests\Models\Document;
 
 use function Pest\Laravel\artisan;
 use function Pest\Laravel\assertDatabaseHas;
@@ -16,7 +12,8 @@ describe('The CopyTables listener correctly copies data', function () {
     beforeEach(function () {
         config()->set('snapshots.force_versions', true);
 
-        app()->instance(ManagesVersions::class, new class extends VersionRepository {
+        app()->instance(ManagesVersions::class, new class extends VersionRepository
+        {
             public function working(?Version $version): ?Version
             {
                 if ($latest = $this->latest()) {

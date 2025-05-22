@@ -69,7 +69,7 @@ class SnapshotMigrator extends Migrator
                     })
                     ->when(
                         ! config()->get('snapshots.force_versions'),
-                        fn(Collection $collection) => $collection->prepend($this->versionedFile(in_array($name, $ran) ? null : $file)),
+                        fn (Collection $collection) => $collection->prepend($this->versionedFile(in_array($name, $ran) ? null : $file)),
                     )
                     ->values()
                     ->all();

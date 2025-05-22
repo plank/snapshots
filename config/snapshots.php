@@ -112,7 +112,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | When set to `true`, there will be no "unprefixed" versioned tables. This
-    | would mean that a version must first exist in order for any versioned 
+    | would mean that a version must first exist in order for any versioned
     | content to exist.
     |
     */
