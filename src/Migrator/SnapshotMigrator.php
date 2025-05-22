@@ -56,7 +56,9 @@ class SnapshotMigrator extends Migrator
                 }
 
                 if (! $this->versionModelHasBeenMigrated()) {
-                    return $this->versionedFile(in_array($name, $ran) ? null : $file);
+                    return config()->get('snapshots.force_versions')
+                        ? null
+                        : $this->versionedFile(in_array($name, $ran) ? null : $file);
                 }
 
                 return Versions::all()
@@ -65,7 +67,10 @@ class SnapshotMigrator extends Migrator
 
                         return in_array($name, $ran) ? null : $this->versionedFile($file, $version);
                     })
-                    ->prepend($this->versionedFile(in_array($name, $ran) ? null : $file))
+                    ->when(
+                        ! config()->get('snapshots.force_versions'),
+                        fn (Collection $collection) => $collection->prepend($this->versionedFile(in_array($name, $ran) ? null : $file)),
+                    )
                     ->values()
                     ->all();
             })
