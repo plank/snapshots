@@ -13,6 +13,10 @@ class CopyData
     public function handle(VersionMigrated $event)
     {
         if (config()->get('snapshots.force_versions') && Versions::working($event->version) === null) {
+            $version = $event->version;
+            $version->copied = true;
+            $version->save();
+
             return;
         }
 
