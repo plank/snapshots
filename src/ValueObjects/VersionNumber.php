@@ -80,6 +80,11 @@ class VersionNumber implements VersionKey
         return 'v'.$this->snake().'_'.static::strip($string);
     }
 
+    public function isPrefixOf(string $string): bool
+    {
+        return str($string)->startsWith([$this->snake(), $this->kebab()]);
+    }
+
     public static function strip(string $string): string
     {
         $stripDot = str(static::DOT_REGEX)
