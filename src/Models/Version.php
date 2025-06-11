@@ -8,7 +8,6 @@ use Plank\Snapshots\Casts\AsVersionNumber;
 use Plank\Snapshots\Concerns\AsVersion;
 use Plank\Snapshots\Contracts\Version as VersionContract;
 use Plank\Snapshots\Contracts\VersionKey;
-use Plank\Snapshots\Observers\VersionObserver;
 use Plank\Snapshots\ValueObjects\VersionNumber;
 
 /**
@@ -48,7 +47,9 @@ class Version extends Model implements VersionContract
     {
         parent::boot();
 
-        static::observe(VersionObserver::class);
+        if ($observer = config()->get('snapshots.observers.version')) {
+            static::observe($observer);
+        }
     }
 
     public static function keyColumn(): string
