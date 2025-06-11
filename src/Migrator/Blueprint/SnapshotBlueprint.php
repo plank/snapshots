@@ -149,8 +149,10 @@ class SnapshotBlueprint extends Blueprint
      */
     protected function indexCommand($type, $columns, $index, $algorithm = null)
     {
-        if ($index && $this->prefix && ! str_starts_with($index, $this->prefix)) {
-            $index = $this->prefix.$index;
+        $prefix = $this->connection->getTablePrefix();
+
+        if ($index && $prefix && ! str_starts_with($index, $prefix)) {
+            $index = $prefix.$index;
         }
 
         return parent::indexCommand($type, $columns, $index, $algorithm);
