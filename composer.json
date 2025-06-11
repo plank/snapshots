@@ -22,7 +22,7 @@
         "doctrine/dbal": "^3.6",
         "illuminate/contracts": "^12",
         "plank/laravel-hush": "^12.1",
-        "plank/laravel-model-resolver": "^12.1.1",
+        "plank/laravel-model-resolver": "^12.1.2",
         "plank/laravel-schema-events": "^12.2",
         "spatie/laravel-package-tools": "^1.14.0"
     },
