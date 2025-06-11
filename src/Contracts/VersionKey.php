@@ -32,6 +32,11 @@ interface VersionKey extends Stringable
     public function prefix(string $string): string;
 
     /**
+     * Determine if this key is the prefix of the given string
+     */
+    public function isPrefixOf(string $string): bool;
+
+    /**
      * Strip any occurence of the version from the string
      */
     public static function strip(string $string): string;

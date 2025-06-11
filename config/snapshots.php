@@ -59,6 +59,10 @@ return [
     | Observers
     |--------------------------------------------------------------------------
     |
+    | Snapshots:
+    | This observer is used to fire versioning events and maintain the linked list
+    | of versions.
+    |
     | History:
     | This Observer is used to track the History of changes to content. Set to `null` to
     | disable history tracking.
