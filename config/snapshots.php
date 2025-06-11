@@ -69,6 +69,7 @@ return [
     |
     */
     'observers' => [
+        'version' => \Plank\Snapshots\Observers\VersionObserver::class,
         'history' => \Plank\Snapshots\Observers\HistoryObserver::class,
         'identity' => \Plank\Snapshots\Observers\IdentityObserver::class,
     ],
