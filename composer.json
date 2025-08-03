@@ -20,7 +20,7 @@
     "require": {
         "php": "^8.2",
         "doctrine/dbal": "^3.6",
-        "illuminate/contracts": "^12",
+        "illuminate/contracts": "^12.21",
         "plank/laravel-hush": "^12.1",
         "plank/laravel-model-resolver": "^12.1.2",
         "plank/laravel-schema-events": "^12.2",

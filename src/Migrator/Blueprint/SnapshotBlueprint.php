@@ -147,7 +147,7 @@ class SnapshotBlueprint extends Blueprint
     /**
      * {@inheritDoc}
      */
-    protected function indexCommand($type, $columns, $index, $algorithm = null)
+    protected function indexCommand($type, $columns, $index, $algorithm = null, $operatorClass = null)
     {
         $prefix = $this->connection->getTablePrefix();
 
@@ -155,6 +155,6 @@ class SnapshotBlueprint extends Blueprint
             $index = $prefix.$index;
         }
 
-        return parent::indexCommand($type, $columns, $index, $algorithm);
+        return parent::indexCommand($type, $columns, $index, $algorithm, $operatorClass);
     }
 }
