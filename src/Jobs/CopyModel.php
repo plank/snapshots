@@ -28,7 +28,9 @@ class CopyModel extends Copier
         // Grab the data from the "working version"
         $working = Versions::working($this->version);
         Versions::setActive($working);
-        $models = $model::query()->withoutGlobalScopes()->cursor();
+
+        /** @var class-string<Model&Versioned> $model */
+        $models = $model::snapshotQuery()->cursor();
 
         // Set the version to the newly created table's version, so we can begin copying
         // over the data.

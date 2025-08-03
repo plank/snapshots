@@ -43,6 +43,7 @@ jobs:
           composer dump-autoload --optimize
 
       - name: Execute tests
+<<<<<<< HEAD
         run: vendor/bin/pest
 
   coverage:
@@ -91,3 +92,6 @@ jobs:
           coverageCommand: composer test-coverage
           coverageLocations: |
             ${{github.workspace}}/build/logs/clover.xml:clover
+=======
+        run: vendor/bin/pest
+>>>>>>> main
