@@ -20,8 +20,6 @@ interface Versioned
 
     /**
      * Get the query used to select records which should be included in a snapshot
-     *
-     * @return Builder
      */
     public static function snapshotQuery(): Builder;
 }
