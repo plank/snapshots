@@ -42,27 +42,27 @@ class SnapshotConnectionInitializer
         );
 
         if ($prefixed instanceof MySqlConnection) {
-            $grammar = (new SnapshotMySqlGrammar)->setConnection($prefixed);
+            $grammar = (new SnapshotMySqlGrammar($prefixed));
             $grammar->setTablePrefix($prefix);
             $prefixed->setSchemaGrammar($grammar);
         } elseif ($prefixed instanceof SQLiteConnection) {
-            $grammar = (new SnapshotSQLiteGrammar)->setConnection($prefixed);
+            $grammar = (new SnapshotSQLiteGrammar($prefixed));
             $grammar->setTablePrefix($prefix);
             $prefixed->setSchemaGrammar($grammar);
         } elseif ($prefixed instanceof PostgresConnection) {
-            $grammar = (new SnapshotPostgresGrammar)->setConnection($prefixed);
+            $grammar = (new SnapshotPostgresGrammar($prefixed));
             $grammar->setTablePrefix($prefix);
             $prefixed->setSchemaGrammar($grammar);
         } elseif ($prefixed instanceof MariaDbConnection) {
-            $grammar = (new SnapshotMariaDbGrammar)->setConnection($prefixed);
+            $grammar = (new SnapshotMariaDbGrammar($prefixed));
             $grammar->setTablePrefix($prefix);
             $prefixed->setSchemaGrammar($grammar);
         } elseif ($prefixed instanceof SqlServerConnection) {
-            $grammar = (new SnapshotSqlServerGrammar)->setConnection($prefixed);
+            $grammar = (new SnapshotSqlServerGrammar($prefixed));
             $grammar->setTablePrefix($prefix);
             $prefixed->setSchemaGrammar($grammar);
         } else {
-            $grammar = (new SnapshotGrammar)->setConnection($prefixed);
+            $grammar = (new SnapshotGrammar($prefixed));
             $grammar->setTablePrefix($prefix);
             $prefixed->setSchemaGrammar($grammar);
         }
