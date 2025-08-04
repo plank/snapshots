@@ -2,6 +2,7 @@
 
 namespace Plank\Snapshots\Observers;
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Event;
 use Plank\Snapshots\Events\VersionCreated;
 use Plank\Snapshots\Exceptions\MigrationInProgressException;
@@ -27,6 +28,6 @@ class VersionObserver
 
     public function created(Version $version)
     {
-        Event::dispatch(new VersionCreated($version));
+        Event::dispatch(new VersionCreated($version, Auth::user()));
     }
 }

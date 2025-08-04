@@ -2,6 +2,7 @@
 
 namespace Plank\Snapshots\Events;
 
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Collection;
@@ -18,6 +19,7 @@ class VersionMigrated
     public function __construct(
         public Version&Model $version,
         public array $tables,
+        public (Authenticatable&Model)|null $causer,
     ) {}
 
     /**
