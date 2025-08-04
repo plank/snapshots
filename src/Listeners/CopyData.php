@@ -27,7 +27,7 @@ class CopyData
                 $version->copied = true;
                 $version->save();
 
-                Event::dispatch(new DataCopied($version));
+                Event::dispatch(new DataCopied($version, $event->causer));
             })
             ->dispatch();
     }
