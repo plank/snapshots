@@ -19,7 +19,7 @@ class VersionMigrated
     public function __construct(
         public Version&Model $version,
         public array $tables,
-        public Authenticatable|null $causer,
+        public ?Authenticatable $causer,
     ) {}
 
     /**

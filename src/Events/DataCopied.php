@@ -16,6 +16,6 @@ class DataCopied
 
     public function __construct(
         public Version&Model $version,
-        public Authenticatable|null $causer,
+        public ?Authenticatable $causer,
     ) {}
 }
