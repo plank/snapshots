@@ -49,7 +49,7 @@ class VersionRepository implements ManagesVersions
     /**
      * {@inheritDoc}
      */
-    public function active(): Version|null
+    public function active(): ?Version
     {
         return $this->active;
     }
@@ -57,7 +57,7 @@ class VersionRepository implements ManagesVersions
     /**
      * {@inheritDoc}
      */
-    public function latest(): Version|null
+    public function latest(): ?Version
     {
         return $this->model()
             ->query()
@@ -95,7 +95,7 @@ class VersionRepository implements ManagesVersions
     /**
      * {@inheritDoc}
      */
-    public function find($key): Version|null
+    public function find($key): ?Version
     {
         return $this->model()
             ->query()
@@ -106,7 +106,7 @@ class VersionRepository implements ManagesVersions
     /**
      * {@inheritDoc}
      */
-    public function byKey(string|VersionKey $key): Version|null
+    public function byKey(string|VersionKey $key): ?Version
     {
         $model = $this->model();
 
