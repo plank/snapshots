@@ -1,6 +1,5 @@
 <?php
 
-use Plank\Snapshots\Jobs\CopyTable;
 use Plank\Snapshots\Models\History;
 use Plank\Snapshots\Observers\HistoryObserver;
 use Plank\Snapshots\Tests\Models\Company;
@@ -10,7 +9,6 @@ use function Pest\Laravel\artisan;
 
 beforeEach(function () {
     config()->set('snapshots.observers.history', HistoryObserver::class);
-    config()->set('snapshots.release.copy.job', CopyTable::class);
 });
 
 describe('Trackable models have a correct hidden property', function () {

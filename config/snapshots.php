@@ -105,7 +105,6 @@ return [
     'release' => [
         'listener' => \Plank\Snapshots\Listeners\ReleaseVersion::class,
         'copy' => [
-            'job' => \Plank\Snapshots\Jobs\CopyTable::class,
             'listener' => \Plank\Snapshots\Listeners\CopyData::class,
             'queue' => 'sync',
         ],
