@@ -9,6 +9,7 @@ use Illuminate\Support\Collection;
 use Plank\Snapshots\Contracts\Version;
 use Plank\Snapshots\Jobs\Copier;
 use Plank\Snapshots\Jobs\CopyTable;
+use Plank\Snapshots\Jobs\MarkAsCopied;
 
 /**
  * @property array<string,int> $tables
@@ -29,6 +30,7 @@ class VersionMigrated
     public function jobs(): Collection
     {
         return Collection::make($this->tables)
-            ->map(fn (string $table) => new CopyTable($this->version, $table));
+            ->map(fn (string $table) => new CopyTable($this->version, $table))
+            ->push(new MarkAsCopied($this));
     }
 }
