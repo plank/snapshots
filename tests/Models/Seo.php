@@ -5,13 +5,13 @@ namespace Plank\Snapshots\Tests\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Plank\Snapshots\Concerns\AsVersionedContent;
+use Plank\Snapshots\Concerns\AsSnapshottedContent;
 use Plank\Snapshots\Contracts\Trackable;
-use Plank\Snapshots\Contracts\Versioned;
+use Plank\Snapshots\Contracts\Snapshotted;
 
-class Seo extends Model implements Trackable, Versioned
+class Seo extends Model implements Trackable, Snapshotted
 {
-    use AsVersionedContent;
+    use AsSnapshottedContent;
     use HasFactory;
 
     protected $guarded = [];

@@ -11,8 +11,8 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Event;
+use Plank\Snapshots\Contracts\Snapshot;
 use Plank\Snapshots\Events\DataCopied;
-use Plank\Snapshots\Models\Version;
 
 class MarkAsCopied implements ShouldQueue
 {
@@ -23,7 +23,7 @@ class MarkAsCopied implements ShouldQueue
     use SerializesModels;
 
     public function __construct(
-        public Version&Model $version,
+        public Snapshot&Model $snapshot,
         public (Authenticatable&Model)|null $user,
     ) {
     }
@@ -35,10 +35,10 @@ class MarkAsCopied implements ShouldQueue
      */
     public function handle()
     {
-        $version = $this->version;
-        $version->copied = true;
-        $version->save();
+        $snapshot = $this->snapshot;
+        $snapshot->copied = true;
+        $snapshot->save();
 
-        Event::dispatch(new DataCopied($version, $this->user));
+        Event::dispatch(new DataCopied($snapshot, $this->user));
     }
 }

@@ -19,7 +19,7 @@ describe('The CopyTables listener correctly copies data', function () {
 
         $documents = Document::factory()->count(3)->create();
 
-        versions()->setActive($version = createFirstVersion('schema/create'));
+        snapshots()->setActive($snapshot = createFirstSnapshot('schema/create'));
 
         expect((new Document)->getTable())->toBe('v1_0_0_documents');
 
@@ -27,9 +27,9 @@ describe('The CopyTables listener correctly copies data', function () {
             expect(Document::query()->whereKey($document->id)->exists())->toBeTrue();
         });
 
-        $version->refresh();
-        expect($version->migrated)->toBeTrue();
-        expect($version->copied)->toBeTrue();
+        $snapshot->refresh();
+        expect($snapshot->migrated)->toBeTrue();
+        expect($snapshot->copied)->toBeTrue();
 
         Event::assertDispatchedTimes(DataCopied::class, 1);
     });

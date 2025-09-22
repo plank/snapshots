@@ -24,20 +24,20 @@ describe('Versioned Content has its Existence tracked correctly when copying by 
         expect(Existence::query()->count())->toBe(1);
 
         $existence = Existence::query()->latest()->first();
-        expect($existence->version)->toBeNull();
+        expect($existence->snapshot)->toBeNull();
 
-        createFirstVersion('schema/create');
+        createFirstSnapshot('schema/create');
 
         expect(Existence::query()->count())->toBe(2);
 
         $existence = Existence::query()->latest()->first();
-        expect((string) $existence->version->number)->toBe('1.0.0');
+        expect((string) $existence->snapshot->number)->toBe('1.0.0');
 
-        versions()->setActive(createMinorVersion('schema/create'));
+        snapshots()->setActive(createMinorSnapshot('schema/create'));
         Document::factory()->create();
 
         $existence = Existence::query()->latest()->first();
-        expect((string) $existence->version->number)->toBe('1.1.0');
+        expect((string) $existence->snapshot->number)->toBe('1.1.0');
     });
 
     it('tracks deletions correctly', function () {
@@ -49,11 +49,11 @@ describe('Versioned Content has its Existence tracked correctly when copying by 
 
         $document = Document::factory()->create();
 
-        versions()->setActive(createFirstVersion('schema/create'));
+        snapshots()->setActive(createFirstSnapshot('schema/create'));
 
         expect(Existence::query()->count())->toBe(2);
 
-        versions()->setActive(createMinorVersion('schema/create'));
+        snapshots()->setActive(createMinorSnapshot('schema/create'));
 
         expect(Existence::query()->count())->toBe(3);
 
@@ -71,11 +71,11 @@ describe('Versioned Content has its Existence tracked correctly when copying by 
 
         $flag = Flag::factory()->create();
 
-        versions()->setActive(createFirstVersion('schema/create'));
+        snapshots()->setActive(createFirstSnapshot('schema/create'));
 
         expect(Existence::query()->count())->toBe(2);
 
-        versions()->setActive(createMinorVersion('schema/create'));
+        snapshots()->setActive(createMinorSnapshot('schema/create'));
 
         expect(Existence::query()->count())->toBe(3);
 
@@ -93,11 +93,11 @@ describe('Versioned Content has its Existence tracked correctly when copying by 
 
         $flag = Flag::factory()->create();
 
-        versions()->setActive(createFirstVersion('schema/create'));
+        snapshots()->setActive(createFirstSnapshot('schema/create'));
 
         expect(Existence::query()->count())->toBe(2);
 
-        versions()->setActive(createMinorVersion('schema/create'));
+        snapshots()->setActive(createMinorSnapshot('schema/create'));
 
         expect(Existence::query()->count())->toBe(3);
 
@@ -115,11 +115,11 @@ describe('Versioned Content has its Existence tracked correctly when copying by 
 
         $flag = Flag::factory()->create();
 
-        versions()->setActive(createFirstVersion('schema/create'));
+        snapshots()->setActive(createFirstSnapshot('schema/create'));
 
         expect(Existence::query()->count())->toBe(2);
 
-        versions()->setActive(createMinorVersion('schema/create'));
+        snapshots()->setActive(createMinorSnapshot('schema/create'));
 
         expect(Existence::query()->count())->toBe(3);
 

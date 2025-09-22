@@ -6,15 +6,17 @@ return [
     | Models
     |--------------------------------------------------------------------------
     |
-    | Version:
-    | This is the model which will be used to store the different versions for the Application.
-    | It must implement the \Plank\Snapshots\Contracts\Version interface.
+    | Snapshot:
+    | This is the model which will be used to track the different versions of the 
+    | content in the Application.
     |
-    | History:
-    | This is the model which will be used to store the history of changes for the Application.
+    | It must implement the \Plank\Snapshots\Contracts\Snapshot interface.
+    |
+    | Existence:
+    | This is the model which will be used to store what snapshots a piece of content exists in.
     */
     'models' => [
-        'version' => \Plank\Snapshots\Models\Version::class,
+        'snapshot' => \Plank\Snapshots\Models\Snapshot::class,
         'existence' => \Plank\Snapshots\Models\Existence::class,
     ],
 
@@ -24,7 +26,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | version_key:
-    | This object adds some helper methods for working with version numbers.
+    | This object adds some helper methods for working with semantic version numbers.
     | It must implement the \Plank\Snapshots\Contracts\VersionKey interface.
     */
     'value_objects' => [
@@ -36,16 +38,16 @@ return [
     | Repositories
     |--------------------------------------------------------------------------
     |
-    | Versions:
+    | Snapshots:
     | This repository will be used to retrieve and maintain the version state for the application.
     |
-    | The interface is minimal to allow you to manage Versions in other ways if your application
+    | The interface is minimal to allow you to manage Snapshots in other ways if your application
     | requires it.
     |
-    | It must implement the \Plank\Snapshots\Contracts\ManagesVersions interface.
+    | It must implement the \Plank\Snapshots\Contracts\ManagesSnapshots interface.
     */
     'repositories' => [
-        'version' => \Plank\Snapshots\Repository\VersionRepository::class,
+        'snapshots' => \Plank\Snapshots\Repository\SnapshotRepository::class,
     ],
 
     /*
@@ -54,8 +56,8 @@ return [
     |--------------------------------------------------------------------------
     |
     | Snapshots:
-    | This observer is used to fire versioning events and maintain the linked list
-    | of versions.
+    | This observer is used to fire the events that create a new snapshot of your
+    | Application when a new Snapshot is created.
     |
     | History:
     | This Observer is used to track the History of changes to content. Set to `null` to
@@ -67,52 +69,47 @@ return [
     |
     */
     'observers' => [
-        'version' => \Plank\Snapshots\Observers\VersionObserver::class,
+        'snapshot' => \Plank\Snapshots\Observers\SnapshotObserver::class,
         'existence' => \Plank\Snapshots\Observers\ExistenceObserver::class,
         'identity' => \Plank\Snapshots\Observers\IdentityObserver::class,
     ],
 
     /*
     |---------------------------------------------------------------------------
-    | Release
+    | Listeners
     |--------------------------------------------------------------------------
     |
-    | `migrate`
-    | This option determines whether or not to run the migrations when a new version
-    | is created. If set to false, the application code will need to handle migrations.
+    | snapshot:
+    | The snapshot listener is responsible for running the migrations and ultimately
+    | kicking off the events/jobs that will copy the data to the new tables.
     |
-    | `copy`
-    | When provided, these settings will be used to automatically copy data to newly
-    | created versions.
-    |
-    | listener:
-    | The VersionMigrated listener is responsible for dispatching data copying jobs
-    |
-    | job:
-    | Handles actually copying the data to the newly created version. Data copying
-    | jobs are dispatched with two arguments $version and $table.
-    |
-    | queue:
-    | The queue you want data copying to occur on
+    | copy:
+    | Handles kicking off the jobs to copy data to the new tables
     |
     */
-    'release' => [
-        'listener' => \Plank\Snapshots\Listeners\ReleaseVersion::class,
-        'copy' => [
-            'listener' => \Plank\Snapshots\Listeners\CopyData::class,
-            'queue' => 'sync',
-        ],
+    'listeners' => [
+        'snapshot' => \Plank\Snapshots\Listeners\ReleaseSnapshot::class,
+        'copy' => \Plank\Snapshots\Listeners\CopyData::class,
     ],
 
     /*
-    |--------------------------------------------------------------------------
-    | Force Versions
+    |---------------------------------------------------------------------------
+    | Queue
     |--------------------------------------------------------------------------
     |
-    | When set to `true`, there will be no "unprefixed" versioned tables. This
-    | would mean that a version must first exist in order for any versioned
-    | content to exist.
+    | The queue that snapshots jobs and data should occur on.
     |
     */
-    'force_versions' => false,
+    'queue' => env('QUEUE_CONNECTION', 'sync'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Force Snapshots
+    |--------------------------------------------------------------------------
+    |
+    | When set to `true`, there will be no "unprefixed" snapshotted tables. This
+    | means that a version must first exist before any versioned content can exist.
+    |
+    */
+    'force_snapshots' => false,
 ];

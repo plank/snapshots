@@ -77,7 +77,7 @@ describe('The install command properly installs the package.', function () {
         if (count($migrations) > 0) {
             $migration = $migrations[0]->getPathname();
         } else {
-            $migration = $migrationsPath.'/'.$now->addSecond()->format('Y_m_d_His').'_create_versions_table.php';
+            $migration = $migrationsPath.'/'.$now->addSecond()->format('Y_m_d_His').'_create_snapshots_table.php';
         }
 
         File::delete($migration);

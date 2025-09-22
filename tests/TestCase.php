@@ -11,7 +11,7 @@ use Orchestra\Testbench\TestCase as Orchestra;
 use Plank\LaravelModelResolver\LaravelModelResolverServiceProvider;
 use Plank\LaravelSchemaEvents\LaravelSchemaEventsServiceProvider;
 use Plank\Snapshots\Repository\ModelRepository;
-use Plank\Snapshots\Repository\VersionRepository;
+use Plank\Snapshots\Repository\SnapshotRepository;
 use Plank\Snapshots\SnapshotServiceProvider;
 use Plank\Snapshots\Tests\Database\Seeders\Model\UserSeeder;
 use Plank\Snapshots\Tests\Models\User;
@@ -20,7 +20,7 @@ class TestCase extends Orchestra
 {
     use RefreshDatabase;
 
-    public ?VersionRepository $versions = null;
+    public ?SnapshotRepository $snapshots = null;
 
     protected function setUp(): void
     {

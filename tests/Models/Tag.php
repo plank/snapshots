@@ -6,14 +6,14 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Plank\Snapshots\Concerns\IdentifiesContent;
-use Plank\Snapshots\Concerns\InteractsWithVersionedContent;
+use Plank\Snapshots\Concerns\InteractsWithSnapshottedContent;
 use Plank\Snapshots\Contracts\Identifying;
 
 class Tag extends Model implements Identifying
 {
     use HasFactory;
     use IdentifiesContent;
-    use InteractsWithVersionedContent;
+    use InteractsWithSnapshottedContent;
 
     protected $guarded = [];
 

@@ -16,10 +16,10 @@ describe('SnapshotMigrations use versions to run up and down', function () {
             '--realpath' => true,
         ])->run();
 
-        createFirstVersion('schema/create');
-        createMinorVersion('schema/create');
-        createPatchVersion('schema/create');
-        createMajorVersion('schema/create');
+        createFirstSnapshot('schema/create');
+        createMinorSnapshot('schema/create');
+        createPatchSnapshot('schema/create');
+        createMajorSnapshot('schema/create');
     });
 
     it('runs snapshot migrations when new versions are created', function () {
@@ -52,7 +52,7 @@ describe('SnapshotMigrations use versions to run up and down', function () {
 
         $items = Item::factory()->count(3)->create();
 
-        versions()->setActive(createPatchVersion('schema/alter'));
+        snapshots()->setActive(createPatchSnapshot('schema/alter'));
 
         foreach ($items as $item) {
             expect(Item::query()->whereKey($item->id)->exists())->toBeTrue();

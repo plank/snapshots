@@ -5,9 +5,9 @@ namespace Plank\Snapshots\Contracts;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * @property version|null $previous
+ * @property Snapshot|null $previous
  */
-interface Version
+interface Snapshot
 {
     /**
      * Determine if the underlying table has been migrated already.
@@ -15,29 +15,29 @@ interface Version
     public function hasBeenMigrated(): bool;
 
     /**
-     * Determine if the Version has already been migrated.
+     * Determine if the Snapshot has already been migrated.
      */
     public function isMigrated(): bool;
 
     /**
-     * Get the version's identifying key
+     * Get the Snapshot's identifying key
      */
     public static function keyColumn(): string;
 
     /**
-     * Get a string which can identify the version in a URL
+     * Get a string which can identify the Snapshot in a URL
      */
     public function key(): VersionKey;
 
     /**
-     * Get the version's identifying key
+     * Get the Snapshot's identifying key
      *
      * @return int|string
      */
     public function getKey();
 
     /**
-     * Retrieve the previous version if one is set
+     * Retrieve the previous Snapshot if one exists
      *
      * @return BelongsTo|null
      */

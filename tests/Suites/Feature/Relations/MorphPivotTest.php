@@ -19,7 +19,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
     });
 
     it('can attach versioned models to versioned models', function () {
-        versions()->setActive(createFirstVersion('pivot'));
+        snapshots()->setActive(createFirstSnapshot('pivot'));
 
         $wellington = Project::query()
             ->where('name', 'Wellington St.')
@@ -32,7 +32,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
         expect($plans)->not->toContain('Plumbing Blueprint');
         expect($plans)->not->toContain('Networking Blueprint');
 
-        versions()->setActive(createMinorVersion('pivot'));
+        snapshots()->setActive(createMinorSnapshot('pivot'));
 
         $networkingPlan = Plan::query()
             ->where('name', 'Networking Blueprint')
@@ -49,7 +49,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
         expect($plans)->not->toContain('Plumbing Blueprint');
         expect($plans)->toContain('Networking Blueprint');
 
-        versions()->setActive(versions()->byKey('1.0.0'));
+        snapshots()->setActive(snapshots()->byKey('1.0.0'));
 
         $plans = $wellington->plans()->get()->pluck('name');
 
@@ -60,7 +60,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
     });
 
     it('can detach versioned models to versioned models', function () {
-        versions()->setActive(createFirstVersion('pivot'));
+        snapshots()->setActive(createFirstSnapshot('pivot'));
 
         $wellington = Project::query()
             ->where('name', 'Wellington St.')
@@ -73,7 +73,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
         expect($plans)->not->toContain('Plumbing Blueprint');
         expect($plans)->not->toContain('Networking Blueprint');
 
-        versions()->setActive(createMinorVersion('pivot'));
+        snapshots()->setActive(createMinorSnapshot('pivot'));
 
         $hvacPlan = Plan::query()
             ->where('name', 'HVAC Blueprint')
@@ -88,7 +88,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
         expect($plans)->not->toContain('Plumbing Blueprint');
         expect($plans)->not->toContain('Networking Blueprint');
 
-        versions()->setActive(versions()->byKey('1.0.0'));
+        snapshots()->setActive(snapshots()->byKey('1.0.0'));
 
         $plans = $wellington->plans()->get()->pluck('name');
 
@@ -99,7 +99,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
     });
 
     it('can delete the pivot for versioned models to versioned models', function () {
-        versions()->setActive(createFirstVersion('pivot'));
+        snapshots()->setActive(createFirstSnapshot('pivot'));
 
         $wellington = Project::query()
             ->where('name', 'Wellington St.')
@@ -112,7 +112,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
         expect($plans)->not->toContain('Plumbing Blueprint');
         expect($plans)->not->toContain('Networking Blueprint');
 
-        versions()->setActive(createMinorVersion('pivot'));
+        snapshots()->setActive(createMinorSnapshot('pivot'));
 
         $hvacPlan = Plan::query()
             ->where('name', 'HVAC Blueprint')
@@ -127,7 +127,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
         expect($plans)->not->toContain('Plumbing Blueprint');
         expect($plans)->not->toContain('Networking Blueprint');
 
-        versions()->setActive(versions()->byKey('1.0.0'));
+        snapshots()->setActive(snapshots()->byKey('1.0.0'));
 
         $plans = $wellington->plans()->get()->pluck('name');
 
@@ -138,7 +138,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
     });
 
     it('can sync versioned models to versioned models', function () {
-        versions()->setActive(createFirstVersion('pivot'));
+        snapshots()->setActive(createFirstSnapshot('pivot'));
 
         $wellington = Project::query()
             ->where('name', 'Wellington St.')
@@ -151,7 +151,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
         expect($plans)->not->toContain('Plumbing Blueprint');
         expect($plans)->not->toContain('Networking Blueprint');
 
-        versions()->setActive(createMinorVersion('pivot'));
+        snapshots()->setActive(createMinorSnapshot('pivot'));
 
         $electricalPlan = Plan::query()
             ->where('name', 'Electrical Blueprint')
@@ -184,7 +184,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
         expect($plans)->toContain('Plumbing Blueprint');
         expect($plans)->toContain('Networking Blueprint');
 
-        versions()->setActive(versions()->byKey('1.0.0'));
+        snapshots()->setActive(snapshots()->byKey('1.0.0'));
 
         $plans = $wellington->plans()->get()->pluck('name');
 
@@ -195,7 +195,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
     });
 
     it('can sync without detaching versioned models to versioned models', function () {
-        versions()->setActive(createFirstVersion('pivot'));
+        snapshots()->setActive(createFirstSnapshot('pivot'));
 
         $wellington = Project::query()
             ->where('name', 'Wellington St.')
@@ -208,7 +208,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
         expect($plans)->not->toContain('Plumbing Blueprint');
         expect($plans)->not->toContain('Networking Blueprint');
 
-        versions()->setActive(createMinorVersion('pivot'));
+        snapshots()->setActive(createMinorSnapshot('pivot'));
 
         $electricalPlan = Plan::query()
             ->where('name', 'Electrical Blueprint')
@@ -241,7 +241,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
         expect($plans)->toContain('Plumbing Blueprint');
         expect($plans)->toContain('Networking Blueprint');
 
-        versions()->setActive(versions()->byKey('1.0.0'));
+        snapshots()->setActive(snapshots()->byKey('1.0.0'));
 
         $plans = $wellington->plans()->get()->pluck('name');
 
@@ -252,7 +252,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
     });
 
     it('can attach versioned models to unversioned models', function () {
-        versions()->setActive(createFirstVersion('pivot'));
+        snapshots()->setActive(createFirstSnapshot('pivot'));
 
         $wellington = Project::query()
             ->where('name', 'Wellington St.')
@@ -264,7 +264,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
         expect($contractors)->not->toContain('Americorp');
         expect($contractors)->not->toContain('Anglocorp');
 
-        versions()->setActive(createMinorVersion('pivot'));
+        snapshots()->setActive(createMinorSnapshot('pivot'));
 
         $mega = Contractor::factory()->create([
             'name' => 'Mega Canacorp',
@@ -279,7 +279,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
         expect($contractors)->not->toContain('Anglocorp');
         expect($contractors)->toContain('Mega Canacorp');
 
-        versions()->setActive(versions()->byKey('1.0.0'));
+        snapshots()->setActive(snapshots()->byKey('1.0.0'));
 
         $contractors = $wellington->contractors()->get()->pluck('name');
 
@@ -290,7 +290,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
     });
 
     it('can detach versioned models to unversioned models', function () {
-        versions()->setActive(createFirstVersion('pivot'));
+        snapshots()->setActive(createFirstSnapshot('pivot'));
 
         $wellington = Project::query()
             ->where('name', 'Wellington St.')
@@ -302,7 +302,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
         expect($contractors)->not->toContain('Americorp');
         expect($contractors)->not->toContain('Anglocorp');
 
-        versions()->setActive(createMinorVersion('pivot'));
+        snapshots()->setActive(createMinorSnapshot('pivot'));
 
         $canacorp = Contractor::query()
             ->where('name', 'Canacorp')
@@ -316,7 +316,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
         expect($contractors)->not->toContain('Americorp');
         expect($contractors)->not->toContain('Anglocorp');
 
-        versions()->setActive(versions()->byKey('1.0.0'));
+        snapshots()->setActive(snapshots()->byKey('1.0.0'));
 
         $contractors = $wellington->contractors()->get()->pluck('name');
 
@@ -326,7 +326,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
     });
 
     it('can delete the pivot for versioned models to unversioned models', function () {
-        versions()->setActive(createFirstVersion('pivot'));
+        snapshots()->setActive(createFirstSnapshot('pivot'));
 
         $wellington = Project::query()
             ->where('name', 'Wellington St.')
@@ -338,7 +338,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
         expect($contractors)->not->toContain('Americorp');
         expect($contractors)->not->toContain('Anglocorp');
 
-        versions()->setActive(createMinorVersion('pivot'));
+        snapshots()->setActive(createMinorSnapshot('pivot'));
 
         $canacorp = Contractor::query()
             ->where('name', 'Canacorp')
@@ -352,7 +352,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
         expect($contractors)->not->toContain('Americorp');
         expect($contractors)->not->toContain('Anglocorp');
 
-        versions()->setActive(versions()->byKey('1.0.0'));
+        snapshots()->setActive(snapshots()->byKey('1.0.0'));
 
         $contractors = $wellington->contractors()->get()->pluck('name');
 
@@ -362,7 +362,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
     });
 
     it('can sync versioned models to unversioned models', function () {
-        versions()->setActive(createFirstVersion('pivot'));
+        snapshots()->setActive(createFirstSnapshot('pivot'));
 
         $wellington = Project::query()
             ->where('name', 'Wellington St.')
@@ -374,7 +374,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
         expect($contractors)->not->toContain('Americorp');
         expect($contractors)->not->toContain('Anglocorp');
 
-        versions()->setActive(createMinorVersion('pivot'));
+        snapshots()->setActive(createMinorSnapshot('pivot'));
 
         $americorp = Contractor::query()
             ->where('name', 'Americorp')
@@ -395,7 +395,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
         expect($contractors)->toContain('Americorp');
         expect($contractors)->toContain('Anglocorp');
 
-        versions()->setActive(versions()->byKey('1.0.0'));
+        snapshots()->setActive(snapshots()->byKey('1.0.0'));
 
         $contractors = $wellington->contractors()->get()->pluck('name');
 
@@ -405,7 +405,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
     });
 
     it('can sync without detaching versioned models to unversioned models', function () {
-        versions()->setActive(createFirstVersion('pivot'));
+        snapshots()->setActive(createFirstSnapshot('pivot'));
 
         $wellington = Project::query()
             ->where('name', 'Wellington St.')
@@ -417,7 +417,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
         expect($contractors)->not->toContain('Americorp');
         expect($contractors)->not->toContain('Anglocorp');
 
-        versions()->setActive(createMinorVersion('pivot'));
+        snapshots()->setActive(createMinorSnapshot('pivot'));
 
         $americorp = Contractor::query()
             ->where('name', 'Americorp')
@@ -438,7 +438,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
         expect($contractors)->toContain('Americorp');
         expect($contractors)->toContain('Anglocorp');
 
-        versions()->setActive(versions()->byKey('1.0.0'));
+        snapshots()->setActive(snapshots()->byKey('1.0.0'));
 
         $contractors = $wellington->contractors()->get()->pluck('name');
 
@@ -448,7 +448,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
     });
 
     it('can attach unversioned models to versioned models on MorphPivot', function () {
-        versions()->setActive(createFirstVersion('pivot'));
+        snapshots()->setActive(createFirstSnapshot('pivot'));
 
         $can = Contractor::where('name', 'Canacorp')->first();
 
@@ -458,7 +458,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
         expect($projects)->not->toContain('Pennsylvania Ave.');
         expect($projects)->not->toContain('Downing St.');
 
-        versions()->setActive(createMajorVersion('pivot'));
+        snapshots()->setActive(createMajorSnapshot('pivot'));
 
         $pennsylvania = Project::query()
             ->where('name', 'Pennsylvania Ave.')
@@ -472,7 +472,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
         expect($projects)->toContain('Pennsylvania Ave.');
         expect($projects)->not->toContain('Downing St.');
 
-        versions()->setActive(versions()->byKey('1.0.0'));
+        snapshots()->setActive(snapshots()->byKey('1.0.0'));
 
         $projects = $can->projects()->get()->pluck('name');
 
@@ -482,7 +482,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
     });
 
     it('can detach unversioned models to versioned models', function () {
-        versions()->setActive(createFirstVersion('pivot'));
+        snapshots()->setActive(createFirstSnapshot('pivot'));
 
         $can = Contractor::where('name', 'Canacorp')->first();
 
@@ -492,7 +492,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
         expect($projects)->not->toContain('Pennsylvania Ave.');
         expect($projects)->not->toContain('Downing St.');
 
-        versions()->setActive(createMajorVersion('pivot'));
+        snapshots()->setActive(createMajorSnapshot('pivot'));
 
         $wellington = Project::query()
             ->where('name', 'Wellington St.')
@@ -506,7 +506,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
         expect($projects)->not->toContain('Pennsylvania Ave.');
         expect($projects)->not->toContain('Downing St.');
 
-        versions()->setActive(versions()->byKey('1.0.0'));
+        snapshots()->setActive(snapshots()->byKey('1.0.0'));
 
         $projects = $can->projects()->get()->pluck('name');
 
@@ -516,7 +516,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
     });
 
     it('can delete the pivot for unversioned models to versioned models', function () {
-        versions()->setActive(createFirstVersion('pivot'));
+        snapshots()->setActive(createFirstSnapshot('pivot'));
 
         $can = Contractor::where('name', 'Canacorp')->first();
 
@@ -526,7 +526,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
         expect($projects)->not->toContain('Pennsylvania Ave.');
         expect($projects)->not->toContain('Downing St.');
 
-        versions()->setActive(createMajorVersion('pivot'));
+        snapshots()->setActive(createMajorSnapshot('pivot'));
 
         $wellington = Project::query()
             ->where('name', 'Wellington St.')
@@ -540,7 +540,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
         expect($projects)->not->toContain('Pennsylvania Ave.');
         expect($projects)->not->toContain('Downing St.');
 
-        versions()->setActive(versions()->byKey('1.0.0'));
+        snapshots()->setActive(snapshots()->byKey('1.0.0'));
 
         $projects = $can->projects()->get()->pluck('name');
 
@@ -550,7 +550,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
     });
 
     it('can sync unversioned models to versioned models', function () {
-        versions()->setActive(createFirstVersion('pivot'));
+        snapshots()->setActive(createFirstSnapshot('pivot'));
 
         $can = Contractor::where('name', 'Canacorp')->first();
 
@@ -560,7 +560,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
         expect($projects)->not->toContain('Pennsylvania Ave.');
         expect($projects)->not->toContain('Downing St.');
 
-        versions()->setActive(createMajorVersion('pivot'));
+        snapshots()->setActive(createMajorSnapshot('pivot'));
 
         $pennsylvania = Project::query()
             ->where('name', 'Pennsylvania Ave.')
@@ -581,7 +581,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
         expect($projects)->toContain('Pennsylvania Ave.');
         expect($projects)->toContain('Downing St.');
 
-        versions()->setActive(versions()->byKey('1.0.0'));
+        snapshots()->setActive(snapshots()->byKey('1.0.0'));
 
         $projects = $can->projects()->get()->pluck('name');
 
@@ -591,7 +591,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
     });
 
     it('can sync without detaching unversioned models to versioned models', function () {
-        versions()->setActive(createFirstVersion('pivot'));
+        snapshots()->setActive(createFirstSnapshot('pivot'));
 
         $can = Contractor::where('name', 'Canacorp')->first();
 
@@ -601,7 +601,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
         expect($projects)->not->toContain('Pennsylvania Ave.');
         expect($projects)->not->toContain('Downing St.');
 
-        versions()->setActive(createMajorVersion('pivot'));
+        snapshots()->setActive(createMajorSnapshot('pivot'));
 
         $pennsylvania = Project::query()
             ->where('name', 'Pennsylvania Ave.')
@@ -622,7 +622,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
         expect($projects)->toContain('Pennsylvania Ave.');
         expect($projects)->toContain('Downing St.');
 
-        versions()->setActive(versions()->byKey('1.0.0'));
+        snapshots()->setActive(snapshots()->byKey('1.0.0'));
 
         $projects = $can->projects()->get()->pluck('name');
 

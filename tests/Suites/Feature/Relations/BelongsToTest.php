@@ -25,9 +25,9 @@ describe('BelongsTo relationships use versioned tables when one of the models is
 
         expect($post->user->id)->toBe($user->id);
 
-        versions()->setActive(createFirstVersion('query'));
+        snapshots()->setActive(createFirstSnapshot('query'));
 
-        expect($post->activeVersion()->user->id)->toBe($user->id);
+        expect($post->fromActiveSnapshot()->user->id)->toBe($user->id);
     });
 
     it('can update a belongs to relationship to a non versioned model from a versioned model', function () {
@@ -40,9 +40,9 @@ describe('BelongsTo relationships use versioned tables when one of the models is
 
         expect($post->user->id)->toBe($user->id);
 
-        versions()->setActive(createFirstVersion('query'));
+        snapshots()->setActive(createFirstSnapshot('query'));
 
-        expect($post->activeVersion()->user->id)->toBe($user->id);
+        expect($post->fromActiveSnapshot()->user->id)->toBe($user->id);
     });
 
     it('can make a non versioned model belong to a versioned model', function () {
@@ -51,10 +51,10 @@ describe('BelongsTo relationships use versioned tables when one of the models is
 
         expect($like->post->uuid)->toBe($post->uuid);
 
-        versions()->setActive(createFirstVersion('query'));
+        snapshots()->setActive(createFirstSnapshot('query'));
 
         expect($like->post()->first()->title)->toBe($post->title);
-        expect($post->activeVersion()->likes->first()->id)->toBe($like->id);
+        expect($post->fromActiveSnapshot()->likes->first()->id)->toBe($like->id);
     });
 
     it('can update a belongs to relationship to a versioned model from a non versioned model', function () {
@@ -70,7 +70,7 @@ describe('BelongsTo relationships use versioned tables when one of the models is
 
         expect($like->post->uuid)->toBe($post->uuid);
 
-        versions()->setActive(createFirstVersion('query'));
+        snapshots()->setActive(createFirstSnapshot('query'));
 
         expect($like->post->title)->toBe('Gets Likes');
     });
@@ -81,9 +81,9 @@ describe('BelongsTo relationships use versioned tables when one of the models is
 
         expect($seo->post->uuid)->toBe($post->uuid);
 
-        versions()->setActive(createFirstVersion('query'));
+        snapshots()->setActive(createFirstSnapshot('query'));
 
-        expect($seo->activeVersion()->post->title)->toBe($post->title);
+        expect($seo->fromActiveSnapshot()->post->title)->toBe($post->title);
     });
 
     it('can update a belongs to relationship to a versioned model from a versioned model', function () {
@@ -99,7 +99,7 @@ describe('BelongsTo relationships use versioned tables when one of the models is
 
         expect($seo->post->uuid)->toBe($post->uuid);
 
-        versions()->setActive(createFirstVersion('query'));
+        snapshots()->setActive(createFirstSnapshot('query'));
 
         expect($seo->post->title)->toBe('Gets Seo');
     });

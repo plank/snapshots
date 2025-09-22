@@ -13,7 +13,7 @@ describe('The snapshot schema works with unversioned foreign keys correctly', fu
     });
 
     it('creates the unversioned foreign keys correctly', function () {
-        versions()->setActive(createFirstVersion('schema/unversioned_fks'));
+        snapshots()->setActive(createFirstSnapshot('schema/unversioned_fks'));
 
         $assertFk = function (array $indexes, string $expected) {
             $columns = collect($indexes)->pluck('columns')->flatten();
@@ -30,7 +30,7 @@ describe('The snapshot schema works with unversioned foreign keys correctly', fu
             $assertFk($schema->getForeignKeys('versioned_uuid_alsos'), 'unversioned_uuid_also_id');
         });
 
-        versions()->clearActive();
+        snapshots()->clearActive();
         usingSnapshotSchema(function (SchemaBuilder $schema) use ($assertFk) {
             expect($schema->getConnection()->getTablePrefix())->toBe('');
             $assertFk($schema->getForeignKeys('versioneds'), 'unversioned_id');
@@ -43,7 +43,7 @@ describe('The snapshot schema works with unversioned foreign keys correctly', fu
     });
 
     it('drops the unversioned foreign keys correctly', function () {
-        versions()->setActive(createFirstVersion('schema/unversioned_fks'));
+        snapshots()->setActive(createFirstSnapshot('schema/unversioned_fks'));
 
         // SQLite does not support dropping FKs but it will let us run the code
         // so lets at least ensure it doest error out.

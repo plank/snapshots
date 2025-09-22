@@ -5,35 +5,35 @@ namespace Plank\Snapshots\Repository;
 use Closure;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
-use Plank\Snapshots\Contracts\ManagesVersions;
-use Plank\Snapshots\Contracts\Version;
+use Plank\Snapshots\Contracts\ManagesSnapshots;
+use Plank\Snapshots\Contracts\Snapshot;
 use Plank\Snapshots\Contracts\VersionKey;
-use Plank\Snapshots\Models\Version as VersionModel;
+use Plank\Snapshots\Models\Snapshot as SnapshotModel;
 
-class VersionRepository implements ManagesVersions
+class SnapshotRepository implements ManagesSnapshots
 {
-    protected ?Version $active = null;
+    protected (Snapshot&Model)|null $active = null;
 
     /**
      * Get an instance of the Model being used for versions.
      */
-    public function model(): Version&Model
+    public function model(): Snapshot&Model
     {
-        return new (config()->get('snapshots.models.version') ?? VersionModel::class);
+        return new (config()->get('snapshots.models.snapshot') ?? SnapshotModel::class);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function setActive(string|null|VersionKey|Version $version): ?Version
+    public function setActive(string|null|VersionKey|Snapshot $snapshot): ?Snapshot
     {
         $oldActive = $this->active;
 
-        if ($version && ! $version instanceof Version) {
-            $version = $this->byKey($version);
+        if ($snapshot && ! $snapshot instanceof Snapshot) {
+            $snapshot = $this->byKey($snapshot);
         }
 
-        $this->active = $version;
+        $this->active = $snapshot;
 
         return $oldActive;
     }
@@ -49,7 +49,7 @@ class VersionRepository implements ManagesVersions
     /**
      * {@inheritDoc}
      */
-    public function active(): (Version&Model)|null
+    public function active(): (Snapshot&Model)|null
     {
         return $this->active;
     }
@@ -57,7 +57,7 @@ class VersionRepository implements ManagesVersions
     /**
      * {@inheritDoc}
      */
-    public function latest(): (Version&Model)|null
+    public function latest(): (Snapshot&Model)|null
     {
         return $this->model()
             ->query()
@@ -68,7 +68,7 @@ class VersionRepository implements ManagesVersions
     /**
      * {@inheritDoc}
      */
-    public function working(?Version $version): ?Version
+    public function working((Snapshot&Model)|null $snapshot): ?Snapshot
     {
         return null;
     }
@@ -76,12 +76,12 @@ class VersionRepository implements ManagesVersions
     /**
      * @template TReturn
      *
-     * @param callable(?Version $version = null): TReturn $callback
+     * @param callable((Snapshot&Model)|null $snapshot = null): TReturn $callback
      * @return TReturn
      */
-    public function withVersionActive(string|null|VersionKey|Version $version, Closure $callback): mixed
+    public function withActiveSnapshot(string|null|VersionKey|Snapshot $snapshot, Closure $callback): mixed
     {
-        $oldActive = $this->setActive($version);
+        $oldActive = $this->setActive($snapshot);
 
         try {
             $result = $callback($this->active);
@@ -95,7 +95,7 @@ class VersionRepository implements ManagesVersions
     /**
      * {@inheritDoc}
      */
-    public function find($key): (Version&Model)|null
+    public function find($key): (Snapshot&Model)|null
     {
         return $this->model()
             ->query()
@@ -106,7 +106,7 @@ class VersionRepository implements ManagesVersions
     /**
      * {@inheritDoc}
      */
-    public function byKey(string|VersionKey $key): (Version&Model)|null
+    public function byKey(string|VersionKey $key): (Snapshot&Model)|null
     {
         $model = $this->model();
 

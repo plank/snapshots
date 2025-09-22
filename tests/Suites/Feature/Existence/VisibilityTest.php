@@ -33,51 +33,51 @@ describe('The visiblity accurately reflects all versions where content is visibl
         $flag = Flag::factory()->create();
 
         // 1.0.0
-        createFirstVersion('schema/create');
+        createFirstSnapshot('schema/create');
 
         $flag->update(['name' => $flag->name.' – patched']);
 
         // 1.0.1
-        createPatchVersion('schema/create');
+        createPatchSnapshot('schema/create');
 
         // 1.1.0
-        createMinorVersion('schema/create');
+        createMinorSnapshot('schema/create');
 
         $flag->delete();
 
         // 2.0.0
-        createMajorVersion('schema/create');
+        createMajorSnapshot('schema/create');
 
         // 2.1.0
-        createMinorVersion('schema/create');
+        createMinorSnapshot('schema/create');
 
         $flag->restore();
 
         // 2.2.0
-        createMinorVersion('schema/create');
+        createMinorSnapshot('schema/create');
 
         $flag->update(['name' => $flag->name.' – patched again']);
 
         // 2.2.1
-        createPatchVersion('schema/create');
+        createPatchSnapshot('schema/create');
 
         $flag->forceDelete();
 
         // 3.0.0
-        createMajorVersion('schema/create');
+        createMajorSnapshot('schema/create');
 
         // 4.0.0
-        createMajorVersion('schema/create');
+        createMajorSnapshot('schema/create');
     });
 
     it('shows the correct visibility for each version', function () {
-        versions()->setActive(version('1.0.0'));
+        snapshots()->setActive('1.0.0');
         $existences = Flag::query()->first()->existences;
 
         $revision = function (string $number) use ($existences): ?Existence {
             /** @var Existence $found */
             $found = $existences->filter(function (Existence $item) use ($number) {
-                return $item->version->number->isEqualTo($number);
+                return $item->snapshot->number->isEqualTo($number);
             })->first();
 
             return $found;

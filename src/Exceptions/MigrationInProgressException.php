@@ -2,12 +2,12 @@
 
 namespace Plank\Snapshots\Exceptions;
 
-use Plank\Snapshots\Contracts\Version;
+use Plank\Snapshots\Contracts\Snapshot;
 
 class MigrationInProgressException extends SnapshotsException
 {
-    public static function create(Version $version): self
+    public static function create(Snapshot $snapshot): self
     {
-        return new self("Version {$version->key()} has not finished migrating. You cannot create a new Version until it is complete.");
+        return new self("Snapshot {$snapshot->key()} has not finished migrating. You cannot create a new Snapshot until it is complete.");
     }
 }

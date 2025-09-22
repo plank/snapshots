@@ -1,6 +1,5 @@
 <?php
 
-use Plank\Snapshots\Enums\Operation;
 use Plank\Snapshots\Observers\ExistenceObserver;
 use Plank\Snapshots\Tests\Database\Seeders\Model\PostSeeder;
 use Plank\Snapshots\Tests\Database\Seeders\Model\TagSeeder;
@@ -15,10 +14,6 @@ beforeEach(function () {
 });
 
 describe('Identity is accurately tracked across versions and relationships', function () {
-    /**
-     * Create the following situation:
-     * Version | Operation     | Visible
-     */
     beforeEach(function () {
         config()->set('snapshots.observers.history', ExistenceObserver::class);
 

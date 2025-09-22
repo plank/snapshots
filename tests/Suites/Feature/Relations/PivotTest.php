@@ -19,7 +19,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
     });
 
     it('can attach versioned models to versioned models', function () {
-        versions()->setActive(createFirstVersion('pivot'));
+        snapshots()->setActive(createFirstSnapshot('pivot'));
 
         $project = Project::query()
             ->where('name', 'Wellington St.')
@@ -31,7 +31,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
         expect($products)->toContain('Fan');
         expect($products)->not()->toContain('Heat Pump');
 
-        versions()->setActive(createPatchVersion('pivot'));
+        snapshots()->setActive(createPatchSnapshot('pivot'));
 
         $heatPump = Product::query()
             ->where('name', 'Heat Pump')
@@ -43,15 +43,15 @@ describe('Custom versioned Pivot classes use version tables correctly', function
             ],
         ]);
 
-        $products = $project->activeVersion()->products->pluck('name');
+        $products = $project->fromActiveSnapshot()->products->pluck('name');
 
         expect($products)->toContain('Furnace');
         expect($products)->toContain('Fan');
         expect($products)->toContain('Heat Pump');
 
-        versions()->setActive(versions()->byKey('1.0.0'));
+        snapshots()->setActive(snapshots()->byKey('1.0.0'));
 
-        $products = $project->activeVersion()->products->pluck('name');
+        $products = $project->fromActiveSnapshot()->products->pluck('name');
 
         expect($products)->toContain('Furnace');
         expect($products)->toContain('Fan');
@@ -59,7 +59,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
     });
 
     it('can detach versioned models to versioned models', function () {
-        versions()->setActive(createFirstVersion('pivot'));
+        snapshots()->setActive(createFirstSnapshot('pivot'));
 
         $project = Project::query()
             ->where('name', 'Pennsylvania Ave.')
@@ -71,7 +71,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
         expect($products)->toContain('Outlet');
         expect($products)->not()->toContain('Switch');
 
-        versions()->setActive(createPatchVersion('pivot'));
+        snapshots()->setActive(createPatchSnapshot('pivot'));
 
         $project->products()->detach([
             Product::query()
@@ -80,15 +80,15 @@ describe('Custom versioned Pivot classes use version tables correctly', function
                 ->id,
         ]);
 
-        $products = $project->activeVersion()->products->pluck('name');
+        $products = $project->fromActiveSnapshot()->products->pluck('name');
 
         expect($products)->not()->toContain('Lightbulb');
         expect($products)->toContain('Outlet');
         expect($products)->not()->toContain('Switch');
 
-        versions()->setActive(versions()->byKey('1.0.0'));
+        snapshots()->setActive(snapshots()->byKey('1.0.0'));
 
-        $products = $project->activeVersion()->products->pluck('name');
+        $products = $project->fromActiveSnapshot()->products->pluck('name');
 
         expect($products)->toContain('Lightbulb');
         expect($products)->toContain('Outlet');
@@ -96,7 +96,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
     });
 
     it('can delete the pivot for versioned models to versioned models', function () {
-        versions()->setActive(createFirstVersion('pivot'));
+        snapshots()->setActive(createFirstSnapshot('pivot'));
 
         $project = Project::query()
             ->where('name', 'Downing St.')
@@ -108,19 +108,19 @@ describe('Custom versioned Pivot classes use version tables correctly', function
         expect($products)->not()->toContain('Sink');
         expect($products)->not()->toContain('Shower');
 
-        versions()->setActive(createPatchVersion('pivot'));
+        snapshots()->setActive(createPatchSnapshot('pivot'));
 
         $project->products()->where('name', 'Toilet')->first()->pivot->delete();
 
-        $products = $project->activeVersion()->products->pluck('name');
+        $products = $project->fromActiveSnapshot()->products->pluck('name');
 
         expect($products)->not()->toContain('Toilet');
         expect($products)->not()->toContain('Sink');
         expect($products)->not()->toContain('Shower');
 
-        versions()->setActive(versions()->byKey('1.0.0'));
+        snapshots()->setActive(snapshots()->byKey('1.0.0'));
 
-        $products = $project->activeVersion()->products->pluck('name');
+        $products = $project->fromActiveSnapshot()->products->pluck('name');
 
         expect($products)->toContain('Toilet');
         expect($products)->not()->toContain('Sink');
@@ -128,7 +128,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
     });
 
     it('can sync versioned models to versioned models', function () {
-        versions()->setActive(createFirstVersion('pivot'));
+        snapshots()->setActive(createFirstSnapshot('pivot'));
 
         $project = Project::query()
             ->where('name', 'Wellington St.')
@@ -148,7 +148,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
 
         expect($pivot->quantity)->toBe(2);
 
-        versions()->setActive(createPatchVersion('pivot'));
+        snapshots()->setActive(createPatchSnapshot('pivot'));
 
         $furnace = Product::query()
             ->where('name', 'Furnace')
@@ -160,7 +160,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
             ],
         ]);
 
-        $products = $project->activeVersion()->products->pluck('name');
+        $products = $project->fromActiveSnapshot()->products->pluck('name');
 
         expect($products)->toContain('Furnace');
         expect($products)->not()->toContain('Fan');
@@ -174,9 +174,9 @@ describe('Custom versioned Pivot classes use version tables correctly', function
 
         expect($pivot->quantity)->toBe(10);
 
-        versions()->setActive(versions()->byKey('1.0.0'));
+        snapshots()->setActive(snapshots()->byKey('1.0.0'));
 
-        $products = $project->activeVersion()->products->pluck('name');
+        $products = $project->fromActiveSnapshot()->products->pluck('name');
 
         expect($products)->toContain('Furnace');
         expect($products)->toContain('Fan');
@@ -192,7 +192,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
     });
 
     it('can sync without detaching versioned models to versioned models', function () {
-        versions()->setActive(createFirstVersion('pivot'));
+        snapshots()->setActive(createFirstSnapshot('pivot'));
 
         $project = Project::query()
             ->where('name', 'Pennsylvania Ave.')
@@ -204,7 +204,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
         expect($products)->toContain('Outlet');
         expect($products)->not()->toContain('Switch');
 
-        versions()->setActive(createPatchVersion('pivot'));
+        snapshots()->setActive(createPatchSnapshot('pivot'));
 
         $switch = Product::query()
             ->where('name', 'Switch')
@@ -216,15 +216,15 @@ describe('Custom versioned Pivot classes use version tables correctly', function
             ],
         ]);
 
-        $products = $project->activeVersion()->products->pluck('name');
+        $products = $project->fromActiveSnapshot()->products->pluck('name');
 
         expect($products)->toContain('Lightbulb');
         expect($products)->toContain('Outlet');
         expect($products)->toContain('Switch');
 
-        versions()->setActive(versions()->byKey('1.0.0'));
+        snapshots()->setActive(snapshots()->byKey('1.0.0'));
 
-        $products = $project->activeVersion()->products->pluck('name');
+        $products = $project->fromActiveSnapshot()->products->pluck('name');
 
         expect($products)->toContain('Lightbulb');
         expect($products)->toContain('Outlet');
@@ -232,7 +232,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
     });
 
     it('can attach versioned models to unversioned models', function () {
-        versions()->setActive(createFirstVersion('pivot'));
+        snapshots()->setActive(createFirstSnapshot('pivot'));
 
         $project = Project::query()
             ->where('name', 'Wellington St.')
@@ -244,7 +244,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
         expect($products)->not()->toContain('Electrical');
         expect($products)->not()->toContain('Plumbing');
 
-        versions()->setActive(createPatchVersion('pivot'));
+        snapshots()->setActive(createPatchSnapshot('pivot'));
 
         $electrical = Category::query()
             ->where('name', 'Electrical')
@@ -254,15 +254,15 @@ describe('Custom versioned Pivot classes use version tables correctly', function
             $electrical->id,
         ]);
 
-        $products = $project->activeVersion()->categories->pluck('name');
+        $products = $project->fromActiveSnapshot()->categories->pluck('name');
 
         expect($products)->toContain('Mechanical');
         expect($products)->toContain('Electrical');
         expect($products)->not()->toContain('Plumbing');
 
-        versions()->setActive(versions()->byKey('1.0.0'));
+        snapshots()->setActive(snapshots()->byKey('1.0.0'));
 
-        $products = $project->activeVersion()->categories->pluck('name');
+        $products = $project->fromActiveSnapshot()->categories->pluck('name');
 
         expect($products)->toContain('Mechanical');
         expect($products)->not()->toContain('Electrical');
@@ -270,7 +270,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
     });
 
     it('can detach versioned models to unversioned models', function () {
-        versions()->setActive(createFirstVersion('pivot'));
+        snapshots()->setActive(createFirstSnapshot('pivot'));
 
         $project = Project::query()
             ->where('name', 'Pennsylvania Ave.')
@@ -282,7 +282,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
         expect($products)->toContain('Electrical');
         expect($products)->not()->toContain('Plumbing');
 
-        versions()->setActive(createPatchVersion('pivot'));
+        snapshots()->setActive(createPatchSnapshot('pivot'));
 
         $project->categories()->detach([
             Category::query()
@@ -291,15 +291,15 @@ describe('Custom versioned Pivot classes use version tables correctly', function
                 ->id,
         ]);
 
-        $products = $project->activeVersion()->categories->pluck('name');
+        $products = $project->fromActiveSnapshot()->categories->pluck('name');
 
         expect($products)->not()->toContain('Mechanical');
         expect($products)->not()->toContain('Electrical');
         expect($products)->not()->toContain('Plumbing');
 
-        versions()->setActive(versions()->byKey('1.0.0'));
+        snapshots()->setActive(snapshots()->byKey('1.0.0'));
 
-        $products = $project->activeVersion()->categories->pluck('name');
+        $products = $project->fromActiveSnapshot()->categories->pluck('name');
 
         expect($products)->not()->toContain('Mechanical');
         expect($products)->toContain('Electrical');
@@ -307,7 +307,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
     });
 
     it('can delete the pivot for versioned models to unversioned models', function () {
-        versions()->setActive(createFirstVersion('pivot'));
+        snapshots()->setActive(createFirstSnapshot('pivot'));
 
         $project = Project::query()
             ->where('name', 'Downing St.')
@@ -319,19 +319,19 @@ describe('Custom versioned Pivot classes use version tables correctly', function
         expect($products)->not()->toContain('Electrical');
         expect($products)->toContain('Plumbing');
 
-        versions()->setActive(createPatchVersion('pivot'));
+        snapshots()->setActive(createPatchSnapshot('pivot'));
 
         $project->categories()->where('name', 'Plumbing')->first()->pivot->delete();
 
-        $products = $project->activeVersion()->categories->pluck('name');
+        $products = $project->fromActiveSnapshot()->categories->pluck('name');
 
         expect($products)->not()->toContain('Mechanical');
         expect($products)->not()->toContain('Electrical');
         expect($products)->not()->toContain('Plumbing');
 
-        versions()->setActive(versions()->byKey('1.0.0'));
+        snapshots()->setActive(snapshots()->byKey('1.0.0'));
 
-        $products = $project->activeVersion()->categories->pluck('name');
+        $products = $project->fromActiveSnapshot()->categories->pluck('name');
 
         expect($products)->not()->toContain('Mechanical');
         expect($products)->not()->toContain('Electrical');
@@ -339,7 +339,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
     });
 
     it('can sync versioned models to unversioned models', function () {
-        versions()->setActive(createFirstVersion('pivot'));
+        snapshots()->setActive(createFirstSnapshot('pivot'));
 
         $project = Project::query()
             ->where('name', 'Wellington St.')
@@ -351,7 +351,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
         expect($products)->not()->toContain('Electrical');
         expect($products)->not()->toContain('Plumbing');
 
-        versions()->setActive(createPatchVersion('pivot'));
+        snapshots()->setActive(createPatchSnapshot('pivot'));
 
         $electrical = Category::query()
             ->where('name', 'Electrical')
@@ -361,15 +361,15 @@ describe('Custom versioned Pivot classes use version tables correctly', function
             $electrical->id,
         ]);
 
-        $products = $project->activeVersion()->categories->pluck('name');
+        $products = $project->fromActiveSnapshot()->categories->pluck('name');
 
         expect($products)->not()->toContain('Mechanical');
         expect($products)->toContain('Electrical');
         expect($products)->not()->toContain('Plumbing');
 
-        versions()->setActive(versions()->byKey('1.0.0'));
+        snapshots()->setActive(snapshots()->byKey('1.0.0'));
 
-        $products = $project->activeVersion()->categories->pluck('name');
+        $products = $project->fromActiveSnapshot()->categories->pluck('name');
 
         expect($products)->toContain('Mechanical');
         expect($products)->not()->toContain('Electrical');
@@ -377,7 +377,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
     });
 
     it('can sync without detaching versioned models to unversioned models', function () {
-        versions()->setActive(createFirstVersion('pivot'));
+        snapshots()->setActive(createFirstSnapshot('pivot'));
 
         $project = Project::query()
             ->where('name', 'Pennsylvania Ave.')
@@ -389,7 +389,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
         expect($products)->toContain('Electrical');
         expect($products)->not()->toContain('Plumbing');
 
-        versions()->setActive(createPatchVersion('pivot'));
+        snapshots()->setActive(createPatchSnapshot('pivot'));
 
         $mechanical = Category::query()
             ->where('name', 'Mechanical')
@@ -399,15 +399,15 @@ describe('Custom versioned Pivot classes use version tables correctly', function
             $mechanical->id,
         ]);
 
-        $products = $project->activeVersion()->categories->pluck('name');
+        $products = $project->fromActiveSnapshot()->categories->pluck('name');
 
         expect($products)->toContain('Mechanical');
         expect($products)->toContain('Electrical');
         expect($products)->not()->toContain('Plumbing');
 
-        versions()->setActive(versions()->byKey('1.0.0'));
+        snapshots()->setActive(snapshots()->byKey('1.0.0'));
 
-        $products = $project->activeVersion()->categories->pluck('name');
+        $products = $project->fromActiveSnapshot()->categories->pluck('name');
 
         expect($products)->not()->toContain('Mechanical');
         expect($products)->toContain('Electrical');
@@ -415,7 +415,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
     });
 
     it('can attach unversioned models to versioned models', function () {
-        versions()->setActive(createFirstVersion('pivot'));
+        snapshots()->setActive(createFirstSnapshot('pivot'));
 
         $category = Category::query()
             ->where('name', 'Mechanical')
@@ -427,7 +427,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
         expect($projects)->not()->toContain('Pennsylvania Ave.');
         expect($projects)->not()->toContain('Downing St.');
 
-        versions()->setActive(createPatchVersion('pivot'));
+        snapshots()->setActive(createPatchSnapshot('pivot'));
 
         $downing = Project::query()
             ->where('name', 'Downing St.')
@@ -443,7 +443,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
         expect($projects)->not()->toContain('Pennsylvania Ave.');
         expect($projects)->toContain('Downing St.');
 
-        versions()->setActive(versions()->byKey('1.0.0'));
+        snapshots()->setActive(snapshots()->byKey('1.0.0'));
 
         $projects = $category->unsetRelations()->projects->pluck('name');
 
@@ -453,7 +453,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
     });
 
     it('can detach unversioned models to versioned models', function () {
-        versions()->setActive(createFirstVersion('pivot'));
+        snapshots()->setActive(createFirstSnapshot('pivot'));
 
         $category = Category::query()
             ->where('name', 'Mechanical')
@@ -465,7 +465,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
         expect($projects)->not()->toContain('Pennsylvania Ave.');
         expect($projects)->not()->toContain('Downing St.');
 
-        versions()->setActive(createPatchVersion('pivot'));
+        snapshots()->setActive(createPatchSnapshot('pivot'));
 
         $category->projects()->detach([
             Project::query()
@@ -480,7 +480,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
         expect($projects)->not()->toContain('Pennsylvania Ave.');
         expect($projects)->not()->toContain('Downing St.');
 
-        versions()->setActive(versions()->byKey('1.0.0'));
+        snapshots()->setActive(snapshots()->byKey('1.0.0'));
 
         $projects = $category->unsetRelations()->projects->pluck('name');
 
@@ -490,7 +490,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
     });
 
     it('can delete the pivot for unversioned models to versioned models', function () {
-        versions()->setActive(createFirstVersion('pivot'));
+        snapshots()->setActive(createFirstSnapshot('pivot'));
 
         $category = Category::query()
             ->where('name', 'Mechanical')
@@ -502,7 +502,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
         expect($projects)->not()->toContain('Pennsylvania Ave.');
         expect($projects)->not()->toContain('Downing St.');
 
-        versions()->setActive(createPatchVersion('pivot'));
+        snapshots()->setActive(createPatchSnapshot('pivot'));
 
         $category->projects()->where('name', 'Wellington St.')->first()->pivot->delete();
 
@@ -512,7 +512,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
         expect($projects)->not()->toContain('Pennsylvania Ave.');
         expect($projects)->not()->toContain('Downing St.');
 
-        versions()->setActive(versions()->byKey('1.0.0'));
+        snapshots()->setActive(snapshots()->byKey('1.0.0'));
 
         $projects = $category->unsetRelations()->projects->pluck('name');
 
@@ -522,7 +522,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
     });
 
     it('can sync unversioned models to versioned models', function () {
-        versions()->setActive(createFirstVersion('pivot'));
+        snapshots()->setActive(createFirstSnapshot('pivot'));
 
         $category = Category::query()
             ->where('name', 'Mechanical')
@@ -534,7 +534,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
         expect($projects)->not()->toContain('Pennsylvania Ave.');
         expect($projects)->not()->toContain('Downing St.');
 
-        versions()->setActive(createPatchVersion('pivot'));
+        snapshots()->setActive(createPatchSnapshot('pivot'));
 
         $downing = Project::query()
             ->where('name', 'Downing St.')
@@ -550,7 +550,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
         expect($projects)->not()->toContain('Pennsylvania Ave.');
         expect($projects)->toContain('Downing St.');
 
-        versions()->setActive(versions()->byKey('1.0.0'));
+        snapshots()->setActive(snapshots()->byKey('1.0.0'));
 
         $projects = $category->unsetRelations()->projects->pluck('name');
 
@@ -560,7 +560,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
     });
 
     it('can sync without detaching unversioned models to versioned models', function () {
-        versions()->setActive(createFirstVersion('pivot'));
+        snapshots()->setActive(createFirstSnapshot('pivot'));
 
         $category = Category::query()
             ->where('name', 'Mechanical')
@@ -572,7 +572,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
         expect($projects)->not()->toContain('Pennsylvania Ave.');
         expect($projects)->not()->toContain('Downing St.');
 
-        versions()->setActive(createPatchVersion('pivot'));
+        snapshots()->setActive(createPatchSnapshot('pivot'));
 
         $downing = Project::query()
             ->where('name', 'Downing St.')
@@ -588,7 +588,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
         expect($projects)->not()->toContain('Pennsylvania Ave.');
         expect($projects)->toContain('Downing St.');
 
-        versions()->setActive(versions()->byKey('1.0.0'));
+        snapshots()->setActive(snapshots()->byKey('1.0.0'));
 
         $projects = $category->unsetRelations()->projects->pluck('name');
 

@@ -5,19 +5,19 @@ namespace Plank\Snapshots\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Plank\Snapshots\Casts\AsVersionNumber;
-use Plank\Snapshots\Concerns\AsVersion;
-use Plank\Snapshots\Contracts\Version as VersionContract;
+use Plank\Snapshots\Concerns\AsSnapshot;
+use Plank\Snapshots\Contracts\Snapshot as SnapshotContract;
 use Plank\Snapshots\Contracts\VersionKey;
 use Plank\Snapshots\ValueObjects\VersionNumber;
 
 /**
  * @property VersionNumber $number
  * @property bool $migrated
- * @property Version $previous
+ * @property Snapshot $previous
  */
-class Version extends Model implements VersionContract
+class Snapshot extends Model implements SnapshotContract
 {
-    use AsVersion;
+    use AsSnapshot;
     use HasFactory;
 
     protected $guarded = [];
@@ -47,7 +47,7 @@ class Version extends Model implements VersionContract
     {
         parent::boot();
 
-        if ($observer = config()->get('snapshots.observers.version')) {
+        if ($observer = config()->get('snapshots.observers.snapshot')) {
             static::observe($observer);
         }
     }

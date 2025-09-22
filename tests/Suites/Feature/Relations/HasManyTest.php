@@ -24,14 +24,14 @@ describe('HasMany relationships use versioned tables correctly', function () {
         expect($user->posts()->count())->toBe(1);
 
         // Create a version and ensure the post was copied over
-        versions()->setActive(createFirstVersion('query'));
+        snapshots()->setActive(createFirstSnapshot('query'));
 
         expect($user->posts()->count())->toBe(1);
 
         // remove the user's post from the first version
         $user->posts()->delete();
 
-        versions()->clearActive();
+        snapshots()->clearActive();
 
         // Go back to the original content and attach another post
         $user->posts()
@@ -40,12 +40,12 @@ describe('HasMany relationships use versioned tables correctly', function () {
         expect($user->posts()->count())->toBe(2);
 
         // Create a new version and verify the attached post matches the previous version
-        versions()->setActive(createMinorVersion('query'));
+        snapshots()->setActive(createMinorSnapshot('query'));
 
         expect($user->posts()->count())->toBe(2);
 
         // Go back to the first version and ensure the post was not attached there
-        versions()->setActive(versions()->byKey('1.0.0'));
+        snapshots()->setActive(snapshots()->byKey('1.0.0'));
 
         expect($user->posts()->count())->toBe(0);
     });

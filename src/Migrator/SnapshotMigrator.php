@@ -8,6 +8,7 @@ use Illuminate\Console\View\Components\TwoColumnDetail;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Connection;
 use Illuminate\Database\DatabaseManager;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Events\MigrationsEnded;
 use Illuminate\Database\Events\MigrationsStarted;
 use Illuminate\Database\Migrations\MigrationRepositoryInterface;
@@ -16,9 +17,9 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use Plank\Snapshots\Contracts\Version;
+use Plank\Snapshots\Contracts\Snapshot;
 use Plank\Snapshots\Contracts\VersionKey;
-use Plank\Snapshots\Facades\Versions;
+use Plank\Snapshots\Facades\Snapshots;
 
 class SnapshotMigrator extends Migrator
 {
@@ -55,20 +56,20 @@ class SnapshotMigrator extends Migrator
                     return in_array($name, $ran) ? null : $file;
                 }
 
-                if (! $this->versionModelHasBeenMigrated()) {
-                    return config()->get('snapshots.force_versions')
+                if (! $this->snapshotModelHasBeenMigrated()) {
+                    return config()->get('snapshots.force_snapshots')
                         ? null
                         : $this->versionedFile(in_array($name, $ran) ? null : $file);
                 }
 
-                return Versions::all()
-                    ->map(function (Version $version) use ($file, $ran) {
-                        $name = $this->addMigrationPrefix($version, $this->getMigrationName($file));
+                return Snapshots::all()
+                    ->map(function (Snapshot $snapshot) use ($file, $ran) {
+                        $name = $this->addMigrationPrefix($snapshot, $this->getMigrationName($file));
 
-                        return in_array($name, $ran) ? null : $this->versionedFile($file, $version);
+                        return in_array($name, $ran) ? null : $this->versionedFile($file, $snapshot);
                     })
                     ->when(
-                        ! config()->get('snapshots.force_versions'),
+                        ! config()->get('snapshots.force_snapshots'),
                         fn (Collection $collection) => $collection->prepend($this->versionedFile(in_array($name, $ran) ? null : $file)),
                     )
                     ->values()
@@ -83,11 +84,11 @@ class SnapshotMigrator extends Migrator
     /**
      * Detrmine if the configured version model has been migrated yet
      */
-    protected function versionModelHasBeenMigrated(): bool
+    protected function snapshotModelHasBeenMigrated(): bool
     {
         return $this->usingConnectionSchema(
             $this->resolver->connection(),
-            fn () => Versions::model()->hasBeenMigrated()
+            fn () => Snapshots::model()->hasBeenMigrated()
         );
     }
 
@@ -117,8 +118,8 @@ class SnapshotMigrator extends Migrator
      */
     protected function runUp($file, $batch, $pretend)
     {
-        [$file, $versionKey] = str_contains($file, '@version:')
-            ? explode('@version:', $file)
+        [$file, $snapshotKey] = str_contains($file, '@snapshot:')
+            ? explode('@snapshot:', $file)
             : [$file, null];
 
         $migration = $this->resolvePath($file);
@@ -127,8 +128,8 @@ class SnapshotMigrator extends Migrator
             $this->resolver->purge($migration->getConnection());
         }
 
-        Versions::withVersionActive(
-            $versionKey ? Versions::find($versionKey) : null,
+        Snapshots::withSnapshotActive(
+            $snapshotKey ? Snapshots::find($snapshotKey) : null,
             fn () => parent::runUp($file, $batch, $pretend)
         );
 
@@ -218,8 +219,8 @@ class SnapshotMigrator extends Migrator
             $this->resolver->purge($instance->getConnection());
         }
 
-        Versions::withVersionActive(
-            Versions::byKey($migration->migration),
+        Snapshots::withSnapshotActive(
+            Snapshots::byKey($migration->migration),
             fn () => parent::runDown($file, $migration, $pretend),
         );
 
@@ -231,13 +232,13 @@ class SnapshotMigrator extends Migrator
     /**
      * {@inheritDoc}
      */
-    protected function addMigrationPrefix(?Version $version, string $migration): string
+    protected function addMigrationPrefix((Snapshot&Model)|null $snapshot, string $migration): string
     {
-        if ($version === null) {
+        if ($snapshot === null) {
             return $migration;
         }
 
-        return $version->key()->prefix($migration);
+        return $snapshot->key()->prefix($migration);
     }
 
     /**
@@ -251,18 +252,18 @@ class SnapshotMigrator extends Migrator
         return $keyClass::strip($migration);
     }
 
-    protected function versionedFile(?string $file, ?Version $version = null): ?string
+    protected function versionedFile(?string $file, (Snapshot&Model)|null $snapshot = null): ?string
     {
         if ($file === null) {
             return null;
         }
 
-        return $file.'@version:'.$version?->getKey();
+        return $file.'@snapshot:'.$snapshot?->getKey();
     }
 
     protected function unversionedFile(string $file): string
     {
-        return (string) str()->before($file, '@version:');
+        return (string) str()->before($file, '@snapshot:');
     }
 
     /**

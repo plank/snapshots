@@ -110,11 +110,11 @@ class VersionNumber implements VersionKey
             ->toString();
     }
 
-    protected static function isValidVersionString(string $version)
+    protected static function isValidVersionString(string $snapshot)
     {
-        return preg_match(static::DOT_REGEX, $version) === 1
-            || preg_match(static::SNAKE_REGEX, $version) === 1
-            || preg_match(static::KEBAB_REGEX, $version) === 1;
+        return preg_match(static::DOT_REGEX, $snapshot) === 1
+            || preg_match(static::SNAKE_REGEX, $snapshot) === 1
+            || preg_match(static::KEBAB_REGEX, $snapshot) === 1;
     }
 
     public function major(): int
@@ -182,13 +182,13 @@ class VersionNumber implements VersionKey
         return $this->compare($other) === 0;
     }
 
-    public static function wrap(string|VersionNumber $version): self
+    public static function wrap(string|VersionNumber $snapshot): self
     {
-        if ($version instanceof VersionNumber) {
-            return $version;
+        if ($snapshot instanceof VersionNumber) {
+            return $snapshot;
         }
 
-        return static::fromString($version);
+        return static::fromString($snapshot);
     }
 
     protected function compare(self $other): int

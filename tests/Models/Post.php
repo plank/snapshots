@@ -11,11 +11,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
-use Plank\Snapshots\Concerns\AsVersionedContent;
+use Plank\Snapshots\Concerns\AsSnapshottedContent;
 use Plank\Snapshots\Concerns\IdentifiesContent;
 use Plank\Snapshots\Contracts\Identifying;
 use Plank\Snapshots\Contracts\Trackable;
-use Plank\Snapshots\Contracts\Versioned;
+use Plank\Snapshots\Contracts\Snapshotted;
 
 /**
  * @property int $id
@@ -30,9 +30,9 @@ use Plank\Snapshots\Contracts\Versioned;
  * @property-read Collection<Like> $likes
  * @property-read Collection<Seo> $seos
  */
-class Post extends Model implements Identifying, Trackable, Versioned
+class Post extends Model implements Identifying, Trackable, Snapshotted
 {
-    use AsVersionedContent;
+    use AsSnapshottedContent;
     use HasFactory;
     use HasUuids;
     use IdentifiesContent;

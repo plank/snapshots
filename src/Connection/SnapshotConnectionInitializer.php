@@ -10,7 +10,7 @@ use Illuminate\Database\PostgresConnection;
 use Illuminate\Database\SQLiteConnection;
 use Illuminate\Database\SqlServerConnection;
 use Illuminate\Foundation\Application;
-use Plank\Snapshots\Facades\Versions;
+use Plank\Snapshots\Facades\Snapshots;
 use Plank\Snapshots\Migrator\Blueprint\SnapshotBlueprint;
 
 class SnapshotConnectionInitializer
@@ -23,7 +23,7 @@ class SnapshotConnectionInitializer
         $connection = $db->connection($name);
         $configuredPrefix = $connection->getTablePrefix();
 
-        $prefix = ($active = Versions::active())
+        $prefix = ($active = Snapshots::active())
             ? $active->key()->prefix($configuredPrefix)
             : $configuredPrefix;
 

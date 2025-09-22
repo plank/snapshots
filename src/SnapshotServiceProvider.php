@@ -8,9 +8,9 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Event;
 use Plank\Snapshots\Connection\SnapshotConnectionInitializer;
-use Plank\Snapshots\Contracts\ManagesVersions;
-use Plank\Snapshots\Events\VersionCreated;
-use Plank\Snapshots\Events\VersionMigrated;
+use Plank\Snapshots\Contracts\ManagesSnapshots;
+use Plank\Snapshots\Events\SnapshotCreated;
+use Plank\Snapshots\Events\SnapshotMigrated;
 use Plank\Snapshots\Migrator\Blueprint\SnapshotBlueprint;
 use Plank\Snapshots\Migrator\SnapshotMigrationRepository;
 use Plank\Snapshots\Migrator\SnapshotMigrator;
@@ -30,8 +30,8 @@ class SnapshotServiceProvider extends PackageServiceProvider
         $package->name('snapshots')
             ->hasConfigFile()
             ->hasMigrations([
-                'create_versions_table',
                 'create_existences_table',
+                'create_snapshots_table',
             ])
             ->hasInstallCommand(function (InstallCommand $command) {
                 $command->startWith(function (InstallCommand $command) {
@@ -65,8 +65,8 @@ class SnapshotServiceProvider extends PackageServiceProvider
 
     protected function bindRepositories(): self
     {
-        $this->app->scopedIf(ManagesVersions::class, function (Application $app) {
-            $repo = $app['config']->get('snapshots.repositories.version');
+        $this->app->scopedIf(ManagesSnapshots::class, function (Application $app) {
+            $repo = $app['config']->get('snapshots.repositories.snapshots');
 
             return new $repo;
         });
@@ -81,7 +81,7 @@ class SnapshotServiceProvider extends PackageServiceProvider
 
             $table = is_array($migrations) ? ($migrations['table'] ?? null) : $migrations;
 
-            return new SnapshotMigrationRepository($app['db'], $table, $app[ManagesVersions::class]);
+            return new SnapshotMigrationRepository($app['db'], $table, $app[ManagesSnapshots::class]);
         });
 
         $this->app->bind(Blueprint::class, function (Application $app, array $arguments) {
@@ -117,12 +117,12 @@ class SnapshotServiceProvider extends PackageServiceProvider
 
     protected function listenToEvents(): self
     {
-        if ($migrator = config()->get('snapshots.release.listener')) {
-            Event::listen(VersionCreated::class, $migrator);
+        if ($migrator = config()->get('snapshots.listeners.snapshot')) {
+            Event::listen(SnapshotCreated::class, $migrator);
         }
 
-        if ($copier = config()->get('snapshots.release.copy.listener')) {
-            Event::listen(VersionMigrated::class, $copier);
+        if ($copier = config()->get('snapshots.listeners.copy')) {
+            Event::listen(SnapshotMigrated::class, $copier);
         }
 
         return $this;

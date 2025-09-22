@@ -29,22 +29,22 @@ describe('MorphToMany relationships use versioned tables when one of the models 
         expect($post->tags->pluck('id'))->not()->toContain($tag->id);
 
         // Relate the posts to eachother in the next version
-        versions()->setActive(createFirstVersion('query'));
+        snapshots()->setActive(createFirstSnapshot('query'));
 
-        $post = $post->activeVersion();
+        $post = $post->fromActiveSnapshot();
         $post->tags()->attach($tag);
 
         // Ensure the post and tag are now related in the version
         expect($post->tags->pluck('id'))->toContain($tag->id);
 
         // Ensure the posts are still not related in the working copy
-        versions()->clearActive();
+        snapshots()->clearActive();
 
-        expect($post->activeVersion()->tags->pluck('id'))->not()->toContain($tag->id);
+        expect($post->fromActiveSnapshot()->tags->pluck('id'))->not()->toContain($tag->id);
     });
 
     it('can detach unversioned models to versioned models', function () {
-        versions()->setActive(createFirstVersion('query'));
+        snapshots()->setActive(createFirstSnapshot('query'));
 
         $post = Post::query()->whereHas('tags')->first();
         expect($post->tags->count())->toBe(3);
@@ -56,14 +56,14 @@ describe('MorphToMany relationships use versioned tables when one of the models 
         expect($post->tags->count())->toBe(2);
         expect($post->tags->pluck('id'))->not()->toContain($toDetach->id);
 
-        versions()->clearActive();
+        snapshots()->clearActive();
 
-        expect($post->activeVersion()->tags->count())->toBe(3);
-        expect($post->activeVersion()->tags->pluck('id'))->toContain($toDetach->id);
+        expect($post->fromActiveSnapshot()->tags->count())->toBe(3);
+        expect($post->fromActiveSnapshot()->tags->pluck('id'))->toContain($toDetach->id);
     });
 
     it('can delete the pivot for unversioned models to versioned models', function () {
-        versions()->setActive(createFirstVersion('query'));
+        snapshots()->setActive(createFirstSnapshot('query'));
 
         $post = Post::query()->whereHas('tags')->first();
         expect($post->tags->count())->toBe(3);
@@ -75,14 +75,14 @@ describe('MorphToMany relationships use versioned tables when one of the models 
         expect($post->tags->count())->toBe(2);
         expect($post->tags->pluck('id'))->not()->toContain($toDetach->id);
 
-        versions()->clearActive();
+        snapshots()->clearActive();
 
-        expect($post->activeVersion()->tags->count())->toBe(3);
-        expect($post->activeVersion()->tags->pluck('id'))->toContain($toDetach->id);
+        expect($post->fromActiveSnapshot()->tags->count())->toBe(3);
+        expect($post->fromActiveSnapshot()->tags->pluck('id'))->toContain($toDetach->id);
     });
 
     it('can sync unversioned models to versioned models', function () {
-        versions()->setActive(createFirstVersion('query'));
+        snapshots()->setActive(createFirstSnapshot('query'));
 
         /** @var Post $post */
         $post = Post::query()->whereHas('tags')->first();
@@ -102,14 +102,14 @@ describe('MorphToMany relationships use versioned tables when one of the models 
         expect($post->tags->pluck('id'))->toContain(...$toSync->pluck('id')->toArray());
         expect($toSync->first()->posts->pluck('uuid'))->toContain($post->uuid);
 
-        versions()->clearActive();
+        snapshots()->clearActive();
 
-        expect($post->activeVersion()->tags->count())->toBe(3);
-        expect($post->activeVersion()->tags->pluck('id'))->toContain(...$tags->pluck('id')->toArray());
+        expect($post->fromActiveSnapshot()->tags->count())->toBe(3);
+        expect($post->fromActiveSnapshot()->tags->pluck('id'))->toContain(...$tags->pluck('id')->toArray());
     });
 
     it('can sync without detaching unversioned models to versioned models', function () {
-        versions()->setActive(createFirstVersion('query'));
+        snapshots()->setActive(createFirstSnapshot('query'));
 
         /** @var Post $post */
         $post = Post::query()->whereHas('tags')->first();
@@ -124,10 +124,10 @@ describe('MorphToMany relationships use versioned tables when one of the models 
         expect($post->tags->pluck('id'))->toContain(...$seeded->pluck('id')->toArray());
         expect($post->tags->pluck('id'))->toContain(...$toSync->pluck('id')->toArray());
 
-        versions()->clearActive();
+        snapshots()->clearActive();
 
-        expect($post->activeVersion()->tags->count())->toBe(3);
-        expect($post->activeVersion()->tags->pluck('id'))->toContain(...$seeded->pluck('id')->toArray());
-        expect($post->activeVersion()->tags->pluck('id'))->not()->toContain(...$toSync->pluck('id')->toArray());
+        expect($post->fromActiveSnapshot()->tags->count())->toBe(3);
+        expect($post->fromActiveSnapshot()->tags->pluck('id'))->toContain(...$seeded->pluck('id')->toArray());
+        expect($post->fromActiveSnapshot()->tags->pluck('id'))->not()->toContain(...$toSync->pluck('id')->toArray());
     });
 });

@@ -3,9 +3,9 @@
 use Illuminate\Database\Schema\Builder as SchemaBuilder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use Plank\Snapshots\Facades\Versions;
-use Plank\Snapshots\Models\Version;
-use Plank\Snapshots\Repository\VersionRepository;
+use Plank\Snapshots\Facades\Snapshots;
+use Plank\Snapshots\Models\Snapshot;
+use Plank\Snapshots\Repository\SnapshotRepository;
 use Plank\Snapshots\Tests\TestCase;
 use Plank\Snapshots\ValueObjects\VersionNumber;
 
@@ -13,14 +13,14 @@ use function Pest\Laravel\travel;
 
 uses(TestCase::class)->in(__DIR__);
 
-function versions(): VersionRepository
+function snapshots(): SnapshotRepository
 {
-    return Versions::getFacadeRoot();
+    return Snapshots::getFacadeRoot();
 }
 
-function version(string|VersionNumber $number): Version
+function snapshot(string|VersionNumber $number): Snapshot
 {
-    return Version::query()->where('number', $number)->firstOrFail();
+    return Snapshot::query()->where('number', $number)->firstOrFail();
 }
 
 function setMigrationPath(string $path): void
@@ -37,9 +37,9 @@ function migrationPath(string $path = ''): string
 }
 
 /**
- * Create the first Version
+ * Create the first Snapshot
  */
-function createFirstVersion(?string $migrationPath = null): Version
+function createFirstSnapshot(?string $migrationPath = null): Snapshot
 {
     if ($migrationPath) {
         setMigrationPath($migrationPath);
@@ -47,25 +47,25 @@ function createFirstVersion(?string $migrationPath = null): Version
 
     travel(1)->minute();
 
-    return Version::factory()->create([
+    return Snapshot::factory()->create([
         'number' => '1.0.0',
     ]);
 }
 
 /**
- * Create the next Patch Version
+ * Create the next Patch Snapshot
  */
-function createPatchVersion(?string $migrationPath = null): Version
+function createPatchSnapshot(?string $migrationPath = null): Snapshot
 {
     if ($migrationPath) {
         setMigrationPath($migrationPath);
     }
 
-    /** @var Version $latest */
-    $latest = versions()->latest();
+    /** @var Snapshot $latest */
+    $latest = snapshots()->latest();
     travel(1)->minute();
 
-    $created = Version::factory()->create([
+    $created = Snapshot::factory()->create([
         'number' => $latest->number->nextPatch(),
     ]);
 
@@ -75,19 +75,19 @@ function createPatchVersion(?string $migrationPath = null): Version
 }
 
 /**
- * Create the next Minor Version
+ * Create the next Minor Snapshot
  */
-function createMinorVersion(?string $migrationPath = null): Version
+function createMinorSnapshot(?string $migrationPath = null): Snapshot
 {
     if ($migrationPath) {
         setMigrationPath($migrationPath);
     }
 
-    /** @var Version $latest */
-    $latest = versions()->latest();
+    /** @var Snapshot $latest */
+    $latest = snapshots()->latest();
     travel(1)->minute();
 
-    $created = Version::factory()->create([
+    $created = Snapshot::factory()->create([
         'number' => $latest->number->nextMinor(),
     ]);
 
@@ -97,19 +97,19 @@ function createMinorVersion(?string $migrationPath = null): Version
 }
 
 /**
- * Create the next Major Version
+ * Create the next Major Snapshot
  */
-function createMajorVersion(?string $migrationPath = null): Version
+function createMajorSnapshot(?string $migrationPath = null): Snapshot
 {
     if ($migrationPath) {
         setMigrationPath($migrationPath);
     }
 
-    /** @var Version $latest */
-    $latest = versions()->latest();
+    /** @var Snapshot $latest */
+    $latest = snapshots()->latest();
     travel(1)->minute();
 
-    $created = Version::factory()->create([
+    $created = Snapshot::factory()->create([
         'number' => $latest->number->nextMajor(),
     ]);
 

@@ -6,7 +6,7 @@ use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Collection;
-use Plank\Snapshots\Contracts\Version;
+use Plank\Snapshots\Contracts\Snapshot;
 use Plank\Snapshots\Jobs\Copier;
 use Plank\Snapshots\Jobs\CopyTable;
 use Plank\Snapshots\Jobs\MarkAsCopied;
@@ -14,12 +14,12 @@ use Plank\Snapshots\Jobs\MarkAsCopied;
 /**
  * @property array<string,int> $tables
  */
-class VersionMigrated
+class SnapshotMigrated
 {
     use SerializesModels;
 
     public function __construct(
-        public Version&Model $version,
+        public Snapshot&Model $snapshot,
         public array $tables,
         public (Authenticatable&Model)|null $user,
     ) {}
@@ -30,7 +30,7 @@ class VersionMigrated
     public function jobs(): Collection
     {
         return Collection::make($this->tables)
-            ->map(fn (string $table) => new CopyTable($this->version, $table))
-            ->push(new MarkAsCopied($this->version, $this->user));
+            ->map(fn (string $table) => new CopyTable($this->snapshot, $table))
+            ->push(new MarkAsCopied($this->snapshot, $this->user));
     }
 }

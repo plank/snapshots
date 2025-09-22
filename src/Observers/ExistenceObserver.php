@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Plank\Snapshots\Contracts\Identifiable;
 use Plank\Snapshots\Contracts\Trackable;
-use Plank\Snapshots\Facades\Versions;
+use Plank\Snapshots\Facades\Snapshots;
 
 class ExistenceObserver
 {
@@ -21,7 +21,7 @@ class ExistenceObserver
         }
 
         $existence = $model->existence()->create([
-            'version_id' => Versions::active()?->getKey(),
+            'snapshot_id' => Snapshots::active()?->getKey(),
             'hash' => $model instanceof Identifiable ? $model->newHash() : null,
         ]);
 
@@ -71,7 +71,7 @@ class ExistenceObserver
         }
 
         $existence = $model->existence()->create([
-            'version_id' => Versions::active()?->getKey(),
+            'snapshot_id' => Snapshots::active()?->getKey(),
             'hash' => $model instanceof Identifiable ? $model->newHash() : null,
         ]);
 

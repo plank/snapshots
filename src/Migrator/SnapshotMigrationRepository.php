@@ -3,7 +3,7 @@
 namespace Plank\Snapshots\Migrator;
 
 use Illuminate\Database\Migrations\DatabaseMigrationRepository;
-use Plank\Snapshots\Facades\Versions;
+use Plank\Snapshots\Facades\Snapshots;
 
 class SnapshotMigrationRepository extends DatabaseMigrationRepository
 {
@@ -16,7 +16,7 @@ class SnapshotMigrationRepository extends DatabaseMigrationRepository
      */
     public function log($file, $batch)
     {
-        if ($active = Versions::active()) {
+        if ($active = Snapshots::active()) {
             $file = $active->key()->prefix($file);
         }
 

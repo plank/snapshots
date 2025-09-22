@@ -3,12 +3,12 @@
 namespace Plank\Snapshots\Concerns;
 
 use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
-use Plank\Snapshots\Facades\Versions;
+use Plank\Snapshots\Facades\Snapshots;
 
 /**
  * @mixin \Illuminate\Database\Eloquent\Relations\Pivot
  */
-trait AsVersionedPivot
+trait AsSnapshottedPivot
 {
     use AsPivot {
         AsPivot::getTable as getPivotTable;
@@ -21,8 +21,8 @@ trait AsVersionedPivot
      */
     public function getTable()
     {
-        if ($version = Versions::active()) {
-            return $version->key()->prefix($this->getPivotTable());
+        if ($snapshot = Snapshots::active()) {
+            return $snapshot->key()->prefix($this->getPivotTable());
         }
 
         return $this->getPivotTable();

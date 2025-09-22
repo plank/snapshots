@@ -6,21 +6,21 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Plank\LaravelHush\Concerns\HushesHandlers;
 use Plank\Snapshots\Contracts\VersionKey;
-use Plank\Snapshots\Facades\Versions;
+use Plank\Snapshots\Facades\Snapshots;
 
 /**
  * @mixin Model
  */
-trait AsVersionedContent
+trait AsSnapshottedContent
 {
     use HasTrackedExistence;
     use HushesHandlers;
-    use InteractsWithVersionedContent;
+    use InteractsWithSnapshottedContent;
 
     /**
-     * Retrieve the active version of the model.
+     * Retrieve the active models content for the active snapshot
      */
-    public function activeVersion(): ?static
+    public function fromActiveSnapshot(): ?static
     {
         return static::query()->find($this->getKey());
     }
@@ -41,8 +41,8 @@ trait AsVersionedContent
             return $table;
         }
 
-        if ($version = Versions::active()) {
-            $table = $version->key()->prefix($table);
+        if ($snapshot = Snapshots::active()) {
+            $table = $snapshot->key()->prefix($table);
         }
 
         return $table;

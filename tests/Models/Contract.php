@@ -3,12 +3,11 @@
 namespace Plank\Snapshots\Tests\Models;
 
 use Illuminate\Database\Eloquent\Relations\MorphPivot;
-use Plank\Snapshots\Concerns\AsVersionedPivot;
-use Plank\Snapshots\Contracts\VersionedPivot;
+use Plank\Snapshots\Concerns\AsSnapshottedPivot;
 
-class Contract extends MorphPivot implements VersionedPivot
+class Contract extends MorphPivot
 {
-    use AsVersionedPivot;
+    use AsSnapshottedPivot;
 
     protected $table = 'contractables';
 }

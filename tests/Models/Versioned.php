@@ -6,12 +6,12 @@ use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Plank\Snapshots\Concerns\AsVersionedContent;
-use Plank\Snapshots\Contracts\Versioned as VersionedContract;
+use Plank\Snapshots\Concerns\AsSnapshottedContent;
+use Plank\Snapshots\Contracts\Snapshotted as SnapshottedContract;
 
-class Versioned extends Model implements VersionedContract
+class Versioned extends Model implements SnapshottedContract
 {
-    use AsVersionedContent;
+    use AsSnapshottedContent;
     use HasFactory;
     use HasUlids;
 

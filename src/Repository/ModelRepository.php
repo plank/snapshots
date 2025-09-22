@@ -20,7 +20,7 @@ class ModelRepository extends BaseModelRepository
     }
 
     /**
-     * Get an instance of the Model being used for versions.
+     * Resolve the class string of a model using its database table name
      *
      * @return class-string<Model>|null
      */

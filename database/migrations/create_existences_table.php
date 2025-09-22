@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('existences', function (Blueprint $table) {
             $table->id();
             $table->morphs('trackable');
-            $table->foreignId('version_id')->nullable()->constrained('versions');
+            $table->foreignId('snapshot_id')->nullable()->constrained('snapshots');
             $table->string('hash')->nullable();
             $table->timestamps();
         });

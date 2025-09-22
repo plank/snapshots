@@ -24,16 +24,16 @@ describe('BelongsToMany relationships use versioned tables when one of the model
         expect($post1->related->pluck('uuid'))->not()->toContain($post2->uuid);
 
         // Relate the posts to eachother in the next version
-        versions()->setActive(createFirstVersion('query'));
+        snapshots()->setActive(createFirstSnapshot('query'));
 
-        $post1 = $post1->activeVersion();
+        $post1 = $post1->fromActiveSnapshot();
         $post1->related()->attach($post2);
         expect($post1->related->first()->uuid)->toBe($post2->uuid);
 
         // Ensure the posts are still not related in the working copy
-        versions()->clearActive();
+        snapshots()->clearActive();
 
-        expect($post1->activeVersion()->related->pluck('uuid'))->not()->toContain($post2->uuid);
+        expect($post1->fromActiveSnapshot()->related->pluck('uuid'))->not()->toContain($post2->uuid);
     });
 
     it('can detach versioned models to versioned models', function () {
@@ -53,9 +53,9 @@ describe('BelongsToMany relationships use versioned tables when one of the model
         expect($post1->related->pluck('title'))->toContain('Post 3');
 
         // Relate the posts to eachother in the next version
-        versions()->setActive(createFirstVersion('query'));
+        snapshots()->setActive(createFirstSnapshot('query'));
 
-        $post1 = $post1->activeVersion();
+        $post1 = $post1->fromActiveSnapshot();
         expect($post1->related)->toHaveCount(1);
         expect($post1->related->pluck('title'))->not()->toContain('Post 2');
         expect($post1->related->pluck('title'))->toContain('Post 3');
@@ -69,9 +69,9 @@ describe('BelongsToMany relationships use versioned tables when one of the model
         expect($post1->related->pluck('title'))->toContain('Post 3');
 
         // Relate the posts to eachother in the next version
-        versions()->setActive(createFirstVersion('query'));
+        snapshots()->setActive(createFirstSnapshot('query'));
 
-        $post1 = $post1->activeVersion();
+        $post1 = $post1->fromActiveSnapshot();
         $post1->related()->where('title', 'Post 2')->first()->pivot->delete();
         $post1->unsetRelation('related');
 
@@ -80,9 +80,9 @@ describe('BelongsToMany relationships use versioned tables when one of the model
         expect($post1->related->pluck('title'))->toContain('Post 3');
 
         // Ensure the posts are still related in the original content
-        versions()->clearActive();
+        snapshots()->clearActive();
 
-        $post1 = $post1->activeVersion();
+        $post1 = $post1->fromActiveSnapshot();
         expect($post1->related)->toHaveCount(2);
         expect($post1->related->pluck('title'))->toContain('Post 2');
         expect($post1->related->pluck('title'))->toContain('Post 3');
@@ -96,14 +96,14 @@ describe('BelongsToMany relationships use versioned tables when one of the model
         expect($post1->related->pluck('title'))->toContain('Post 3');
 
         // Relate the posts to eachother in the next version
-        versions()->setActive(createFirstVersion('query'));
+        snapshots()->setActive(createFirstSnapshot('query'));
 
         $post4 = Post::factory()->create([
             'title' => 'Post 4',
             'body' => 'Post 4 body',
         ]);
 
-        $post1 = $post1->activeVersion();
+        $post1 = $post1->fromActiveSnapshot();
         $post1->related()->sync($post1->related->pluck('uuid')->push($post4->uuid));
         $post1->unsetRelation('related');
 
@@ -113,9 +113,9 @@ describe('BelongsToMany relationships use versioned tables when one of the model
         expect($post1->related->pluck('title'))->toContain('Post 4');
 
         // Ensure the posts are still related in the original content
-        versions()->clearActive();
+        snapshots()->clearActive();
 
-        $post1 = $post1->activeVersion();
+        $post1 = $post1->fromActiveSnapshot();
         expect($post1->related)->toHaveCount(2);
         expect($post1->related->pluck('title'))->toContain('Post 2');
         expect($post1->related->pluck('title'))->toContain('Post 3');
@@ -130,14 +130,14 @@ describe('BelongsToMany relationships use versioned tables when one of the model
         expect($post1->related->pluck('title'))->toContain('Post 3');
 
         // Relate the posts to eachother in the next version
-        versions()->setActive(createFirstVersion('query'));
+        snapshots()->setActive(createFirstSnapshot('query'));
 
         $post4 = Post::factory()->create([
             'title' => 'Post 4',
             'body' => 'Post 4 body',
         ]);
 
-        $post1 = $post1->activeVersion();
+        $post1 = $post1->fromActiveSnapshot();
         $post1->related()->syncWithoutDetaching($post1->related->pluck('uuid')->push($post4->uuid));
         $post1->unsetRelation('related');
 
@@ -147,9 +147,9 @@ describe('BelongsToMany relationships use versioned tables when one of the model
         expect($post1->related->pluck('title'))->toContain('Post 4');
 
         // Ensure the posts are still related in the original content
-        versions()->clearActive();
+        snapshots()->clearActive();
 
-        $post1 = $post1->activeVersion();
+        $post1 = $post1->fromActiveSnapshot();
         expect($post1->related)->toHaveCount(2);
         expect($post1->related->pluck('title'))->toContain('Post 2');
         expect($post1->related->pluck('title'))->toContain('Post 3');
