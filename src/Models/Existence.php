@@ -14,7 +14,6 @@ use Plank\Snapshots\Contracts\Trackable;
  * @property string|int $trackable_id
  * @property string|int $snapshot_id
  * @property ?string $hash
-*
  * @property-read Model&Trackable $trackable
  * @property-read (Snapshot&Model)|null $snapshot
  */
@@ -23,7 +22,7 @@ class Existence extends MorphPivot
     protected $table = 'existences';
 
     public $incrementing = true;
-    
+
     protected $guarded = [];
 
     protected $casts = [];

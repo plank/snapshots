@@ -7,7 +7,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | Snapshot:
-    | This is the model which will be used to track the different versions of the 
+    | This is the model which will be used to track the different versions of the
     | content in the Application.
     |
     | It must implement the \Plank\Snapshots\Contracts\Snapshot interface.

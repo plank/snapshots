@@ -12,9 +12,9 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Plank\LaravelModelResolver\Facades\Models;
-use Plank\Snapshots\Contracts\Trackable;
 use Plank\Snapshots\Contracts\Snapshot;
 use Plank\Snapshots\Contracts\Snapshotted;
+use Plank\Snapshots\Contracts\Trackable;
 use Plank\Snapshots\Contracts\VersionKey;
 use Plank\Snapshots\Facades\Snapshots;
 

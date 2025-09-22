@@ -15,7 +15,7 @@ interface ManagesSnapshots
 
     /**
      * Set the active Snapshot which will serve to scope queries to the correct table
-     * 
+     *
      * Returns the Snapshot which was active prior to the Snapshot being passed in.
      */
     public function setActive(string|null|VersionKey|Snapshot $snapshot): ?Snapshot;

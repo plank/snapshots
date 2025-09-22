@@ -14,8 +14,8 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Plank\Snapshots\Concerns\AsSnapshottedContent;
 use Plank\Snapshots\Concerns\IdentifiesContent;
 use Plank\Snapshots\Contracts\Identifying;
-use Plank\Snapshots\Contracts\Trackable;
 use Plank\Snapshots\Contracts\Snapshotted;
+use Plank\Snapshots\Contracts\Trackable;
 
 /**
  * @property int $id
@@ -30,7 +30,7 @@ use Plank\Snapshots\Contracts\Snapshotted;
  * @property-read Collection<Like> $likes
  * @property-read Collection<Seo> $seos
  */
-class Post extends Model implements Identifying, Trackable, Snapshotted
+class Post extends Model implements Identifying, Snapshotted, Trackable
 {
     use AsSnapshottedContent;
     use HasFactory;
