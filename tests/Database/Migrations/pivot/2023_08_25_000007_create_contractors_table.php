@@ -1,17 +1,17 @@
 <?php
 
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use Plank\Snapshots\Migrator\Blueprint\SnapshotBlueprint;
-use Plank\Snapshots\Migrator\SnapshotMigration;
 
-return new class extends SnapshotMigration
+return new class extends Migration
 {
     /**
      * Run the migrations.
      */
     public function up(): void
     {
-        Schema::create('contractors', function (SnapshotBlueprint $table) {
+        Schema::create('contractors', function (Blueprint $table) {
             $table->id();
             $table->string('name');
             $table->timestamps();

@@ -20,17 +20,17 @@ trait HasTrackedExistence
 
     public static function bootHasTrackedExistence(): void
     {
-        if ($observer = config()->get('snapshots.observers.existense')) {
+        if ($observer = config()->get('snapshots.observers.existence')) {
             static::observe($observer);
         }
     }
 
-    public function existenses(): MorphMany
+    public function existences(): MorphMany
     {
         return $this->morphMany(config()->get('snapshots.models.existence'), 'trackable');
     }
 
-    public function existense(): MorphOne
+    public function existence(): MorphOne
     {
         return $this->morphOne(config()->get('snapshots.models.existence'), 'trackable')
             ->where('version_id', Versions::active()?->getKey());

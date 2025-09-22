@@ -12,6 +12,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Plank\LaravelModelResolver\Facades\Models;
+use Plank\Snapshots\Contracts\Trackable;
 use Plank\Snapshots\Contracts\Version;
 use Plank\Snapshots\Contracts\Versioned;
 use Plank\Snapshots\Contracts\VersionKey;
@@ -58,6 +59,10 @@ class CopyTable implements ShouldQueue
         });
 
         $class = Models::fromTable($to);
+
+        if ($class === null || ! is_a($class, Trackable::class, true)) {
+            return;
+        }
 
         Versions::withVersionActive($working, function () use ($class) {
             $class::query()

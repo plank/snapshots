@@ -20,10 +20,12 @@ class ExistenceObserver
             return;
         }
 
-        $model->existence()->create([
+        $existence = $model->existence()->create([
             'version_id' => Versions::active()?->getKey(),
             'hash' => $model instanceof Identifiable ? $model->newHash() : null,
         ]);
+
+        $model->setRelation('existence', $existence);
     }
 
     public function updated(Model&Trackable $model)
@@ -47,9 +49,7 @@ class ExistenceObserver
             }
         }
 
-        $model->existence()->update([
-            'hash' => $model->newHash(),
-        ]);
+        $model->updateHash();
     }
 
     public function deleted(Model&Trackable $model)
@@ -61,6 +61,7 @@ class ExistenceObserver
         }
 
         $model->existence()->delete();
+        $model->unsetRelation('existence');
     }
 
     public function restored(Model&Trackable $model)
@@ -69,13 +70,17 @@ class ExistenceObserver
             return;
         }
 
-        $model->existence()->update([
-            'hash' => $model->newHash(),
+        $existence = $model->existence()->create([
+            'version_id' => Versions::active()?->getKey(),
+            'hash' => $model instanceof Identifiable ? $model->newHash() : null,
         ]);
+
+        $model->setRelation('existence', $existence);
     }
 
     public function forceDeleted(Model&Trackable $model)
     {
         $model->existence()->delete();
+        $model->unsetRelation('existence');
     }
 }

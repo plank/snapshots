@@ -31,6 +31,6 @@ class VersionMigrated
     {
         return Collection::make($this->tables)
             ->map(fn (string $table) => new CopyTable($this->version, $table))
-            ->push(new MarkAsCopied($this));
+            ->push(new MarkAsCopied($this->version, $this->user));
     }
 }
