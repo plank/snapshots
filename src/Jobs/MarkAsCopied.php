@@ -31,6 +31,6 @@ class MarkAsCopied implements ShouldQueue
         $version->copied = true;
         $version->save();
 
-        Event::dispatch(new DataCopied($version, $event->causer));
+        Event::dispatch(new DataCopied($version, $event->user));
     }
 }

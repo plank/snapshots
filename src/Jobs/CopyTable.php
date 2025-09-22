@@ -2,14 +2,34 @@
 
 namespace Plank\Snapshots\Jobs;
 
+use Illuminate\Bus\Batchable;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Plank\LaravelModelResolver\Facades\Models;
+use Plank\Snapshots\Contracts\Version;
+use Plank\Snapshots\Contracts\Versioned;
 use Plank\Snapshots\Contracts\VersionKey;
 use Plank\Snapshots\Facades\Versions;
 
-class CopyTable extends Copier
+class CopyTable implements ShouldQueue
 {
+    use Batchable;
+    use Dispatchable;
+    use InteractsWithQueue;
+    use Queueable;
+    use SerializesModels;
+
+    public function __construct(
+        public Version&Model $version,
+        public string $table,
+    ) {}
+
     /**
      * Execute the job.
      *
@@ -37,8 +57,17 @@ class CopyTable extends Copier
             DB::statement("INSERT INTO `$to` SELECT * FROM `$from`");
         });
 
-        if (config('snapshots.observers.history') && $model = Models::fromTable($to)) {
-            $this->writeHistory($model);
-        }
+        $class = Models::fromTable($to);
+
+        Versions::withVersionActive($working, function () use ($class) {
+            $class::query()
+                ->with('existence')
+                ->cursor()
+                ->each(function (Versioned&Model $model) {
+                    $existence = $model->existence->replicate();
+                    $existence->version_id = $this->version->id;
+                    $existence->save();
+                });
+        });
     }
 }

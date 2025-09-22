@@ -8,14 +8,10 @@ return new class extends Migration
 {
     public function up()
     {
-        Schema::create('history', function (Blueprint $table) {
+        Schema::create('existences', function (Blueprint $table) {
             $table->id();
-            $table->morphs('causer');
             $table->morphs('trackable');
             $table->foreignId('version_id')->nullable()->constrained('versions');
-            $table->string('operation');
-            $table->json('from')->nullable();
-            $table->json('to')->nullable();
             $table->string('hash')->nullable();
             $table->timestamps();
         });
@@ -23,6 +19,6 @@ return new class extends Migration
 
     public function down()
     {
-        Schema::dropIfExists('history');
+        Schema::dropIfExists('existences');
     }
 };

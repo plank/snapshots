@@ -15,7 +15,7 @@ return [
     */
     'models' => [
         'version' => \Plank\Snapshots\Models\Version::class,
-        'history' => \Plank\Snapshots\Models\History::class,
+        'existence' => \Plank\Snapshots\Models\Existence::class,
     ],
 
     /*
@@ -43,15 +43,9 @@ return [
     | requires it.
     |
     | It must implement the \Plank\Snapshots\Contracts\ManagesVersions interface.
-    |
-    | Causers:
-    | This is the repository which will be used retrieve and maintain the causer state
-    | for the Application. The causer is the model or object responsible for the changes
-    | being made to the content.
     */
     'repositories' => [
         'version' => \Plank\Snapshots\Repository\VersionRepository::class,
-        'causer' => \Plank\Snapshots\Repository\CauserRepository::class,
     ],
 
     /*
@@ -74,7 +68,7 @@ return [
     */
     'observers' => [
         'version' => \Plank\Snapshots\Observers\VersionObserver::class,
-        'history' => \Plank\Snapshots\Observers\HistoryObserver::class,
+        'existence' => \Plank\Snapshots\Observers\ExistenceObserver::class,
         'identity' => \Plank\Snapshots\Observers\IdentityObserver::class,
     ],
 

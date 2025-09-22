@@ -245,7 +245,7 @@ describe('Versioned Content has its History tracked correctly when copying by ta
         expect($restored = $restored->first())->toBeInstanceOf(History::class);
         expect($restored->version)->toBeNull();
         expect($restored->trackable_id)->toBe($flag->id);
-        expect($restored->causer->email)->toBe('admin@app.test');
+        expect($restored->user->email)->toBe('admin@app.test');
     });
 
     it('tracks Create Operations correctly while a version is active', function () {

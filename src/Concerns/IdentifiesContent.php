@@ -19,8 +19,8 @@ trait IdentifiesContent
 
     public static function bootIdentifiesContent(): void
     {
-        // Identification requires history to be enabled
-        if (! config()->get('snapshots.observers.history', false)) {
+        // Identification requires tracking to be enabled
+        if (! config()->get('snapshots.observers.existence', false)) {
             return;
         }
 
