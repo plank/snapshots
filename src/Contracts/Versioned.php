@@ -4,7 +4,7 @@ namespace Plank\Snapshots\Contracts;
 
 use Illuminate\Database\Eloquent\Builder;
 
-interface Versioned
+interface Versioned extends Trackable
 {
     /**
      * Retrieve the active version of the model.
