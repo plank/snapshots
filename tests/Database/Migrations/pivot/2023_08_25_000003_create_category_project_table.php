@@ -13,7 +13,7 @@ return new class extends SnapshotMigration
     {
         Schema::create('category_project', function (SnapshotBlueprint $table) {
             $table->id();
-            $table->foreignId('category_id')->constrained('categories')->onDelete('cascade');
+            $table->unversionedforeignId('category_id')->constrained('categories')->onDelete('cascade');
             $table->foreignUlid('project_id')->constrained('projects', 'ulid');
             $table->timestamps();
         });
