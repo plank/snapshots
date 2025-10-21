@@ -7,51 +7,30 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphPivot;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Plank\Snapshots\Contracts\Trackable;
-use Plank\Snapshots\Enums\Operation;
 
 /**
- * @property Operation $operation
  * @property string $trackable_type
  * @property string|int $trackable_id
- * @property-read Model&Trackable $trackable
  * @property string|int $version_id
+ * @property ?string $hash
+ * @property-read Model&Trackable $trackable
  * @property-read Version|null $version
- * @property array $from
- * @property array $to
  */
-class History extends MorphPivot
+class Existence extends MorphPivot
 {
-    protected $table = 'history';
-
-    protected $guarded = ['id'];
+    protected $table = 'existences';
 
     public $incrementing = true;
 
-    protected $casts = [
-        'operation' => Operation::class,
-        'from' => 'json',
-        'to' => 'json',
-    ];
+    protected $guarded = [];
 
-    /**
-     * Get the Model representing the content that was versioned
-     */
-    public function causer(): MorphTo
-    {
-        return $this->morphTo();
-    }
+    protected $casts = [];
 
-    /**
-     * Get the Model representing the content that was versioned
-     */
     public function trackable(): MorphTo
     {
         return $this->morphTo();
     }
 
-    /**
-     * Get the Version associated with the History
-     */
     public function version(): BelongsTo
     {
         return $this->belongsTo(config()->get('snapshots.models.version'));

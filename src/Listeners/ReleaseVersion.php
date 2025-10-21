@@ -32,6 +32,6 @@ class ReleaseVersion
         $version->migrated = true;
         $version->save();
 
-        Event::dispatch(new VersionMigrated($event->version, $tables, $event->causer));
+        Event::dispatch(new VersionMigrated($event->version, $tables, $event->user));
     }
 }

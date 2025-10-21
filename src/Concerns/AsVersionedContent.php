@@ -13,7 +13,7 @@ use Plank\Snapshots\Facades\Versions;
  */
 trait AsVersionedContent
 {
-    use HasHistory;
+    use HasTrackedExistence;
     use HushesHandlers;
     use InteractsWithVersionedContent;
 

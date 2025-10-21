@@ -13,6 +13,6 @@ class VersionCreated
 
     public function __construct(
         public Version&Model $version,
-        public ?Authenticatable $causer,
+        public (Authenticatable&Model)|null $user,
     ) {}
 }
