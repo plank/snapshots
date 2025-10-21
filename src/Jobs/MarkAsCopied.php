@@ -27,7 +27,7 @@ class MarkAsCopied implements ShouldQueue
 
     public function __construct(
         public Version&Model $version,
-        public Authenticatable|null $user,
+        public ?Authenticatable $user,
     ) {}
 
     /**
