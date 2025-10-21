@@ -1,6 +1,5 @@
 <?php
 
-use Plank\Snapshots\Enums\Operation;
 use Plank\Snapshots\Models\Existence;
 use Plank\Snapshots\Observers\ExistenceObserver;
 use Plank\Snapshots\Tests\Models\Document;

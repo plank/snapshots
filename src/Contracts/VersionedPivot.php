@@ -2,8 +2,6 @@
 
 namespace Plank\Snapshots\Contracts;
 
-use Illuminate\Database\Eloquent\Builder;
-
 interface VersionedPivot
 {
     /**
