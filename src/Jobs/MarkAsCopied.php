@@ -14,6 +14,9 @@ use Illuminate\Support\Facades\Event;
 use Plank\Snapshots\Events\DataCopied;
 use Plank\Snapshots\Models\Version;
 
+/**
+ * @property (Authenticatable&Model)|null $user
+ */
 class MarkAsCopied implements ShouldQueue
 {
     use Batchable;
@@ -24,7 +27,7 @@ class MarkAsCopied implements ShouldQueue
 
     public function __construct(
         public Version&Model $version,
-        public (Authenticatable&Model)|null $user,
+        public Authenticatable|null $user,
     ) {}
 
     /**

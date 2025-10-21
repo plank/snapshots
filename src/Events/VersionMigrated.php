@@ -13,6 +13,7 @@ use Plank\Snapshots\Jobs\MarkAsCopied;
 
 /**
  * @property array<string,int> $tables
+ * @property (Authenticatable&Model)|null $user
  */
 class VersionMigrated
 {
@@ -21,7 +22,7 @@ class VersionMigrated
     public function __construct(
         public Version&Model $version,
         public array $tables,
-        public (Authenticatable&Model)|null $user,
+        public Authenticatable|null $user,
     ) {}
 
     /**

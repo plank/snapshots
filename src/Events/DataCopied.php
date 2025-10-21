@@ -9,6 +9,7 @@ use Plank\Snapshots\Contracts\Version;
 
 /**
  * @property array<string,int> $tables
+ * @property (Authenticatable&Model)|null $user
  */
 class DataCopied
 {
@@ -16,6 +17,6 @@ class DataCopied
 
     public function __construct(
         public Version&Model $version,
-        public (Authenticatable&Model)|null $user,
+        public Authenticatable|null $user,
     ) {}
 }
