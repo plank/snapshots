@@ -125,8 +125,6 @@ The `auto_copy` option determines whether the package will automatically copy co
 
 The package provides the default implementation of `Plank\Snapshots\Listeners\CopyTable`, where the data is copied over at the database level.
 
-The package also ships with `Plank\Snapshots\Listeners\CopyModels`, where the data is copied over at the model level. This is useful if you have custom logic in your models that needs to be run when the data is copied over.
-
 You can also provide your own implementation by setting it in the configuration file.
 
 &nbsp;
