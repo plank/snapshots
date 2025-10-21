@@ -447,7 +447,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
         expect($contractors)->not->toContain('Anglocorp');
     });
 
-    it('can attach unversioned models to versioned models', function () {
+    it('can attach unversioned models to versioned models on MorphPivot', function () {
         versions()->setActive(createFirstVersion('pivot'));
 
         $can = Contractor::where('name', 'Canacorp')->first();

@@ -1,7 +1,7 @@
 <?php
 
 use Plank\Snapshots\Enums\Operation;
-use Plank\Snapshots\Observers\HistoryObserver;
+use Plank\Snapshots\Observers\ExistenceObserver;
 use Plank\Snapshots\Tests\Database\Seeders\Model\PostSeeder;
 use Plank\Snapshots\Tests\Database\Seeders\Model\TagSeeder;
 use Plank\Snapshots\Tests\Database\Seeders\Model\VideoSeeder;
@@ -11,7 +11,7 @@ use function Pest\Laravel\artisan;
 use function Pest\Laravel\seed;
 
 beforeEach(function () {
-    config()->set('snapshots.observers.history', HistoryObserver::class);
+    config()->set('snapshots.observers.existence', ExistenceObserver::class);
 });
 
 describe('Identity is accurately tracked across versions and relationships', function () {
@@ -20,7 +20,7 @@ describe('Identity is accurately tracked across versions and relationships', fun
      * Version | Operation     | Visible
      */
     beforeEach(function () {
-        config()->set('snapshots.observers.history', HistoryObserver::class);
+        config()->set('snapshots.observers.history', ExistenceObserver::class);
 
         artisan('migrate', [
             '--path' => migrationPath('query'),
@@ -32,6 +32,12 @@ describe('Identity is accurately tracked across versions and relationships', fun
         seed(VideoSeeder::class);
     });
 
+    /**
+     * Post:
+     * $identifyingRelationships = ['tags', 'related', 'videos'];
+     * $identifiesRelationships = ['associated'];
+     * $nonIdentifyingAttributes = ['updated_at'];
+     */
     it('can track identity across relations', function () {
         $post1 = Post::query()
             ->where('title', 'Post 1')
@@ -79,13 +85,13 @@ describe('Identity is accurately tracked across versions and relationships', fun
     it('does not update the hash when a non-identifying attribute is changed', function () {
         $post = Post::query()
             ->where('title', 'Post 1')
+            ->with('existence')
             ->first();
 
         expect($hash = $post->hash)->not->toBeNull();
 
         $post->touch();
 
-        expect($post->activeHistoryItem()->operation)->toBe(Operation::Updated);
         expect($post->hash)->toBe($hash);
     });
 });

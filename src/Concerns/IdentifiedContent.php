@@ -22,19 +22,19 @@ trait IdentifiedContent
     public function hash(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->activeHistoryItem()?->hash,
-        );
+            get: fn () => $this->existence()->first()?->hash,
+        )->withoutObjectCaching();
     }
 
     public function updateHash(): void
     {
-        $activeHistoryItem = $this->activeHistoryItem();
+        $existence = $this->existence()->first();
 
-        if ($activeHistoryItem === null) {
+        if ($existence === null) {
             return;
         }
 
-        $activeHistoryItem->update([
+        $existence->update([
             'hash' => $this->newHash(),
         ]);
     }
@@ -46,7 +46,7 @@ trait IdentifiedContent
         $identity .= static::identifyingRelationships()
             ->implode(fn (string $relationship) => $this->relatedHash($relationship), '');
 
-        return md5($identity);
+        return hash('sha256', $identity);
     }
 
     public function modelHash(): string
@@ -62,7 +62,7 @@ trait IdentifiedContent
             ->map(fn ($value, $key) => $key.':'.json_encode($value))
             ->implode(', ');
 
-        return md5($identity);
+        return hash('sha256', $identity);
     }
 
     protected function relatedHash(string $relationship): string
@@ -70,7 +70,7 @@ trait IdentifiedContent
         $result = Collection::wrap($this->unsetRelation($relationship)->$relationship);
 
         if ($result->isEmpty()) {
-            return md5($relationship.': []');
+            return hash('sha256', $relationship.': []');
         }
 
         return $result->implode(function (Model $model) {
@@ -78,7 +78,7 @@ trait IdentifiedContent
                 return $model->modelHash();
             }
 
-            return md5($model->toJson());
+            return hash('sha256', $model->toJson());
         });
     }
 

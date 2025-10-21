@@ -9,7 +9,6 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Event;
 use Plank\Snapshots\Connection\SnapshotConnectionInitializer;
 use Plank\Snapshots\Contracts\ManagesVersions;
-use Plank\Snapshots\Contracts\ResolvesCauser;
 use Plank\Snapshots\Events\VersionCreated;
 use Plank\Snapshots\Events\VersionMigrated;
 use Plank\Snapshots\Migrator\Blueprint\SnapshotBlueprint;
@@ -31,8 +30,8 @@ class SnapshotServiceProvider extends PackageServiceProvider
         $package->name('snapshots')
             ->hasConfigFile()
             ->hasMigrations([
-                'create_history_table',
                 'create_versions_table',
+                'create_existences_table',
             ])
             ->hasInstallCommand(function (InstallCommand $command) {
                 $command->startWith(function (InstallCommand $command) {
@@ -68,12 +67,6 @@ class SnapshotServiceProvider extends PackageServiceProvider
     {
         $this->app->scopedIf(ManagesVersions::class, function (Application $app) {
             $repo = $app['config']->get('snapshots.repositories.version');
-
-            return new $repo;
-        });
-
-        $this->app->scopedIf(ResolvesCauser::class, function (Application $app) {
-            $repo = $app['config']->get('snapshots.repositories.causer');
 
             return new $repo;
         });
