@@ -2,8 +2,6 @@
 
 namespace Plank\Snapshots\Contracts;
 
-use Illuminate\Database\Eloquent\Builder;
-
 interface Versioned extends Trackable
 {
     /**
@@ -17,9 +15,4 @@ interface Versioned extends Trackable
      * @return string
      */
     public function getTable();
-
-    /**
-     * Get the query used to select records which should be included in a snapshot
-     */
-    public static function snapshotQuery(): Builder;
 }

@@ -65,7 +65,6 @@ class TestCase extends Orchestra
     {
         $app['config']->set('database.default', 'testing');
         $app['config']->set('queue.batching.database', 'testing');
-        $app['config']->set('snapshots.observers.history', null);
         $app['config']->set('schema-events.listeners.finished', null);
         $app['config']->set('model-resolver.repository', ModelRepository::class);
     }

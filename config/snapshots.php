@@ -10,8 +10,8 @@ return [
     | This is the model which will be used to store the different versions for the Application.
     | It must implement the \Plank\Snapshots\Contracts\Version interface.
     |
-    | History:
-    | This is the model which will be used to store the history of changes for the Application.
+    | Existence:
+    | This is the model which will be used to store the existence of content across snapshots
     */
     'models' => [
         'version' => \Plank\Snapshots\Models\Version::class,
@@ -57,9 +57,8 @@ return [
     | This observer is used to fire versioning events and maintain the linked list
     | of versions.
     |
-    | History:
-    | This Observer is used to track the History of changes to content. Set to `null` to
-    | disable history tracking.
+    | Existence:
+    | This Observer is used to track the existence of content across snapshots.
     |
     | Identity:
     | This Observer is used to track the Identity of the content. Set to `null` to

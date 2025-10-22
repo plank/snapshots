@@ -18,7 +18,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
         seed(PivotSeeder::class);
     });
 
-    it('can attach versioned models to versioned models', function () {
+    it('can attach versioned models to versioned models through pivots', function () {
         versions()->setActive(createFirstVersion('pivot'));
 
         $project = Project::query()
@@ -58,7 +58,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
         expect($products)->not()->toContain('Heat Pump');
     });
 
-    it('can detach versioned models to versioned models', function () {
+    it('can detach versioned models to versioned models through pivots', function () {
         versions()->setActive(createFirstVersion('pivot'));
 
         $project = Project::query()
@@ -95,7 +95,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
         expect($products)->not()->toContain('Switch');
     });
 
-    it('can delete the pivot for versioned models to versioned models', function () {
+    it('can delete the pivot for versioned models to versioned models through pivots', function () {
         versions()->setActive(createFirstVersion('pivot'));
 
         $project = Project::query()
@@ -127,7 +127,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
         expect($products)->not()->toContain('Shower');
     });
 
-    it('can sync versioned models to versioned models', function () {
+    it('can sync versioned models to versioned models through pivots', function () {
         versions()->setActive(createFirstVersion('pivot'));
 
         $project = Project::query()
@@ -191,7 +191,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
         expect($pivot->quantity)->toBe(2);
     });
 
-    it('can sync without detaching versioned models to versioned models', function () {
+    it('can sync without detaching versioned models to versioned models through pivots', function () {
         versions()->setActive(createFirstVersion('pivot'));
 
         $project = Project::query()
@@ -231,7 +231,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
         expect($products)->not()->toContain('Switch');
     });
 
-    it('can attach versioned models to unversioned models', function () {
+    it('can attach versioned models to unversioned models through pivots', function () {
         versions()->setActive(createFirstVersion('pivot'));
 
         $project = Project::query()
@@ -269,7 +269,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
         expect($products)->not()->toContain('Plumbing');
     });
 
-    it('can detach versioned models to unversioned models', function () {
+    it('can detach versioned models to unversioned models through pivots', function () {
         versions()->setActive(createFirstVersion('pivot'));
 
         $project = Project::query()
@@ -306,7 +306,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
         expect($products)->not()->toContain('Plumbing');
     });
 
-    it('can delete the pivot for versioned models to unversioned models', function () {
+    it('can delete the pivot for versioned models to unversioned models through pivots', function () {
         versions()->setActive(createFirstVersion('pivot'));
 
         $project = Project::query()
@@ -338,7 +338,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
         expect($products)->toContain('Plumbing');
     });
 
-    it('can sync versioned models to unversioned models', function () {
+    it('can sync versioned models to unversioned models through pivots', function () {
         versions()->setActive(createFirstVersion('pivot'));
 
         $project = Project::query()
@@ -376,7 +376,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
         expect($products)->not()->toContain('Plumbing');
     });
 
-    it('can sync without detaching versioned models to unversioned models', function () {
+    it('can sync without detaching versioned models to unversioned models through pivots', function () {
         versions()->setActive(createFirstVersion('pivot'));
 
         $project = Project::query()
@@ -414,7 +414,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
         expect($products)->not()->toContain('Plumbing');
     });
 
-    it('can attach unversioned models to versioned models', function () {
+    it('can attach unversioned models to versioned models through pivots', function () {
         versions()->setActive(createFirstVersion('pivot'));
 
         $category = Category::query()
@@ -452,7 +452,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
         expect($projects)->not()->toContain('Downing St.');
     });
 
-    it('can detach unversioned models to versioned models', function () {
+    it('can detach unversioned models to versioned models through pivots', function () {
         versions()->setActive(createFirstVersion('pivot'));
 
         $category = Category::query()
@@ -489,7 +489,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
         expect($projects)->not()->toContain('Downing St.');
     });
 
-    it('can delete the pivot for unversioned models to versioned models', function () {
+    it('can delete the pivot for unversioned models to versioned models through pivots', function () {
         versions()->setActive(createFirstVersion('pivot'));
 
         $category = Category::query()
@@ -521,7 +521,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
         expect($projects)->not()->toContain('Downing St.');
     });
 
-    it('can sync unversioned models to versioned models', function () {
+    it('can sync unversioned models to versioned models through pivots', function () {
         versions()->setActive(createFirstVersion('pivot'));
 
         $category = Category::query()
@@ -559,7 +559,7 @@ describe('Custom versioned Pivot classes use version tables correctly', function
         expect($projects)->not()->toContain('Downing St.');
     });
 
-    it('can sync without detaching unversioned models to versioned models', function () {
+    it('can sync without detaching unversioned models to versioned models through pivots', function () {
         versions()->setActive(createFirstVersion('pivot'));
 
         $category = Category::query()

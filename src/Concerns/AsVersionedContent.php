@@ -47,9 +47,4 @@ trait AsVersionedContent
 
         return $table;
     }
-
-    public static function snapshotQuery(): Builder
-    {
-        return static::query()->withoutGlobalScopes();
-    }
 }
