@@ -9,7 +9,7 @@ use function Pest\Laravel\artisan;
 
 describe('Versioned Content has its Existence tracked correctly when copying by table', function () {
     beforeEach(function () {
-        config()->set('snapshots.observers.history', ExistenceObserver::class);
+        config()->set('snapshots.observers.existence', ExistenceObserver::class);
 
         artisan('migrate', [
             '--path' => migrationPath('schema/create'),

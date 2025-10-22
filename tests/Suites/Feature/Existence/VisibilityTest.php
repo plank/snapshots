@@ -7,7 +7,7 @@ use Plank\Snapshots\Tests\Models\Flag;
 use function Pest\Laravel\artisan;
 
 beforeEach(function () {
-    config()->set('snapshots.observers.history', ExistenceObserver::class);
+    config()->set('snapshots.observers.existence', ExistenceObserver::class);
 });
 
 describe('The visiblity accurately reflects all versions where content is visible', function () {
