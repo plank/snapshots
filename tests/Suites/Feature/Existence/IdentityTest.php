@@ -20,7 +20,7 @@ describe('Identity is accurately tracked across versions and relationships', fun
      * Version | Operation     | Visible
      */
     beforeEach(function () {
-        config()->set('snapshots.observers.history', ExistenceObserver::class);
+        config()->set('snapshots.observers.existence', ExistenceObserver::class);
 
         artisan('migrate', [
             '--path' => migrationPath('query'),
