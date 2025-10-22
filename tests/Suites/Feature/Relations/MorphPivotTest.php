@@ -18,7 +18,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
         seed(MorphPivotSeeder::class);
     });
 
-    it('can attach versioned models to versioned models', function () {
+    it('can attach versioned models to versioned models on morph pivots', function () {
         versions()->setActive(createFirstVersion('pivot'));
 
         $wellington = Project::query()
@@ -59,7 +59,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
         expect($plans)->not->toContain('Networking Blueprint');
     });
 
-    it('can detach versioned models to versioned models', function () {
+    it('can detach versioned models to versioned models on morph pivots', function () {
         versions()->setActive(createFirstVersion('pivot'));
 
         $wellington = Project::query()
@@ -98,7 +98,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
         expect($plans)->not->toContain('Networking Blueprint');
     });
 
-    it('can delete the pivot for versioned models to versioned models', function () {
+    it('can delete the pivot for versioned models to versioned models on morph pivots', function () {
         versions()->setActive(createFirstVersion('pivot'));
 
         $wellington = Project::query()
@@ -137,7 +137,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
         expect($plans)->not->toContain('Networking Blueprint');
     });
 
-    it('can sync versioned models to versioned models', function () {
+    it('can sync versioned models to versioned models on morph pivots', function () {
         versions()->setActive(createFirstVersion('pivot'));
 
         $wellington = Project::query()
@@ -194,7 +194,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
         expect($plans)->not->toContain('Networking Blueprint');
     });
 
-    it('can sync without detaching versioned models to versioned models', function () {
+    it('can sync without detaching versioned models to versioned models on morph pivots', function () {
         versions()->setActive(createFirstVersion('pivot'));
 
         $wellington = Project::query()
@@ -251,7 +251,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
         expect($plans)->not->toContain('Networking Blueprint');
     });
 
-    it('can attach versioned models to unversioned models', function () {
+    it('can attach versioned models to unversioned models on morph pivots', function () {
         versions()->setActive(createFirstVersion('pivot'));
 
         $wellington = Project::query()
@@ -289,7 +289,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
         expect($contractors)->not->toContain('Mega Canacorp');
     });
 
-    it('can detach versioned models to unversioned models', function () {
+    it('can detach versioned models to unversioned models on morph pivots', function () {
         versions()->setActive(createFirstVersion('pivot'));
 
         $wellington = Project::query()
@@ -325,7 +325,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
         expect($contractors)->not->toContain('Anglocorp');
     });
 
-    it('can delete the pivot for versioned models to unversioned models', function () {
+    it('can delete the pivot for versioned models to unversioned models on morph pivots', function () {
         versions()->setActive(createFirstVersion('pivot'));
 
         $wellington = Project::query()
@@ -361,7 +361,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
         expect($contractors)->not->toContain('Anglocorp');
     });
 
-    it('can sync versioned models to unversioned models', function () {
+    it('can sync versioned models to unversioned models on morph pivots', function () {
         versions()->setActive(createFirstVersion('pivot'));
 
         $wellington = Project::query()
@@ -404,7 +404,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
         expect($contractors)->not->toContain('Anglocorp');
     });
 
-    it('can sync without detaching versioned models to unversioned models', function () {
+    it('can sync without detaching versioned models to unversioned models on morph pivots', function () {
         versions()->setActive(createFirstVersion('pivot'));
 
         $wellington = Project::query()
@@ -447,7 +447,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
         expect($contractors)->not->toContain('Anglocorp');
     });
 
-    it('can attach unversioned models to versioned models on MorphPivot', function () {
+    it('can attach unversioned models to versioned models on MorphPivot on morph pivots', function () {
         versions()->setActive(createFirstVersion('pivot'));
 
         $can = Contractor::where('name', 'Canacorp')->first();
@@ -481,7 +481,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
         expect($projects)->not->toContain('Downing St.');
     });
 
-    it('can detach unversioned models to versioned models', function () {
+    it('can detach unversioned models to versioned models on morph pivots', function () {
         versions()->setActive(createFirstVersion('pivot'));
 
         $can = Contractor::where('name', 'Canacorp')->first();
@@ -515,7 +515,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
         expect($projects)->not->toContain('Downing St.');
     });
 
-    it('can delete the pivot for unversioned models to versioned models', function () {
+    it('can delete the pivot for unversioned models to versioned models on morph pivots', function () {
         versions()->setActive(createFirstVersion('pivot'));
 
         $can = Contractor::where('name', 'Canacorp')->first();
@@ -549,7 +549,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
         expect($projects)->not->toContain('Downing St.');
     });
 
-    it('can sync unversioned models to versioned models', function () {
+    it('can sync unversioned models to versioned models on morph pivots', function () {
         versions()->setActive(createFirstVersion('pivot'));
 
         $can = Contractor::where('name', 'Canacorp')->first();
@@ -590,7 +590,7 @@ describe('Custom versioned MorphPivot classes use versioned tables correctly', f
         expect($projects)->not->toContain('Downing St.');
     });
 
-    it('can sync without detaching unversioned models to versioned models', function () {
+    it('can sync without detaching unversioned models to versioned models on morph pivots', function () {
         versions()->setActive(createFirstVersion('pivot'));
 
         $can = Contractor::where('name', 'Canacorp')->first();

@@ -14,8 +14,6 @@ use Plank\Snapshots\Facades\Versions;
  */
 trait InteractsWithVersionedContent
 {
-    use HasIdentifyingRelationships;
-
     protected function newBelongsToMany(
         Builder $query,
         Model $parent,
