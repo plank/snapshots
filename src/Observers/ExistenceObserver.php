@@ -21,7 +21,10 @@ class ExistenceObserver
             return;
         }
 
-        $model->setRelation('existence', Existence::createOrUpdateFor($model, Versions::active()));
+        /** @var class-string<Existence> $class */
+        $class = config()->get('snapshots.models.existence');
+
+        $model->setRelation('existence', $class::createOrUpdateFor($model, Versions::active()));
     }
 
     public function updated(Model&Trackable $model)
@@ -66,7 +69,10 @@ class ExistenceObserver
             return;
         }
 
-        $model->setRelation('existence', Existence::createOrUpdateFor($model, Versions::active()));
+        /** @var class-string<Existence> $class */
+        $class = config()->get('snapshots.models.existence');
+
+        $model->setRelation('existence', $class::createOrUpdateFor($model, Versions::active()));
     }
 
     public function forceDeleted(Model&Trackable $model)
