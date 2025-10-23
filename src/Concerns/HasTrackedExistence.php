@@ -32,7 +32,10 @@ trait HasTrackedExistence
 
     public function existence(): MorphOne
     {
+        /** @var class-string<Existence> $class */
+        $class = config()->get('snapshots.models.existence');
+
         return $this->morphOne(config()->get('snapshots.models.existence'), 'trackable')
-            ->where('version_id', Versions::active()?->getKey());
+            ->where($class::versionColumn(), Versions::active()?->getKey());
     }
 }
