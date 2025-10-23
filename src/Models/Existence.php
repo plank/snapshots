@@ -6,7 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphPivot;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Plank\Snapshots\Contracts\Identifiable;
 use Plank\Snapshots\Contracts\Trackable;
+use Plank\Snapshots\Contracts\Versioned;
 
 /**
  * @property string $trackable_type
@@ -34,5 +36,38 @@ class Existence extends MorphPivot
     public function version(): BelongsTo
     {
         return $this->belongsTo(config()->get('snapshots.models.version'));
+    }
+
+    public static function createOrUpdateFor(Versioned&Model $model, (Version&Model)|null $version): self
+    {
+        if ($existence = $model->existences()->where(static::versionColumn(), $version?->getKey())->first()) {
+            if ($model instanceof Identifiable) {
+                $existence->hash = $model->newHash();
+                $existence->save();
+            }
+
+            return $existence;
+        }
+
+        return static::query()->create([
+            'trackable_type' => $model::class,
+            'trackable_id' => $model->getKey(),
+            'version_id' => $version?->getKey(),
+            'hash' => $model instanceof Identifiable ? $model->newHash() : null,
+        ]);
+    }
+
+    public static function copiedTo(Versioned&Model $model, Version&Model $version): self
+    {
+        $existence = $model->existence->replicate();
+        $existence->version_id = $version->id;
+        $existence->save();
+
+        return $existence;
+    }
+
+    public static function versionColumn(): string
+    {
+        return 'version_id';
     }
 }

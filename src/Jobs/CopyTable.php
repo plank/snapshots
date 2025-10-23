@@ -17,6 +17,7 @@ use Plank\Snapshots\Contracts\Version;
 use Plank\Snapshots\Contracts\Versioned;
 use Plank\Snapshots\Contracts\VersionKey;
 use Plank\Snapshots\Facades\Versions;
+use Plank\Snapshots\Models\Existence;
 
 class CopyTable implements ShouldQueue
 {
@@ -68,11 +69,7 @@ class CopyTable implements ShouldQueue
             $class::query()
                 ->with('existence')
                 ->cursor()
-                ->each(function (Versioned&Model $model) {
-                    $existence = $model->existence->replicate();
-                    $existence->version_id = $this->version->id;
-                    $existence->save();
-                });
+                ->each(fn (Versioned&Model $model) => Existence::copiedTo($model, $this->version));
         });
     }
 }
