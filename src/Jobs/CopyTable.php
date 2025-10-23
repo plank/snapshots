@@ -65,11 +65,14 @@ class CopyTable implements ShouldQueue
             return;
         }
 
+        /** @var class-string<Existence> $class */
+        $class = config()->get('snapshots.models.existence');
+
         Versions::withVersionActive($working, function () use ($class) {
             $class::query()
                 ->with('existence')
                 ->cursor()
-                ->each(fn (Versioned&Model $model) => Existence::copiedTo($model, $this->version));
+                ->each(fn (Versioned&Model $model) => $class::copiedTo($model, $this->version));
         });
     }
 }
