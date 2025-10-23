@@ -38,7 +38,7 @@ class Existence extends MorphPivot
         return $this->belongsTo(config()->get('snapshots.models.version'));
     }
 
-    public static function createOrUpdateFor(Versioned&Model $model, (Version&Model)|null $version): self
+    public static function createOrUpdateFor(Versioned&Model $model, ?Version $version): self
     {
         if ($existence = $model->existences()->where(static::versionColumn(), $version?->getKey())->first()) {
             if ($model instanceof Identifiable) {
