@@ -67,13 +67,17 @@ trait IdentifiedContent
 
     protected function relatedHash(string $relationship): string
     {
-        $result = Collection::wrap($this->unsetRelation($relationship)->$relationship);
+        // We don't want to alter the state of which relations are eager loaded, to leave
+        // a minimal footprint on consuming applications
+        $related = $this->relationLoaded($relationship)
+            ? Collection::wrap($this->unsetRelation($relationship)->$relationship)
+            : $this->$relationship()->get();
 
-        if ($result->isEmpty()) {
+        if ($related->isEmpty()) {
             return hash('sha256', $relationship.': []');
         }
 
-        return $result->implode(function (Model $model) {
+        return $related->implode(function (Model $model) {
             if ($model instanceof Identifiable) {
                 return $model->modelHash();
             }

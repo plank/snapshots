@@ -53,6 +53,7 @@ class Existence extends MorphPivot
             'trackable_type' => $model::class,
             'trackable_id' => $model->getKey(),
             'version_id' => $version?->getKey(),
+            'last_changed_in' => $version?->getKey(),
             'hash' => $model instanceof Identifiable ? $model->newHash() : null,
         ]);
     }

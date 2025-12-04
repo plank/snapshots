@@ -37,8 +37,13 @@ trait IdentifiesContent
 
     protected function updateRelationshipHashes(string $relationship): void
     {
-        Collection::wrap($this->$relationship)
-            ->filter(fn (Model $model) => $model instanceof Identifiable)
+        // We don't want to alter the state of which relations are eager loaded, to leave
+        // a minimal footprint on consuming applications
+        $related = $this->relationLoaded($relationship)
+            ? Collection::wrap($this->unsetRelation($relationship)->$relationship)
+            : $this->$relationship()->get();
+
+        $related->filter(fn (Model $model) => $model instanceof Identifiable)
             ->each(fn (Model&Identifiable $model) => $model->updateHash());
     }
 
