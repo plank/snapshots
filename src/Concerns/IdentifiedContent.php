@@ -82,8 +82,22 @@ trait IdentifiedContent
                 return $model->modelHash();
             }
 
-            return hash('sha256', $model->toJson());
+            return $this->identifyModel($model);
         });
+    }
+
+    protected function identifyModel(Model $model): string
+    {
+        $data = $model->withoutRelations()->toArray();
+
+        unset($data[$model->getKey()]);
+
+        if ($model->usesTimestamps()) {
+            unset($data[$model->getCreatedAtColumn()]);
+            unset($data[$model->getUpdatedAtColumn()]);
+        }
+
+        return hash('sha256', json_encode($data));
     }
 
     protected static function identifyingRelationships(): Collection
