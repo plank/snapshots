@@ -18,7 +18,7 @@
         }
     ],
     "require": {
-        "php": "^8.1",
+        "php": "^8.2",
         "doctrine/dbal": "^3.6",
         "illuminate/contracts": "^10",
         "plank/laravel-hush": "^10.1",
