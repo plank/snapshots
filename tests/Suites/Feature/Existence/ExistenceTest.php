@@ -87,7 +87,7 @@ describe('Versioned Content has its Existence tracked correctly when copying by 
         $flag = Flag::factory()->create();
         expect(Existence::query()->count())->toBe(1);
 
-        $flag->delete();
+        $flag->forceDelete();
         expect(Existence::query()->count())->toBe(0);
 
         $flag = Flag::factory()->create();
@@ -102,14 +102,15 @@ describe('Versioned Content has its Existence tracked correctly when copying by 
 
         $flag->delete();
 
-        expect(Existence::query()->count())->toBe(2);
+        // Soft deletions still exist
+        expect(Existence::query()->count())->toBe(3);
     });
 
     it('tracks restoration correctly for SoftDeleting models', function () {
         $flag = Flag::factory()->create();
         expect(Existence::query()->count())->toBe(1);
 
-        $flag->delete();
+        $flag->forceDelete();
         expect(Existence::query()->count())->toBe(0);
 
         $flag = Flag::factory()->create();
@@ -124,7 +125,8 @@ describe('Versioned Content has its Existence tracked correctly when copying by 
 
         $flag->delete();
 
-        expect(Existence::query()->count())->toBe(2);
+        // Soft deleted things still exist
+        expect(Existence::query()->count())->toBe(3);
 
         $flag->restore();
 

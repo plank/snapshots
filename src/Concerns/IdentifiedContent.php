@@ -57,12 +57,23 @@ trait IdentifiedContent
         $identity = Collection::make($this->attributes)
             ->except(static::nonIdentifyingAttributes())
             ->except($hidden)
+            ->when($this->ignoreTimestampsInIdentity(), function ($attributes) {
+                return $attributes->except([
+                    $this->getCreatedAtColumn(),
+                    $this->getUpdatedAtColumn(),
+                ]);
+            })
             ->when($visible, fn ($attributes) => $attributes->only($visible))
             ->sortKeys()
             ->map(fn ($value, $key) => $key.':'.json_encode($value))
             ->implode(', ');
 
         return hash('sha256', $identity);
+    }
+
+    public function ignoreTimestampsInIdentity(): bool
+    {
+        return $this->usesTimestamps();
     }
 
     protected function relatedHash(string $relationship): string
@@ -79,7 +90,7 @@ trait IdentifiedContent
 
         return $related->implode(function (Model $model) {
             if ($model instanceof Identifiable) {
-                return $model->modelHash();
+                return $model->hash;
             }
 
             return $this->identifyModel($model);
@@ -90,7 +101,7 @@ trait IdentifiedContent
     {
         $data = $model->withoutRelations()->toArray();
 
-        unset($data[$model->getKey()]);
+        unset($data[$model->getKeyName()]);
 
         if ($model->usesTimestamps()) {
             unset($data[$model->getCreatedAtColumn()]);

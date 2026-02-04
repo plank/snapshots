@@ -16,7 +16,7 @@ class ExistenceObserver
         $softDeletes = in_array(SoftDeletes::class, class_uses_recursive($model));
 
         if ($softDeletes && $model->{$model->getDeletedAtColumn()} !== null) {
-            $this->deleted($model);
+            $this->deleting($model);
 
             return;
         }
@@ -37,7 +37,7 @@ class ExistenceObserver
 
         if ($softDeletes) {
             if ($model->{$model->getDeletedAtColumn()} !== null) {
-                $this->deleted($model);
+                $this->deleting($model);
 
                 return;
             }
@@ -51,19 +51,17 @@ class ExistenceObserver
         $model->updateHash();
     }
 
-    public function deleted(Model&Trackable $model)
+    public function deleting(Model&Trackable $model)
     {
-        $softDeletes = in_array(SoftDeletes::class, class_uses_recursive($model));
-
-        if ($softDeletes && $model->isForceDeleting()) {
+        if (in_array(SoftDeletes::class, class_uses_recursive($model))) {
             return;
         }
 
-        $model->existence()->delete();
+        $model->existence?->delete();
         $model->unsetRelation('existence');
     }
 
-    public function restored(Model&Trackable $model)
+    public function restoring(Model&Trackable $model)
     {
         if (! $model instanceof Identifiable) {
             return;
@@ -75,9 +73,9 @@ class ExistenceObserver
         $model->setRelation('existence', $class::createOrUpdateFor($model, Versions::active()));
     }
 
-    public function forceDeleted(Model&Trackable $model)
+    public function forceDeleting(Model&Trackable $model)
     {
-        $model->existence()->delete();
+        $model->existence?->delete();
         $model->unsetRelation('existence');
     }
 }
