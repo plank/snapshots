@@ -99,6 +99,7 @@ return [
         'listener' => \Plank\Snapshots\Listeners\ReleaseVersion::class,
         'copy' => [
             'listener' => \Plank\Snapshots\Listeners\CopyData::class,
+            'job' => \Plank\Snapshots\Jobs\CopyTable::class,
             'queue' => 'sync',
         ],
     ],

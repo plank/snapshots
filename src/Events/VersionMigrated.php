@@ -29,8 +29,10 @@ class VersionMigrated
      */
     public function jobs(): Collection
     {
+        $jobClass = config()->get('snapshots.release.copy.job', CopyTable::class);
+
         return Collection::make($this->tables)
-            ->map(fn (string $table) => new CopyTable($this->version, $table))
+            ->map(fn (string $table) => new $jobClass($this->version, $table))
             ->push(new MarkAsCopied($this->version, $this->user));
     }
 }
