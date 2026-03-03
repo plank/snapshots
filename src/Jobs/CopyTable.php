@@ -65,6 +65,11 @@ class CopyTable implements ShouldQueue
             return;
         }
 
+        $this->createExistences($class, $working);
+    }
+
+    protected function createExistences(string $class, ?Version $working): void
+    {
         /** @var class-string<Existence> $existence */
         $existence = config()->get('snapshots.models.existence');
 
