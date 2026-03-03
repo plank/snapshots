@@ -34,6 +34,7 @@ trait AsVersionedContent
     {
         $table = parent::getTable();
         $version = Versions::active();
+
         $cacheKey = str_contains($table, 'laravel_reserved_')
             ? (preg_match('/laravel_reserved_[0-9]+/', $table, $m) ? $m[0] : $table)
             : ($version?->key()->toString() ?? '__none__');
