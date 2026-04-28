@@ -50,6 +50,6 @@ describe('The snapshot schema works with unversioned foreign keys correctly', fu
         expect(fn () => artisan('migrate', [
             '--path' => migrationPath('schema/drop_unversioned_fks'),
             '--realpath' => true,
-        ])->run())->not->toThrow(\Throwable::class);
+        ])->run())->not->toThrow(Throwable::class);
     });
 });

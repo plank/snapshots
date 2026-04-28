@@ -15,7 +15,7 @@ trait HasIdentifyingRelationships
     /**
      * Instantiate a new BelongsToMany relationship.
      *
-     * @param  string|class-string<\Illuminate\Database\Eloquent\Model>  $table
+     * @param  string|class-string<Model>  $table
      * @param  string  $foreignPivotKey
      * @param  string  $relatedPivotKey
      * @param  string  $parentKey
