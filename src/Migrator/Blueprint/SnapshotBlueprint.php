@@ -143,7 +143,7 @@ class SnapshotBlueprint extends Blueprint
      */
     public function dropUnversionedForeign($index)
     {
-        return $this->dropIndexCommand('dropUnversionedForeign', 'foreign', $index);
+        return $this->dropIndexCommand('dropUnversionedForeign', 'unversionedForeign', $index);
     }
 
     /**
