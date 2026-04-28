@@ -10,7 +10,7 @@ use Plank\Snapshots\Contracts\Versioned;
 use Plank\Snapshots\Facades\Versions;
 
 /**
- * @mixin \Illuminate\Database\Eloquent\Model
+ * @mixin Model
  */
 trait InteractsWithVersionedContent
 {

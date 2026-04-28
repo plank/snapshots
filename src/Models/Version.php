@@ -4,7 +4,6 @@ namespace Plank\Snapshots\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Plank\Snapshots\Casts\AsVersionNumber;
 use Plank\Snapshots\Concerns\AsVersion;
 use Plank\Snapshots\Concerns\HasVersionNumber;
 use Plank\Snapshots\Contracts\Version as VersionContract;
