@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Database\Schema\Builder as SchemaBuilder;
 use Illuminate\Support\Facades\DB;
 use Plank\Snapshots\Exceptions\MigrationFailedException;
@@ -406,7 +407,7 @@ describe('The snapshot schema prefixes tables appropriately', function () {
     });
 
     it('throws an exception when the artisan command migrations fail when auto-migrating', function () {
-        partialMock(\Illuminate\Contracts\Console\Kernel::class, function ($mock) {
+        partialMock(Kernel::class, function ($mock) {
             $mock->shouldReceive('call')->andReturn(1);
         });
 
