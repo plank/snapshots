@@ -56,16 +56,6 @@ trait HasUnversionedForeignKeys
      */
     public function compileDropUnversionedForeign(Blueprint $blueprint, Fluent $command)
     {
-        /** @var class-string<VersionKey> $keyClass */
-        $keyClass = config('snapshots.value_objects.version_key');
-        $previousPrefix = $this->getTablePrefix();
-
-        try {
-            $this->setTablePrefix($keyClass::strip($previousPrefix));
-
-            return parent::compileDropForeign($blueprint, $command);
-        } finally {
-            $this->setTablePrefix($previousPrefix);
-        }
+        return parent::compileDropForeign($blueprint, $command);
     }
 }
