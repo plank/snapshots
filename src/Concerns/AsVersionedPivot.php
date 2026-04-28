@@ -3,10 +3,11 @@
 namespace Plank\Snapshots\Concerns;
 
 use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 use Plank\Snapshots\Facades\Versions;
 
 /**
- * @mixin \Illuminate\Database\Eloquent\Relations\Pivot
+ * @mixin Pivot
  */
 trait AsVersionedPivot
 {

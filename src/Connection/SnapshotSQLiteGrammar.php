@@ -3,6 +3,7 @@
 namespace Plank\Snapshots\Connection;
 
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Schema\ForeignKeyDefinition;
 use Illuminate\Database\Schema\Grammars\SQLiteGrammar;
 use Illuminate\Support\Fluent;
 use Plank\Snapshots\Concerns\HasUnversionedForeignKeys;
@@ -42,7 +43,7 @@ class SnapshotSQLiteGrammar extends SQLiteGrammar
     /**
      * Get the foreign key syntax for a table creation statement.
      *
-     * @param  \Illuminate\Database\Schema\ForeignKeyDefinition[]  $foreignKeys
+     * @param  ForeignKeyDefinition[]  $foreignKeys
      * @return string|null
      */
     protected function addUnversionedForeignKeys($blueprint)
@@ -73,7 +74,7 @@ class SnapshotSQLiteGrammar extends SQLiteGrammar
     /**
      * Get the SQL for the foreign key.
      *
-     * @param  \Illuminate\Support\Fluent  $foreign
+     * @param  Fluent  $foreign
      * @return string
      */
     protected function getUnversionedForeignKey($foreign)

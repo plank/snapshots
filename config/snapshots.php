@@ -1,5 +1,16 @@
 <?php
 
+use Plank\Snapshots\Jobs\CopyTable;
+use Plank\Snapshots\Listeners\CopyData;
+use Plank\Snapshots\Listeners\ReleaseVersion;
+use Plank\Snapshots\Models\Existence;
+use Plank\Snapshots\Models\Version;
+use Plank\Snapshots\Observers\ExistenceObserver;
+use Plank\Snapshots\Observers\IdentityObserver;
+use Plank\Snapshots\Observers\VersionObserver;
+use Plank\Snapshots\Repository\VersionRepository;
+use Plank\Snapshots\ValueObjects\VersionNumber;
+
 return [
     /*
     |--------------------------------------------------------------------------
@@ -14,8 +25,8 @@ return [
     | This is the model which will be used to store the existence of content across snapshots
     */
     'models' => [
-        'version' => \Plank\Snapshots\Models\Version::class,
-        'existence' => \Plank\Snapshots\Models\Existence::class,
+        'version' => Version::class,
+        'existence' => Existence::class,
     ],
 
     /*
@@ -28,7 +39,7 @@ return [
     | It must implement the \Plank\Snapshots\Contracts\VersionKey interface.
     */
     'value_objects' => [
-        'version_key' => \Plank\Snapshots\ValueObjects\VersionNumber::class,
+        'version_key' => VersionNumber::class,
     ],
 
     /*
@@ -45,7 +56,7 @@ return [
     | It must implement the \Plank\Snapshots\Contracts\ManagesVersions interface.
     */
     'repositories' => [
-        'version' => \Plank\Snapshots\Repository\VersionRepository::class,
+        'version' => VersionRepository::class,
     ],
 
     /*
@@ -66,9 +77,9 @@ return [
     |
     */
     'observers' => [
-        'version' => \Plank\Snapshots\Observers\VersionObserver::class,
-        'existence' => \Plank\Snapshots\Observers\ExistenceObserver::class,
-        'identity' => \Plank\Snapshots\Observers\IdentityObserver::class,
+        'version' => VersionObserver::class,
+        'existence' => ExistenceObserver::class,
+        'identity' => IdentityObserver::class,
     ],
 
     /*
@@ -96,10 +107,10 @@ return [
     |
     */
     'release' => [
-        'listener' => \Plank\Snapshots\Listeners\ReleaseVersion::class,
+        'listener' => ReleaseVersion::class,
         'copy' => [
-            'listener' => \Plank\Snapshots\Listeners\CopyData::class,
-            'job' => \Plank\Snapshots\Jobs\CopyTable::class,
+            'listener' => CopyData::class,
+            'job' => CopyTable::class,
             'queue' => 'sync',
         ],
     ],

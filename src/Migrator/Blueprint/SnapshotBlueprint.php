@@ -3,8 +3,10 @@
 namespace Plank\Snapshots\Migrator\Blueprint;
 
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\ForeignKeyDefinition;
+use Illuminate\Support\Fluent;
 
 class SnapshotBlueprint extends Blueprint
 {
@@ -91,9 +93,9 @@ class SnapshotBlueprint extends Blueprint
     /**
      * Indicate that the given unversioned foreign key should be dropped.
      *
-     * @param  \Illuminate\Database\Eloquent\Model|string  $model
+     * @param  Model|string  $model
      * @param  string|null  $column
-     * @return \Illuminate\Support\Fluent
+     * @return Fluent
      */
     public function dropConstrainedUnversionedForeignIdFor($model, $column = null)
     {
@@ -108,7 +110,7 @@ class SnapshotBlueprint extends Blueprint
      * Indicate that the given column and unversioned foreign key should be dropped.
      *
      * @param  string  $column
-     * @return \Illuminate\Support\Fluent
+     * @return Fluent
      */
     public function dropConstrainedUnversionedForeignId($column)
     {
@@ -120,9 +122,9 @@ class SnapshotBlueprint extends Blueprint
     /**
      * Indicate that the given unversioned foreign key should be dropped.
      *
-     * @param  \Illuminate\Database\Eloquent\Model|string  $model
+     * @param  Model|string  $model
      * @param  string|null  $column
-     * @return \Illuminate\Support\Fluent
+     * @return Fluent
      */
     public function dropUnversionedForeignIdFor($model, $column = null)
     {
@@ -137,7 +139,7 @@ class SnapshotBlueprint extends Blueprint
      * Indicate that the given unversioned foreign key should be dropped.
      *
      * @param  string|array  $index
-     * @return \Illuminate\Support\Fluent
+     * @return Fluent
      */
     public function dropUnversionedForeign($index)
     {
