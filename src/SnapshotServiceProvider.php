@@ -14,6 +14,7 @@ use Plank\Snapshots\Events\VersionMigrated;
 use Plank\Snapshots\Migrator\Blueprint\SnapshotBlueprint;
 use Plank\Snapshots\Migrator\SnapshotMigrationRepository;
 use Plank\Snapshots\Migrator\SnapshotMigrator;
+use Plank\Snapshots\Models\Version;
 use Spatie\LaravelPackageTools\Commands\InstallCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
@@ -117,6 +118,11 @@ class SnapshotServiceProvider extends PackageServiceProvider
 
     protected function listenToEvents(): self
     {
+        if ($observer = config()->get('snapshots.observers.version')) {
+            $versionModel = config()->get('snapshots.models.version', Version::class);
+            $versionModel::observe($observer);
+        }
+
         if ($migrator = config()->get('snapshots.release.listener')) {
             Event::listen(VersionCreated::class, $migrator);
         }

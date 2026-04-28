@@ -20,8 +20,18 @@ trait HasTrackedExistence
 
     public static function bootHasTrackedExistence(): void
     {
-        if ($observer = config()->get('snapshots.observers.existence')) {
-            static::observe($observer);
+        $observerClass = config()->get('snapshots.observers.existence');
+
+        if (! $observerClass) {
+            return;
+        }
+
+        $observer = app($observerClass);
+
+        foreach (get_class_methods($observer) as $method) {
+            if (! str_starts_with($method, '__')) {
+                static::registerModelEvent($method, [$observer, $method]);
+            }
         }
     }
 

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Plank\Snapshots\Casts\AsVersionNumber;
 use Plank\Snapshots\Concerns\AsVersion;
+use Plank\Snapshots\Concerns\HasVersionNumber;
 use Plank\Snapshots\Contracts\Version as VersionContract;
 use Plank\Snapshots\Contracts\VersionKey;
 use Plank\Snapshots\ValueObjects\VersionNumber;
@@ -19,6 +20,7 @@ class Version extends Model implements VersionContract
 {
     use AsVersion;
     use HasFactory;
+    use HasVersionNumber;
 
     protected $guarded = [];
 
@@ -26,31 +28,6 @@ class Version extends Model implements VersionContract
         'migrated' => 'boolean',
         'copied' => 'boolean',
     ];
-
-    /**
-     * Create a new Eloquent model instance.
-     *
-     * @return void
-     */
-    public function __construct(array $attributes = [])
-    {
-        if (! $this->hasCast(static::keyColumn())) {
-            $this->mergeCasts([
-                static::keyColumn() => AsVersionNumber::class,
-            ]);
-        }
-
-        parent::__construct($attributes);
-    }
-
-    public static function boot(): void
-    {
-        parent::boot();
-
-        if ($observer = config()->get('snapshots.observers.version')) {
-            static::observe($observer);
-        }
-    }
 
     public static function keyColumn(): string
     {

@@ -19,13 +19,22 @@ trait IdentifiesContent
 
     public static function bootIdentifiesContent(): void
     {
-        // Identification requires tracking to be enabled
         if (! config()->get('snapshots.observers.existence', false)) {
             return;
         }
 
-        if ($observer = config()->get('snapshots.observers.identity')) {
-            static::observe($observer);
+        $observerClass = config()->get('snapshots.observers.identity');
+
+        if (! $observerClass) {
+            return;
+        }
+
+        $observer = app($observerClass);
+
+        foreach (get_class_methods($observer) as $method) {
+            if (! str_starts_with($method, '__')) {
+                static::registerModelEvent($method, [$observer, $method]);
+            }
         }
     }
 

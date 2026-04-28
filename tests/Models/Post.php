@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Plank\Snapshots\Concerns\AsVersionedContent;
+use Plank\Snapshots\Concerns\HasVersionNumber;
 use Plank\Snapshots\Concerns\IdentifiesContent;
 use Plank\Snapshots\Contracts\Identifying;
 use Plank\Snapshots\Contracts\Trackable;
