@@ -10,7 +10,6 @@ use Illuminate\Support\Fluent;
 
 class SnapshotBlueprint extends Blueprint
 {
-
     /**
      * Create a foreign ID column for the given model.
      */
