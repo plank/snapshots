@@ -374,7 +374,7 @@ describe('The snapshot schema prefixes tables appropriately', function () {
             'columns' => [
                 0 => 'document_id',
             ],
-            'foreign_schema' => 'main',
+            'foreign_schema' => null,
             'foreign_table' => 'v1_0_0_documents',
             'foreign_columns' => [
                 0 => 'id',

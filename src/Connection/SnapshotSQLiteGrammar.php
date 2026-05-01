@@ -25,9 +25,9 @@ class SnapshotSQLiteGrammar extends SQLiteGrammar
             $blueprint->temporary ? 'create temporary' : 'create',
             $this->wrapTable($blueprint),
             implode(', ', $this->getColumns($blueprint)),
-            $this->addForeignKeys($this->getCommandsByName($blueprint, 'foreign')),
+            $this->addForeignKeys($blueprint),
             $this->addUnversionedForeignKeys($this->getCommandsByName($blueprint, 'unversionedForeign')),
-            $this->addPrimaryKeys($this->getCommandByName($blueprint, 'primary'))
+            $this->addPrimaryKeys($blueprint)
         );
     }
 
@@ -39,6 +39,17 @@ class SnapshotSQLiteGrammar extends SQLiteGrammar
     public function compileUnversionedForeign(Blueprint $blueprint, Fluent $command)
     {
         // Handled on table creation...
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * SQLite does not support dropping foreign keys via ALTER TABLE.
+     * The FK is removed implicitly when the column is dropped (via table recreation).
+     */
+    public function compileDropUnversionedForeign(Blueprint $blueprint, Fluent $command)
+    {
+        // No-op on SQLite
     }
 
     /**

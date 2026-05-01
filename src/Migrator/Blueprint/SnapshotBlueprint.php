@@ -6,26 +6,10 @@ use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\ForeignKeyDefinition;
-use Illuminate\Database\Schema\Grammars\SQLiteGrammar;
 use Illuminate\Support\Fluent;
 
 class SnapshotBlueprint extends Blueprint
 {
-    /**
-     * {@inheritDoc}
-     */
-    public function addAlterCommands()
-    {
-        if ($this->grammar instanceof SQLiteGrammar) {
-            foreach ($this->commands as $command) {
-                if ($command->name === 'dropUnversionedForeign') {
-                    $command->name = 'dropForeign';
-                }
-            }
-        }
-
-        parent::addAlterCommands();
-    }
 
     /**
      * Create a foreign ID column for the given model.
@@ -166,14 +150,12 @@ class SnapshotBlueprint extends Blueprint
     /**
      * {@inheritDoc}
      */
-    protected function indexCommand($type, $columns, $index, $algorithm = null, $operatorClass = null)
+    protected function indexCommand($type, $columns, $index, $algorithm = null)
     {
-        $prefix = $this->connection->getTablePrefix();
-
-        if ($index && $prefix && ! str_starts_with($index, $prefix)) {
-            $index = $prefix.$index;
+        if ($index && $this->prefix && ! str_starts_with($index, $this->prefix)) {
+            $index = $this->prefix.$index;
         }
 
-        return parent::indexCommand($type, $columns, $index, $algorithm, $operatorClass);
+        return parent::indexCommand($type, $columns, $index, $algorithm);
     }
 }
