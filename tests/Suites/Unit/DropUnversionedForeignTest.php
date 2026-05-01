@@ -1,5 +1,7 @@
 <?php
 
+use Plank\Snapshots\Connection\SnapshotMySqlGrammar;
+use Plank\Snapshots\Connection\SnapshotPostgresGrammar;
 use Plank\Snapshots\Migrator\Blueprint\SnapshotBlueprint;
 use Plank\Snapshots\Tests\Models\Unversioned;
 use Plank\Snapshots\Tests\Models\UnversionedAlso;
@@ -328,7 +330,7 @@ describe('drop index names match create index names across all FK types', functi
 
 describe('compile methods produce correct SQL', function () {
     it('compileDropUnversionedForeign produces correct MySQL SQL', function () {
-        $grammar = new \Plank\Snapshots\Connection\SnapshotMySqlGrammar;
+        $grammar = new SnapshotMySqlGrammar;
         $grammar->setTablePrefix('v1_0_0_');
 
         $blueprint = new SnapshotBlueprint('versioneds', null, 'v1_0_0_');
@@ -346,7 +348,7 @@ describe('compile methods produce correct SQL', function () {
     });
 
     it('compileDropUnversionedForeign produces correct Postgres SQL', function () {
-        $grammar = new \Plank\Snapshots\Connection\SnapshotPostgresGrammar;
+        $grammar = new SnapshotPostgresGrammar;
         $grammar->setTablePrefix('v1_0_0_');
 
         $blueprint = new SnapshotBlueprint('versioneds', null, 'v1_0_0_');
