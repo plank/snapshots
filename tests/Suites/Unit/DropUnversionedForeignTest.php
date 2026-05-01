@@ -2,6 +2,8 @@
 
 use Illuminate\Database\SQLiteConnection;
 use Illuminate\Support\Facades\DB;
+use Plank\Snapshots\Connection\SnapshotMySqlGrammar;
+use Plank\Snapshots\Connection\SnapshotPostgresGrammar;
 use Plank\Snapshots\Connection\SnapshotSQLiteGrammar;
 use Plank\Snapshots\Migrator\Blueprint\SnapshotBlueprint;
 use Plank\Snapshots\Tests\Models\Unversioned;
@@ -354,7 +356,7 @@ describe('drop index names match create index names across all FK types', functi
 describe('compile methods produce correct SQL', function () {
     it('compileDropUnversionedForeign produces correct MySQL SQL', function () {
         $connection = snapshotConnection('v1_0_0_');
-        $grammar = new \Plank\Snapshots\Connection\SnapshotMySqlGrammar($connection);
+        $grammar = new SnapshotMySqlGrammar($connection);
 
         $bp = blueprint('versioneds', 'v1_0_0_');
         $bp->dropUnversionedForeign(['unversioned_id']);
@@ -372,7 +374,7 @@ describe('compile methods produce correct SQL', function () {
 
     it('compileDropUnversionedForeign produces correct Postgres SQL', function () {
         $connection = snapshotConnection('v1_0_0_');
-        $grammar = new \Plank\Snapshots\Connection\SnapshotPostgresGrammar($connection);
+        $grammar = new SnapshotPostgresGrammar($connection);
 
         $bp = blueprint('versioneds', 'v1_0_0_');
         $bp->dropUnversionedForeign(['unversioned_id']);
