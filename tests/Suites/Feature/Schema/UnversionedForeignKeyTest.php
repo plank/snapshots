@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Database\Schema\Builder as SchemaBuilder;
+use Illuminate\Support\Facades\Schema;
+use Plank\Snapshots\Migrator\Blueprint\SnapshotBlueprint;
 
 use function Pest\Laravel\artisan;
 
@@ -42,14 +44,98 @@ describe('The snapshot schema works with unversioned foreign keys correctly', fu
         });
     });
 
-    it('drops the unversioned foreign keys correctly', function () {
+    it('drops unversioned foreign keys and columns on versioned tables', function () {
         versions()->setActive(createFirstVersion('schema/unversioned_fks'));
 
-        // SQLite does not support dropping FKs but it will let us run the code
-        // so lets at least ensure it doest error out.
-        expect(fn () => artisan('migrate', [
-            '--path' => migrationPath('schema/drop_unversioned_fks'),
-            '--realpath' => true,
-        ])->run())->not->toThrow(Throwable::class);
+        usingSnapshotSchema(function (SchemaBuilder $schema) {
+            $fkColumns = collect($schema->getForeignKeys('versioneds'))->pluck('columns')->flatten();
+            expect($fkColumns)->toContain('unversioned_id');
+        });
+
+        usingSnapshotSchema(function () {
+            Schema::table('versioneds', function (SnapshotBlueprint $table) {
+                $table->dropUnversionedForeign(['unversioned_id']);
+                $table->dropColumn('unversioned_id');
+            });
+        });
+
+        usingSnapshotSchema(function (SchemaBuilder $schema) {
+            expect($schema->hasColumn('versioneds', 'unversioned_id'))->toBeFalse();
+        });
+    });
+
+    it('drops unversioned foreign keys and columns on unversioned tables', function () {
+        usingSnapshotSchema(function (SchemaBuilder $schema) {
+            $fkColumns = collect($schema->getForeignKeys('versioneds'))->pluck('columns')->flatten();
+            expect($fkColumns)->toContain('unversioned_id');
+        });
+
+        usingSnapshotSchema(function () {
+            Schema::table('versioneds', function (SnapshotBlueprint $table) {
+                $table->dropUnversionedForeign(['unversioned_id']);
+                $table->dropColumn('unversioned_id');
+            });
+        });
+
+        usingSnapshotSchema(function (SchemaBuilder $schema) {
+            expect($schema->hasColumn('versioneds', 'unversioned_id'))->toBeFalse();
+        });
+    });
+
+    it('drops unversioned foreign keys without dropping the column', function () {
+        versions()->setActive(createFirstVersion('schema/unversioned_fks'));
+
+        usingSnapshotSchema(function (SchemaBuilder $schema) {
+            $fkColumns = collect($schema->getForeignKeys('versioneds'))->pluck('columns')->flatten();
+            expect($fkColumns)->toContain('unversioned_id');
+        });
+
+        usingSnapshotSchema(function () {
+            Schema::table('versioneds', function (SnapshotBlueprint $table) {
+                $table->dropUnversionedForeign(['unversioned_id']);
+            });
+        });
+
+        usingSnapshotSchema(function (SchemaBuilder $schema) {
+            expect($schema->hasColumn('versioneds', 'unversioned_id'))->toBeTrue();
+            $fkColumns = collect($schema->getForeignKeys('versioneds'))->pluck('columns')->flatten();
+            expect($fkColumns)->not->toContain('unversioned_id');
+        });
+    });
+
+    it('drops constrained unversioned foreign id on versioned tables', function () {
+        versions()->setActive(createFirstVersion('schema/unversioned_fks'));
+
+        usingSnapshotSchema(function (SchemaBuilder $schema) {
+            $fkColumns = collect($schema->getForeignKeys('versioneds'))->pluck('columns')->flatten();
+            expect($fkColumns)->toContain('unversioned_id');
+            expect($schema->hasColumn('versioneds', 'unversioned_id'))->toBeTrue();
+        });
+
+        usingSnapshotSchema(function () {
+            Schema::table('versioneds', function (SnapshotBlueprint $table) {
+                $table->dropConstrainedUnversionedForeignId('unversioned_id');
+            });
+        });
+
+        usingSnapshotSchema(function (SchemaBuilder $schema) {
+            expect($schema->hasColumn('versioneds', 'unversioned_id'))->toBeFalse();
+        });
+    });
+
+    it('preserves other foreign keys when dropping an unversioned foreign key', function () {
+        versions()->setActive(createFirstVersion('schema/unversioned_fks'));
+
+        usingSnapshotSchema(function () {
+            Schema::table('versioneds', function (SnapshotBlueprint $table) {
+                $table->dropUnversionedForeign(['unversioned_id']);
+                $table->dropColumn('unversioned_id');
+            });
+        });
+
+        usingSnapshotSchema(function (SchemaBuilder $schema) {
+            expect($schema->hasColumn('versioneds', 'unversioned_id'))->toBeFalse();
+            expect($schema->hasTable('versioneds'))->toBeTrue();
+        });
     });
 });
