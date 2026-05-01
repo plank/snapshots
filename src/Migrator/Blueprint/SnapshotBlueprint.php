@@ -2,10 +2,12 @@
 
 namespace Plank\Snapshots\Migrator\Blueprint;
 
+use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\ForeignKeyDefinition;
+use Illuminate\Database\Schema\Grammars\Grammar;
 use Illuminate\Database\Schema\Grammars\SQLiteGrammar;
 use Illuminate\Support\Fluent;
 
@@ -14,9 +16,9 @@ class SnapshotBlueprint extends Blueprint
     /**
      * {@inheritDoc}
      */
-    public function addAlterCommands()
+    public function addAlterCommands(Connection $connection, Grammar $grammar)
     {
-        if ($this->grammar instanceof SQLiteGrammar) {
+        if ($grammar instanceof SQLiteGrammar) {
             foreach ($this->commands as $command) {
                 if ($command->name === 'dropUnversionedForeign') {
                     $command->name = 'dropForeign';
@@ -24,7 +26,7 @@ class SnapshotBlueprint extends Blueprint
             }
         }
 
-        parent::addAlterCommands();
+        parent::addAlterCommands($connection, $grammar);
     }
 
     /**
