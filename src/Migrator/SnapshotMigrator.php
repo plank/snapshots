@@ -154,7 +154,7 @@ class SnapshotMigrator extends Migrator
             return $callback();
         } finally {
             $connection->setTablePrefix($originalPrefix);
-            
+
             if ($originalGrammar !== null) {
                 $connection->setSchemaGrammar($originalGrammar);
             } else {
