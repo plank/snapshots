@@ -6,7 +6,6 @@ use Closure;
 use Illuminate\Console\View\Components\Info;
 use Illuminate\Console\View\Components\TwoColumnDetail;
 use Illuminate\Contracts\Events\Dispatcher;
-use Illuminate\Database\Connection;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Database\Events\MigrationsEnded;
 use Illuminate\Database\Events\MigrationsStarted;
@@ -16,6 +15,7 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Plank\Snapshots\Connection\SchemaGrammar;
 use Plank\Snapshots\Contracts\Version;
 use Plank\Snapshots\Contracts\VersionKey;
 use Plank\Snapshots\Facades\Versions;
@@ -85,31 +85,7 @@ class SnapshotMigrator extends Migrator
      */
     protected function versionModelHasBeenMigrated(): bool
     {
-        return $this->usingConnectionSchema(
-            $this->resolver->connection(),
-            fn () => Versions::model()->hasBeenMigrated()
-        );
-    }
-
-    /**
-     * @template TReturn
-     *
-     * @param  callable(): TReturn  $callback
-     * @return TReturn
-     */
-    protected function usingConnectionSchema(Connection $connection, Closure $callback): mixed
-    {
-        $previousSchema = $this->app->make('db.schema');
-
-        try {
-            $this->app->instance('db.schema', $connection->getSchemaBuilder());
-
-            $result = $callback();
-        } finally {
-            $this->app->instance('db.schema', $previousSchema);
-        }
-
-        return $result;
+        return Versions::model()->hasBeenMigrated();
     }
 
     /**
@@ -121,19 +97,69 @@ class SnapshotMigrator extends Migrator
             ? explode('@version:', $file)
             : [$file, null];
 
-        $migration = $this->resolvePath($file);
+        $version = $versionKey ? Versions::find($versionKey) : null;
 
-        if ($migration instanceof SnapshotMigration) {
-            $this->resolver->purge($migration->getConnection());
+        Versions::withVersionActive($version, fn () => parent::runUp($file, $batch, $pretend));
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * Sets the versioned prefix for pretend mode, which bypasses runMigration.
+     */
+    protected function getQueries($migration, $method)
+    {
+        if (! $migration instanceof SnapshotMigration) {
+            return parent::getQueries($migration, $method);
         }
 
-        Versions::withVersionActive(
-            $versionKey ? Versions::find($versionKey) : null,
-            fn () => parent::runUp($file, $batch, $pretend)
-        );
+        return $this->withVersionedConnection($migration, fn () => parent::getQueries($migration, $method));
+    }
 
-        if ($migration instanceof SnapshotMigration) {
-            $this->app->instance('db.schema', $this->resolver->connection($this->connection)->getSchemaBuilder());
+    /**
+     * {@inheritDoc}
+     */
+    protected function runMigration($migration, $method, $name = null)
+    {
+        if (! $migration instanceof SnapshotMigration) {
+            parent::runMigration($migration, $method, $name);
+
+            return;
+        }
+
+        $this->withVersionedConnection($migration, fn () => parent::runMigration($migration, $method, $name));
+    }
+
+    /**
+     * @template TReturn
+     *
+     * @param  callable(): TReturn  $callback
+     * @return TReturn
+     */
+    protected function withVersionedConnection(SnapshotMigration $migration, Closure $callback): mixed
+    {
+        $connection = $this->resolver->connection($migration->getConnection());
+        $version = Versions::active();
+
+        $originalGrammar = $connection->getSchemaGrammar();
+        SchemaGrammar::useSnapshots($connection);
+
+        $originalPrefix = $connection->getTablePrefix();
+
+        if ($version) {
+            $connection->setTablePrefix($version->key()->prefix($originalPrefix));
+        }
+
+        try {
+            return $callback();
+        } finally {
+            $connection->setTablePrefix($originalPrefix);
+            
+            if ($originalGrammar !== null) {
+                $connection->setSchemaGrammar($originalGrammar);
+            } else {
+                $connection->useDefaultSchemaGrammar();
+            }
         }
     }
 
@@ -212,20 +238,10 @@ class SnapshotMigrator extends Migrator
      */
     protected function runDown($file, $migration, $pretend)
     {
-        $instance = $this->resolvePath($file);
-
-        if ($instance instanceof SnapshotMigration) {
-            $this->resolver->purge($instance->getConnection());
-        }
-
         Versions::withVersionActive(
             Versions::byKey($migration->migration),
             fn () => parent::runDown($file, $migration, $pretend),
         );
-
-        if ($migration instanceof SnapshotMigration) {
-            $this->app->instance('db.schema', $this->resolver->connection($this->connection)->getSchemaBuilder());
-        }
     }
 
     /**

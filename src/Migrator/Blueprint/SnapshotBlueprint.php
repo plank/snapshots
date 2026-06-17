@@ -165,6 +165,40 @@ class SnapshotBlueprint extends Blueprint
 
     /**
      * {@inheritDoc}
+     *
+     * Use getTablePrefix() directly so dynamically-set version prefixes are
+     * reflected in auto-generated index names without needing prefix_indexes
+     * to be set in the static connection config.
+     */
+    protected function createIndexName($type, array $columns)
+    {
+        $index = strtolower($this->prefixedTable().'_'.implode('_', $columns).'_'.$type);
+
+        return str_replace(['-', '.'], '_', $index);
+    }
+
+    /**
+     * Returns the table name with the connection's current prefix applied,
+     * correctly handling schema-qualified names (e.g. PostgreSQL "public.users"
+     * becomes "public.{prefix}users").
+     */
+    private function prefixedTable(): string
+    {
+        $prefix = $this->connection->getTablePrefix();
+
+        if (! $prefix) {
+            return $this->table;
+        }
+
+        $dot = strrpos($this->table, '.');
+
+        return $dot !== false
+            ? substr_replace($this->table, '.'.$prefix, $dot, 1)
+            : $prefix.$this->table;
+    }
+
+    /**
+     * {@inheritDoc}
      */
     protected function indexCommand($type, $columns, $index, $algorithm = null, $operatorClass = null)
     {

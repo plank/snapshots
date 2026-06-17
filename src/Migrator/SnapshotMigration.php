@@ -9,6 +9,6 @@ abstract class SnapshotMigration extends Migration
 {
     public function getConnection()
     {
-        return ($this->connection ?? DB::getDefaultConnection()).'_snapshots';
+        return $this->connection ?? DB::getDefaultConnection();
     }
 }

@@ -21,7 +21,7 @@ function snapshotConnection(string $prefix = ''): SQLiteConnection
         $base->getRawPdo(),
         ':memory:',
         $prefix,
-        ['prefix' => $prefix, 'prefix_indexes' => true],
+        ['prefix' => $prefix],
     );
 
     $grammar = new SnapshotSQLiteGrammar($connection);
