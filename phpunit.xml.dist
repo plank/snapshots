@@ -29,13 +29,7 @@
             <directory>tests/Suites/Regression</directory>
         </testsuite>
     </testsuites>
-    <coverage>
-        <report>
-            <html outputDirectory="build/coverage" />
-            <text outputFile="build/coverage.txt" />
-            <clover outputFile="build/logs/clover.xml" />
-        </report>
-    </coverage>
+
     <logging>
         <junit outputFile="build/report.junit.xml" />
     </logging>
