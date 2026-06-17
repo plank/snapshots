@@ -2,7 +2,7 @@
 
 use Illuminate\Database\Schema\Builder as SchemaBuilder;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
+use Plank\Snapshots\Connection\SchemaGrammar;
 use Plank\Snapshots\Facades\Versions;
 use Plank\Snapshots\Models\Version;
 use Plank\Snapshots\Repository\VersionRepository;
@@ -135,22 +135,26 @@ function varcharColumn(): string
  */
 function usingSnapshotSchema(Closure $callback): mixed
 {
-    /** @var SchemaBuilder $schema */
-    $schema = Schema::getFacadeRoot();
-    $connection = $schema->getConnection();
-    $name = $connection->getName();
+    $connection = DB::connection();
 
-    $name = str($name)->endsWith('_snapshots')
-        ? $name
-        : $name.'_snapshots';
+    $originalGrammar = $connection->getSchemaGrammar();
+    SchemaGrammar::useSnapshots($connection);
 
-    DB::purge($name);
+    $originalPrefix = $connection->getTablePrefix();
 
-    $snapshotConnection = DB::connection($name);
+    if ($active = Versions::active()) {
+        $connection->setTablePrefix($active->key()->prefix($originalPrefix));
+    }
 
     try {
-        return $callback($snapshotConnection->getSchemaBuilder());
+        return $callback($connection->getSchemaBuilder());
     } finally {
-        app()->instance('db.schema', $schema);
+        $connection->setTablePrefix($originalPrefix);
+
+        if ($originalGrammar !== null) {
+            $connection->setSchemaGrammar($originalGrammar);
+        } else {
+            $connection->useDefaultSchemaGrammar();
+        }
     }
 }

@@ -7,7 +7,6 @@ use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Event;
-use Plank\Snapshots\Connection\SnapshotConnectionInitializer;
 use Plank\Snapshots\Contracts\ManagesVersions;
 use Plank\Snapshots\Events\VersionCreated;
 use Plank\Snapshots\Events\VersionMigrated;
@@ -90,23 +89,9 @@ class SnapshotServiceProvider extends PackageServiceProvider
         });
 
         $this->app->extend('migrator', function (Migrator $migrator, Application $app) {
-            $db = $app['db'];
-
-            foreach ($app['config']->get('database.connections') as $name => $config) {
-                $connections = $app['config']->get('database.connections');
-                $connections[$name.'_snapshots'] = $config;
-                $app['config']->set('database.connections', $connections);
-
-                $db->extend($name.'_snapshots', fn () => SnapshotConnectionInitializer::initialize(
-                    $app,
-                    $db,
-                    $name
-                ));
-            }
-
             return new SnapshotMigrator(
                 $app['migration.repository'],
-                $db,
+                $app['db'],
                 $app['files'],
                 $app['events'],
                 $app
