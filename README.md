@@ -12,24 +12,24 @@
 
 :warning: Package is under active development. Do not use in production. :warning:
 
-Snapshots is a Laravel package that allows you to version the content of your app by replicating database tables and their content. Each snapshot represents a browseable version of your app's content at a specific point in time. By changing the active version of your app, you can view your app's content at a previous version.
+Snapshots is a Laravel package that allows you to snapshot the content of your app by replicating database tables and their content. Each snapshot represents a browseable snapshot of your app's content at a specific point in time. By changing the active snapshot of your app, you can view your app's content at a previous snapshot.
 
-The main goal of this package is for it to perform robust versioning of your content, but stay out of your way. You should be able to use it without having to change your existing codebase. It should be easy to install and configure, and it should be easy to use.
+The main goal of this package is for it to perform robust snapshotting of your content, but stay out of your way. You should be able to use it without having to change your existing codebase. It should be easy to install and configure, and it should be easy to use.
 
 ## Table of Contents
 
 - [Installation](#installation)
 - [Quick Start](#quick-start)
 - [Configuration](#configuration)
-  - [Version Model](#version-model)
+  - [Snapshot Model](#snapshot-model)
   - [Repository](#repository)
   - [Auto Migration](#auto-migration)
   - [Auto Copy](#auto-copy)
 - [Usage](#usage)
-  - [Versions](#versions)
+  - [Snapshots](#snapshots)
     - [Contract and Model](#contract-and-model)
       - [Events](#events)
-    - [Repository](#version-repository)
+    - [Repository](#snapshot-repository)
   - [Migrations](#migrations)
     - [SnapshotMigration](#snapshotmigration)
     - [SnapshotMigrator](#snapshotmigrator)
@@ -61,10 +61,10 @@ php artisan snapshots:install
 
 Once the installation has completed, to begin using the package:
 
-1. Make all migrations for versioned content implement `Plank\Snapshots\Migrator\SnapshotMigration`.
-2. Make all models representing versioned content implement `Plank\Snapshots\Contracts\Versioned` and use the `Plank\Snapshots\Concerns\AsVersionedContent` trait.
-3. Make all models that are not versioned, but have a relation to versioned content use the `Plank\Snapshots\Concerns\InteractsWithVersionedContent` trait.
-4. Create a middleware to set the active version of your app based on the request.
+1. Make all migrations for snapshotted content implement `Plank\Snapshots\Migrator\SnapshotMigration`.
+2. Make all models representing snapshotted content implement `Plank\Snapshots\Contracts\Snapshotted` and use the `Plank\Snapshots\Concerns\AsSnapshottedContent` trait.
+3. Make all models that are not snapshotted, but have a relation to snapshotted content use the `Plank\Snapshots\Concerns\InteractsWithSnapshottedContent` trait.
+4. Create a middleware to set the active snapshot of your app based on the request.
 
 Middleware example:
 
@@ -74,16 +74,16 @@ Middleware example:
 namespace App\Http\Middleware;
 
 use Closure;
-use Plank\Snapshots\Facades\Versions;
+use Plank\Snapshots\Facades\Snapshots;
 
-class SetActiveVersion
+class SetActiveSnapshot
 {
     public function handle($request, Closure $next)
     {
-        $version = $request->route('version');
+        $snapshot = $request->route('snapshot');
 
-        if ($version = Versions::byKey($version)) {
-            Versions::setActive($version);
+        if ($snapshot = Snapshots::byKey($snapshot)) {
+            Snapshots::setActive($snapshot);
         }
 
         return $next($request);
@@ -91,7 +91,7 @@ class SetActiveVersion
 }
 ```
 
-Now, whenever you create a new version, the `SnapshotDatabase` listener will handle the `VersionCreated` event and run all migrations for the versioned content. It will also copy the content from the previous version of the table into the new version of the table.
+Now, whenever you create a new snapshot, the `SnapshotDatabase` listener will handle the `SnapshotCreated` event and run all migrations for the snapshotted content. It will also copy the content from the previous snapshot of the table into the new snapshot of the table.
 
 &nbsp;
 
@@ -103,25 +103,25 @@ The package's configuration file is located at `config/snapshots.php`. If you di
 php artisan vendor:publish --provider="Plank\Snapshots\SnapshotsServiceProvider" --tag="config"
 ```
 
-### Version Model
+### Snapshot Model
 
-The `model` option is the fully qualified class name of the model that will be used to store the versions of your app. The default value is `Plank\Snapshots\Models\Version`. Any model provided must implement the `Plank\Snapshots\Contracts\Version` interface.
+The `model` option is the fully qualified class name of the model that will be used to store the snapshots of your app. The default value is `Plank\Snapshots\Models\Snapshot`. Any model provided must implement the `Plank\Snapshots\Contracts\Snapshot` interface.
 
-### Version Factory
+### Snapshot Factory
 
-The `factory` option is the fully qualified class name of the model factory that will be used to generate Version instances for testing and seeding your application. The default value is `Plank\Snapshots\Factories\VersionFactory`.
+The `factory` option is the fully qualified class name of the model factory that will be used to generate Snapshot instances for testing and seeding your application. The default value is `Plank\Snapshots\Factories\SnapshotFactory`.
 
 ### Repository
 
-The `repository` option is the fully qualified class name of the repository that will be used to retrieve the versions of your app. The default value is `Plank\Snapshots\Repository\VersionRepository`. Any repository provided must implement the `Plank\Snapshots\Contracts\ManagesVersions` interface.
+The `repository` option is the fully qualified class name of the repository that will be used to retrieve the snapshots of your app. The default value is `Plank\Snapshots\Repository\SnapshotRepository`. Any repository provided must implement the `Plank\Snapshots\Contracts\ManagesSnapshots` interface.
 
 ### Auto Migration
 
-The `auto_migrate` option determines whether the package will automatically create new tables for all versioned content when a new version model is created. The package provides the default implementation of `Plank\Snapshots\Listeners\SnapshotDatabase`, but you can provide your own implementation.
+The `auto_migrate` option determines whether the package will automatically create new tables for all snapshotted content when a new snapshot model is created. The package provides the default implementation of `Plank\Snapshots\Listeners\SnapshotDatabase`, but you can provide your own implementation.
 
 ### Auto Copy
 
-The `auto_copy` option determines whether the package will automatically copy content to the newly versioned tables when a new version model is created.
+The `auto_copy` option determines whether the package will automatically copy content to the newly snapshotted tables when a new snapshot model is created.
 
 The package provides the default implementation of `Plank\Snapshots\Listeners\CopyTable`, where the data is copied over at the database level.
 
@@ -131,31 +131,31 @@ You can also provide your own implementation by setting it in the configuration 
 
 ## Usage
 
-### Versions
+### Snapshots
 
 #### Contract and Model
 
-Snapshots are identified by and accessed through a `Version` model. This model is created by the package or can be overridden by the consumer by creating a class which implements the `Plank\Contracts\Version` contract, and specifying it as the [`model`](#version-model) in the configuration file.
+Snapshots are identified by and accessed through a `Snapshot` model. This model is created by the package or can be overridden by the consumer by creating a class which implements the `Plank\Contracts\Snapshot` contract, and specifying it as the [`model`](#snapshot-model) in the configuration file.
 
-In applications that use this package, requests should generally specify an "active" `Version`. The active `Version` will alter the database tables which versioned content will be queried on.
+In applications that use this package, requests should generally specify an "active" `Snapshot`. The active `Snapshot` will alter the database tables which snapshotted content will be queried on.
 
 ##### Events
 
-- `Plank\Events\VersionCreated`
-  - Fired after a new version model is created
-  - Hooked on to by the package to run all the versioned migrations, but can be disabled by setting [`auto_migrate`](#auto-migration) to `false`
+- `Plank\Events\SnapshotCreated`
+  - Fired after a new snapshot model is created
+  - Hooked on to by the package to run all the snapshotted migrations, but can be disabled by setting [`auto_migrate`](#auto-migration) to `false`
 
-#### Version Repository
+#### Snapshot Repository
 
-The `ManagesVersions` interface is a minimal interface for a `Version` repository required for the migrator to function. The package provides a `VersionRepository` class which implements this interface, but it can be overridden by the consumer by creating a class which implements the `Plank\Contracts\ManagesVersions` contract, and specifying it as the [`repository`](#repository) in the configuration file.
+The `ManagesSnapshots` interface is a minimal interface for a `Snapshot` repository required for the migrator to function. The package provides a `SnapshotRepository` class which implements this interface, but it can be overridden by the consumer by creating a class which implements the `Plank\Contracts\ManagesSnapshots` contract, and specifying it as the [`repository`](#repository) in the configuration file.
 
-The repository is responsible for querying existing versions and managing the active version. It is not used to create new versions, as that is out of scope for the package.
+The repository is responsible for querying existing snapshots and managing the active snapshot. It is not used to create new snapshots, as that is out of scope for the package.
 
 ### Migrations
 
 #### SnapshotMigration
 
-This package adds a `SnapshotMigration` class, to house the migrations for all of your versioned content. It allows the [`SnapshotMigrator`](#snapshotmigrator) to know which migrations need to be run across all versions of your app.
+This package adds a `SnapshotMigration` class, to house the migrations for all of your snapshotted content. It allows the [`SnapshotMigrator`](#snapshotmigrator) to know which migrations need to be run across all snapshots of your app.
 
 To use it, simply make the Migration classes extend `SnapshotMigration` instead of the framework's `Migration` class.
 
@@ -187,22 +187,22 @@ return new class extends SnapshotMigration
 }
 ```
 
-You will notice that in a `SnapshotMigration` you have the `SnapshotBlueprint` class injected into your schema calls. This blueprint type exists to allow you to define unversioned foreign keys on versioned content using methods like `->unversionedForeign('user_id')` method.
+You will notice that in a `SnapshotMigration` you have the `SnapshotBlueprint` class injected into your schema calls. This blueprint type exists to allow you to define plain foreign keys on snapshotted content using methods like `->plainForeign('user_id')` method.
 
 
 ##### Limitations
 
-1. Foreign keys for relations from unversioned content to versioned content can not be used. This is due to there being more than one version of the table, and the foreign key will not know which version to reference. Foreign keys from versioned content to unversioned content, and from versioned content to versioned content are still possible.
+1. Foreign keys for relations from plain content to snapshotted content can not be used. This is due to there being more than one snapshot of the table, and the foreign key will not know which snapshot to reference. Foreign keys from snapshotted content to plain content, and from snapshotted content to snapshotted content are still possible.
 
-2. It is important to note that pivot tables where at least one of the related models is versioned, should also be versioned. This is because the pivot table will need to be copied for each version of the related model.
+2. It is important to note that pivot tables where at least one of the related models is snapshotted, should also be snapshotted. This is because the pivot table will need to be copied for each snapshot of the related model.
 
-3. It is also important to note that if you are using a versioned custom Pivot model, you cannot relate unversioned content to unversioned content through the pivot. So be especially careful with what you are relating through your custom polymorphic pivot models.
+3. It is also important to note that if you are using a snapshotted custom Pivot model, you cannot relate plain content to plain content through the pivot. So be especially careful with what you are relating through your custom polymorphic pivot models.
 
 &nbsp;
 
 #### SnapshotMigrator
 
-This package will replace the framework's migrator with the `SnapshotMigrator` class. The migrator extends the framework's migrator with the sole purpose of ensuring the migrations for your versioned content are run for every version of your app.
+This package will replace the framework's migrator with the `SnapshotMigrator` class. The migrator extends the framework's migrator with the sole purpose of ensuring the migrations for your snapshotted content are run for every snapshot of your app.
 
 For example, after running migrations in a traditional Laravel Application, you might have the following:
 
@@ -234,10 +234,10 @@ INFO  Running migrations.
 2023_09_25_000000_create_users_table    ............................... 10ms DONE
 2023_09_25_000001_create_roles_table    ............................... 10ms DONE
 2023_09_25_000002_create_pages_table    ............................... 14ms DONE
-2023_09_25_000002_create_versions_table ............................... 14ms DONE
+2023_09_25_000002_create_snapshots_table ............................... 14ms DONE
 ```
 
-When creating the first `Version` model – with [`auto_migrate`](#auto-migrate) set to `true` – assuming the Page content is versioned, the package will re-run your `2023_09_25_000002_create_pages_table` migration for the new `Version`.
+When creating the first `Snapshot` model – with [`auto_migrate`](#auto-migrate) set to `true` – assuming the Page content is snapshotted, the package will re-run your `2023_09_25_000002_create_pages_table` migration for the new `Snapshot`.
 
 The following output is shown as an illustration. The migration is run in the background, and not output.
 
@@ -260,17 +260,17 @@ INFO  Running migrations.
 v1_0_0_2023_09_25_000003_add_slug_to_pages_table  ............................... 10ms DONE
 ```
 
-The migration is applied to all versions of your content to achieve consistency across versions.
+The migration is applied to all snapshots of your content to achieve consistency across snapshots.
 
 &nbsp;
 
 ### Models
 
-#### Versioned Models
+#### Snapshotted Models
 
-This package provides a `Plank\Snapshots\Contracts\Versioned` interface, and a `AsVersionedContent` trait. For models whose content should be versioned, have them implement the `Versioned` interface, and use the `AsVersionedContent` trait.
+This package provides a `Plank\Snapshots\Contracts\Snapshotted` interface, and a `AsSnapshottedContent` trait. For models whose content should be snapshotted, have them implement the `Snapshotted` interface, and use the `AsSnapshottedContent` trait.
 
-This trait ensures queries on the model's table are prefixed with the active version's prefix. It also overrides the pivoted relations to use the versioned pivot table.
+This trait ensures queries on the model's table are prefixed with the active snapshot's prefix. It also overrides the pivoted relations to use the snapshotted pivot table.
 
 Example:
 
@@ -280,18 +280,18 @@ Example:
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Plank\Snapshots\Concerns\AsVersionedContent;
-use Plank\Snapshots\Contracts\Versioned;
+use Plank\Snapshots\Concerns\AsSnapshottedContent;
+use Plank\Snapshots\Contracts\Snapshotted;
 
-class Page extends Model implements Versioned
+class Page extends Model implements Snapshotted
 {
-    use AsVersionedContent;
+    use AsSnapshottedContent;
 }
 ```
 
-#### Unversioned Models
+#### Plain Models
 
-For any models that have an association to a versioned model, you can use the `Plank\Snapshots\Concerns\InteractsWithVersionedContent` trait. This trait ensures that when a versioned model is related through a pivot, the versioned pivot table is used.
+For any models that have an association to a snapshotted model, you can use the `Plank\Snapshots\Concerns\InteractsWithSnapshottedContent` trait. This trait ensures that when a snapshotted model is related through a pivot, the snapshotted pivot table is used.
 
 Example:
 
@@ -301,11 +301,11 @@ Example:
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Plank\Snapshots\Concerns\InteractsWithVersionedContent;
+use Plank\Snapshots\Concerns\InteractsWithSnapshottedContent;
 
 class User extends Model
 {
-    use InteractsWithVersionedContent;
+    use InteractsWithSnapshottedContent;
 
     public function pages()
     {
