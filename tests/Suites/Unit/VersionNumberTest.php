@@ -15,7 +15,7 @@ describe('VersionNumber creates, compares and transforms correctly', function ()
         VersionNumber::fromString('10000');
     })->throws(InvalidArgumentException::class);
 
-    it('can return the next major version', function () {
+    it('can return the next major snapshot', function () {
         $number = VersionNumber::fromString('1.0.0');
 
         $next = $number->nextMajor();
@@ -25,7 +25,7 @@ describe('VersionNumber creates, compares and transforms correctly', function ()
         expect($next->patch())->toEqual(0);
     });
 
-    it('can return the next minor version', function () {
+    it('can return the next minor snapshot', function () {
         $number = VersionNumber::fromString('1.0.0');
 
         $next = $number->nextMinor();
@@ -35,7 +35,7 @@ describe('VersionNumber creates, compares and transforms correctly', function ()
         expect($next->patch())->toEqual(0);
     });
 
-    it('can return the next patch version', function () {
+    it('can return the next patch snapshot', function () {
         $number = VersionNumber::fromString('1.0.0');
 
         $next = $number->nextPatch();
@@ -45,13 +45,13 @@ describe('VersionNumber creates, compares and transforms correctly', function ()
         expect($next->patch())->toEqual(1);
     });
 
-    it('can return a string key of the version', function () {
+    it('can return a string key of the snapshot', function () {
         $number = VersionNumber::fromString('1.0.0');
 
         expect($number->snake())->toEqual('1_0_0');
     });
 
-    it('can return a kebab cased string of the version', function () {
+    it('can return a kebab cased string of the snapshot', function () {
         $number = VersionNumber::fromString('1.0.0');
 
         expect($number->kebab())->toEqual('1-0-0');

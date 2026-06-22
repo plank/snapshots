@@ -5,12 +5,12 @@ namespace Plank\Snapshots\Tests\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Plank\Snapshots\Concerns\InteractsWithVersionedContent;
+use Plank\Snapshots\Concerns\InteractsWithSnapshottedContent;
 
 class Like extends Model
 {
     use HasFactory;
-    use InteractsWithVersionedContent;
+    use InteractsWithSnapshottedContent;
 
     protected $guarded = [];
 

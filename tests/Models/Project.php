@@ -7,13 +7,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
-use Plank\Snapshots\Concerns\AsVersionedContent;
+use Plank\Snapshots\Concerns\AsSnapshottedContent;
 use Plank\Snapshots\Contracts\Trackable;
-use Plank\Snapshots\Contracts\Versioned;
+use Plank\Snapshots\Contracts\Snapshotted;
 
-class Project extends Model implements Trackable, Versioned
+class Project extends Model implements Trackable, Snapshotted
 {
-    use AsVersionedContent;
+    use AsSnapshottedContent;
     use HasFactory;
     use HasUlids;
 

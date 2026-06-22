@@ -17,7 +17,7 @@ return new class extends SnapshotMigration
             $table->morphs('contractable');
             $table->timestamps();
 
-            $table->unversionedForeign('contractor_id')
+            $table->plainForeign('contractor_id')
                 ->references('id')
                 ->on('contractors')
                 ->onDelete('cascade');

@@ -6,7 +6,7 @@ use Plank\Snapshots\Tests\Models\Post;
 use function Pest\Laravel\artisan;
 use function Pest\Laravel\seed;
 
-describe('Versioned models use the version prefixed table when interacting with the database', function () {
+describe('Snapshotted models use the snapshot prefixed table when interacting with the database', function () {
     beforeEach(function () {
         artisan('migrate', [
             '--path' => migrationPath('query'),
@@ -16,23 +16,23 @@ describe('Versioned models use the version prefixed table when interacting with 
         seed(PostSeeder::class);
     });
 
-    it('can retrieve the correct version of a model', function () {
+    it('can retrieve the correct snapshot of a model', function () {
         // Verify the seeded post was found and has the correct data
         expect(($post = Post::query()->where('title', 'Post 1')->first()))->not->toBeNull();
 
-        // Create a new version and make it active
-        versions()->setActive(createFirstVersion('query'));
+        // Create a new snapshot and make it active
+        snapshots()->setActive(createFirstSnapshot('query'));
 
-        // Assert the posts will be querying the new versions tables
+        // Assert the posts will be querying the new snapshots tables
         expect((new Post)->getTable())->toBe('v1_0_0_posts');
 
-        // Verify the post was copied over when migrating the version
+        // Verify the post was copied over when migrating the snapshot
         expect(Post::find($post->uuid)->title)->toBe('Post 1');
     });
 
-    it('can save a model to the correct version table', function () {
-        // Create a new version and make it active
-        versions()->setActive(createFirstVersion('query'));
+    it('can save a model to the correct snapshot table', function () {
+        // Create a new snapshot and make it active
+        snapshots()->setActive(createFirstSnapshot('query'));
 
         // Create a new post
         $post = Post::factory()->create(['title' => 'Saved to v1.0.0']);
@@ -44,15 +44,15 @@ describe('Versioned models use the version prefixed table when interacting with 
         expect(Post::query()->where('title', 'Saved to v1.0.0')->exists())->toBeTrue();
 
         // Switch back to the original content
-        versions()->clearActive();
+        snapshots()->clearActive();
 
         // Verify the post was not saved to the incorrect table
         expect(Post::query()->where('title', 'Saved to v1.0.0')->exists())->toBeFalse();
     });
 
-    it('can delete a model from the correct version table', function () {
-        // Create a new version and make it active
-        versions()->setActive(createFirstVersion('query'));
+    it('can delete a model from the correct snapshot table', function () {
+        // Create a new snapshot and make it active
+        snapshots()->setActive(createFirstSnapshot('query'));
 
         // Find the first post
         expect(($post = Post::query()->where('title', 'Post 1')->first()))->not->toBeNull();
@@ -67,15 +67,15 @@ describe('Versioned models use the version prefixed table when interacting with 
         expect(Post::query()->where('title', 'Post 1')->exists())->toBeFalse();
 
         // Switch back to the original content
-        versions()->clearActive();
+        snapshots()->clearActive();
 
         // Verify the post was not deleted from the incorrect table
         expect(Post::query()->where('title', 'Post 1')->exists())->toBeTrue();
     });
 
-    it('can update a model in the correct version table', function () {
-        // Create a new version and make it active
-        versions()->setActive(createFirstVersion('query'));
+    it('can update a model in the correct snapshot table', function () {
+        // Create a new snapshot and make it active
+        snapshots()->setActive(createFirstSnapshot('query'));
 
         // Find the first post
         expect(($post = Post::query()->where('title', 'Post 1')->first()))->not->toBeNull();
@@ -83,16 +83,16 @@ describe('Versioned models use the version prefixed table when interacting with 
         // Verify the query will be using the correct table
         expect($post->getTable())->toBe('v1_0_0_posts');
 
-        // Fix some errate in the first version
+        // Fix some errate in the first snapshot
         $post->update(['title' => 'Fixed Errata in v1.0.0']);
 
         // Ensure the post was updated
         expect(($post = Post::query()->where('title', 'Fixed Errata in v1.0.0')->first()))->not->toBeNull();
 
-        // Fo back to the working version
-        versions()->clearActive();
+        // Fo back to the working snapshot
+        snapshots()->clearActive();
 
-        // Ensure we are back in the working version
+        // Ensure we are back in the working snapshot
         expect($post->getTable())->toBe('posts');
 
         // Update the post
@@ -101,13 +101,13 @@ describe('Versioned models use the version prefixed table when interacting with 
         // Verify the post was updated in the correct table
         expect(Post::query()->where('title', 'Updated for v1.0.0')->exists())->toBeTrue();
 
-        // Create a new version and make it active
-        versions()->setActive(createPatchVersion('query'));
+        // Create a new snapshot and make it active
+        snapshots()->setActive(createPatchSnapshot('query'));
 
         // Verify the query will be using the correct table
         expect($post->getTable())->toBe('v1_0_1_posts');
 
-        // Verify the post was carried over from the working version
+        // Verify the post was carried over from the working snapshot
         expect(Post::query()->where('title', 'Updated for v1.0.0')->exists())->toBeTrue();
     });
 });

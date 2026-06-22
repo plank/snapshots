@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Artisan;
-use Plank\Snapshots\Models\Version as VersionModel;
+use Plank\Snapshots\Models\Snapshot as SnapshotModel;
 
 use function Pest\Laravel\artisan;
 use function Pest\Laravel\assertDatabaseHas;
@@ -16,14 +16,14 @@ describe('SnapshotMigrations can be pretended', function () {
     });
 
     it('pretends snapshot up migrations', function () {
-        createFirstVersion('schema/create');
+        createFirstSnapshot('schema/create');
 
         assertDatabaseHas('migrations', [
             'migration' => 'v1_0_0_create_documents_table',
             'batch' => 4,
         ]);
 
-        VersionModel::factory()->createQuietly([
+        SnapshotModel::factory()->createQuietly([
             'number' => '1.0.1',
         ]);
 
@@ -53,7 +53,7 @@ describe('SnapshotMigrations can be pretended', function () {
     });
 
     it('pretends snapshot down migrations', function () {
-        createFirstVersion('schema/create');
+        createFirstSnapshot('schema/create');
 
         assertDatabaseHas('migrations', [
             'migration' => 'v1_0_0_create_documents_table',
