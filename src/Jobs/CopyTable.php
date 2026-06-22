@@ -13,10 +13,10 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Plank\LaravelModelResolver\Facades\Models;
 use Plank\Snapshots\Contracts\Trackable;
-use Plank\Snapshots\Contracts\Version;
-use Plank\Snapshots\Contracts\Versioned;
-use Plank\Snapshots\Contracts\VersionKey;
-use Plank\Snapshots\Facades\Versions;
+use Plank\Snapshots\Contracts\Snapshot;
+use Plank\Snapshots\Contracts\Snapshotted;
+use Plank\Snapshots\Contracts\SnapshotKey;
+use Plank\Snapshots\Facades\Snapshots;
 use Plank\Snapshots\Models\Existence;
 
 class CopyTable implements ShouldQueue
@@ -28,7 +28,7 @@ class CopyTable implements ShouldQueue
     use SerializesModels;
 
     public function __construct(
-        public Version&Model $version,
+        public Snapshot&Model $snapshot,
         public string $table,
     ) {}
 
@@ -39,11 +39,11 @@ class CopyTable implements ShouldQueue
      */
     public function handle()
     {
-        // Grab the data from the "working version"
-        $working = Versions::working($this->version);
+        // Grab the data from the "working snapshot"
+        $working = Snapshots::working($this->snapshot);
 
-        /** @var class-string<VersionKey> $keyClass */
-        $keyClass = config()->get('snapshots.value_objects.version_key');
+        /** @var class-string<SnapshotKey> $keyClass */
+        $keyClass = config()->get('snapshots.value_objects.snapshot_key');
 
         $from = $working
             ? $working->key()->prefix($this->table)
@@ -68,7 +68,7 @@ class CopyTable implements ShouldQueue
         $this->createExistences($class, $working);
     }
 
-    protected function createExistences(string $class, ?Version $working): void
+    protected function createExistences(string $class, ?Snapshot $working): void
     {
         /** @var class-string<Existence> $existence */
         $existence = config()->get('snapshots.models.existence');
@@ -77,11 +77,11 @@ class CopyTable implements ShouldQueue
             return;
         }
 
-        Versions::withVersionActive($working, function () use ($class, $existence) {
+        Snapshots::withSnapshotActive($working, function () use ($class, $existence) {
             $class::query()
                 ->with('existence')
                 ->cursor()
-                ->each(fn (Versioned&Model $model) => $existence::copiedTo($model, $this->version));
+                ->each(fn (Snapshotted&Model $model) => $existence::copiedTo($model, $this->snapshot));
         });
     }
 }

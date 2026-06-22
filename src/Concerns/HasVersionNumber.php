@@ -3,10 +3,10 @@
 namespace Plank\Snapshots\Concerns;
 
 use Plank\Snapshots\Casts\AsVersionNumber;
-use Plank\Snapshots\Models\Version;
+use Plank\Snapshots\Models\Snapshot;
 
 /**
- * @mixin Version
+ * @mixin Snapshot
  */
 trait HasVersionNumber
 {

@@ -4,20 +4,20 @@ namespace Plank\Snapshots\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Plank\Snapshots\Concerns\AsVersion;
+use Plank\Snapshots\Concerns\AsSnapshot;
 use Plank\Snapshots\Concerns\HasVersionNumber;
-use Plank\Snapshots\Contracts\Version as VersionContract;
-use Plank\Snapshots\Contracts\VersionKey;
+use Plank\Snapshots\Contracts\Snapshot as SnapshotContract;
+use Plank\Snapshots\Contracts\SnapshotKey;
 use Plank\Snapshots\ValueObjects\VersionNumber;
 
 /**
  * @property VersionNumber $number
  * @property bool $migrated
- * @property Version $previous
+ * @property Snapshot $previous
  */
-class Version extends Model implements VersionContract
+class Snapshot extends Model implements SnapshotContract
 {
-    use AsVersion;
+    use AsSnapshot;
     use HasFactory;
     use HasVersionNumber;
 
@@ -33,7 +33,7 @@ class Version extends Model implements VersionContract
         return 'number';
     }
 
-    public function key(): VersionKey
+    public function key(): SnapshotKey
     {
         return $this->{static::keyColumn()};
     }

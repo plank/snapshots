@@ -16,9 +16,9 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Plank\Snapshots\Connection\SchemaGrammar;
-use Plank\Snapshots\Contracts\Version;
-use Plank\Snapshots\Contracts\VersionKey;
-use Plank\Snapshots\Facades\Versions;
+use Plank\Snapshots\Contracts\Snapshot;
+use Plank\Snapshots\Contracts\SnapshotKey;
+use Plank\Snapshots\Facades\Snapshots;
 
 class SnapshotMigrator extends Migrator
 {
@@ -55,21 +55,21 @@ class SnapshotMigrator extends Migrator
                     return in_array($name, $ran) ? null : $file;
                 }
 
-                if (! $this->versionModelHasBeenMigrated()) {
-                    return config()->get('snapshots.force_versions')
+                if (! $this->snapshotModelHasBeenMigrated()) {
+                    return config()->get('snapshots.force_snapshots')
                         ? null
-                        : $this->versionedFile(in_array($name, $ran) ? null : $file);
+                        : $this->snapshottedFile(in_array($name, $ran) ? null : $file);
                 }
 
-                return Versions::all()
-                    ->map(function (Version $version) use ($file, $ran) {
-                        $name = $this->addMigrationPrefix($version, $this->getMigrationName($file));
+                return Snapshots::all()
+                    ->map(function (Snapshot $snapshot) use ($file, $ran) {
+                        $name = $this->addMigrationPrefix($snapshot, $this->getMigrationName($file));
 
-                        return in_array($name, $ran) ? null : $this->versionedFile($file, $version);
+                        return in_array($name, $ran) ? null : $this->snapshottedFile($file, $snapshot);
                     })
                     ->when(
-                        ! config()->get('snapshots.force_versions'),
-                        fn (Collection $collection) => $collection->prepend($this->versionedFile(in_array($name, $ran) ? null : $file)),
+                        ! config()->get('snapshots.force_snapshots'),
+                        fn (Collection $collection) => $collection->prepend($this->snapshottedFile(in_array($name, $ran) ? null : $file)),
                     )
                     ->values()
                     ->all();
@@ -81,11 +81,11 @@ class SnapshotMigrator extends Migrator
     }
 
     /**
-     * Detrmine if the configured version model has been migrated yet
+     * Detrmine if the configured snapshot model has been migrated yet
      */
-    protected function versionModelHasBeenMigrated(): bool
+    protected function snapshotModelHasBeenMigrated(): bool
     {
-        return Versions::model()->hasBeenMigrated();
+        return Snapshots::model()->hasBeenMigrated();
     }
 
     /**
@@ -93,19 +93,19 @@ class SnapshotMigrator extends Migrator
      */
     protected function runUp($file, $batch, $pretend)
     {
-        [$file, $versionKey] = str_contains($file, '@version:')
-            ? explode('@version:', $file)
+        [$file, $snapshotKey] = str_contains($file, '@snapshot:')
+            ? explode('@snapshot:', $file)
             : [$file, null];
 
-        $version = $versionKey ? Versions::find($versionKey) : null;
+        $snapshot = $snapshotKey ? Snapshots::find($snapshotKey) : null;
 
-        Versions::withVersionActive($version, fn () => parent::runUp($file, $batch, $pretend));
+        Snapshots::withSnapshotActive($snapshot, fn () => parent::runUp($file, $batch, $pretend));
     }
 
     /**
      * {@inheritDoc}
      *
-     * Sets the versioned prefix for pretend mode, which bypasses runMigration.
+     * Sets the snapshotted prefix for pretend mode, which bypasses runMigration.
      */
     protected function getQueries($migration, $method)
     {
@@ -113,7 +113,7 @@ class SnapshotMigrator extends Migrator
             return parent::getQueries($migration, $method);
         }
 
-        return $this->withVersionedConnection($migration, fn () => parent::getQueries($migration, $method));
+        return $this->withSnapshottedConnection($migration, fn () => parent::getQueries($migration, $method));
     }
 
     /**
@@ -127,7 +127,7 @@ class SnapshotMigrator extends Migrator
             return;
         }
 
-        $this->withVersionedConnection($migration, fn () => parent::runMigration($migration, $method, $name));
+        $this->withSnapshottedConnection($migration, fn () => parent::runMigration($migration, $method, $name));
     }
 
     /**
@@ -136,18 +136,18 @@ class SnapshotMigrator extends Migrator
      * @param  callable(): TReturn  $callback
      * @return TReturn
      */
-    protected function withVersionedConnection(SnapshotMigration $migration, Closure $callback): mixed
+    protected function withSnapshottedConnection(SnapshotMigration $migration, Closure $callback): mixed
     {
         $connection = $this->resolver->connection($migration->getConnection());
-        $version = Versions::active();
+        $snapshot = Snapshots::active();
 
         $originalGrammar = $connection->getSchemaGrammar();
         SchemaGrammar::useSnapshots($connection);
 
         $originalPrefix = $connection->getTablePrefix();
 
-        if ($version) {
-            $connection->setTablePrefix($version->key()->prefix($originalPrefix));
+        if ($snapshot) {
+            $connection->setTablePrefix($snapshot->key()->prefix($originalPrefix));
         }
 
         try {
@@ -177,7 +177,7 @@ class SnapshotMigrator extends Migrator
         $this->write(Info::class, 'Rolling back migrations.');
 
         // Since we are dealing with individual migrations which may have run accross many
-        // batches, for consistency we need to apply all down operations to every version
+        // batches, for consistency we need to apply all down operations to every snapshot
         // of the migration.
         $ran = $this->repository->getMigrations(count($this->repository->getRan()));
         $migrations = $this->allMatchingMigrations($migrations, $ran);
@@ -211,7 +211,7 @@ class SnapshotMigrator extends Migrator
     public function requireFiles(array $files)
     {
         foreach ($files as $file) {
-            $this->files->requireOnce($this->unversionedFile($file));
+            $this->files->requireOnce($this->plainFile($file));
         }
     }
 
@@ -238,8 +238,8 @@ class SnapshotMigrator extends Migrator
      */
     protected function runDown($file, $migration, $pretend)
     {
-        Versions::withVersionActive(
-            Versions::byKey($migration->migration),
+        Snapshots::withSnapshotActive(
+            Snapshots::byKey($migration->migration),
             fn () => parent::runDown($file, $migration, $pretend),
         );
     }
@@ -247,13 +247,13 @@ class SnapshotMigrator extends Migrator
     /**
      * {@inheritDoc}
      */
-    protected function addMigrationPrefix(?Version $version, string $migration): string
+    protected function addMigrationPrefix(?Snapshot $snapshot, string $migration): string
     {
-        if ($version === null) {
+        if ($snapshot === null) {
             return $migration;
         }
 
-        return $version->key()->prefix($migration);
+        return $snapshot->key()->prefix($migration);
     }
 
     /**
@@ -261,24 +261,24 @@ class SnapshotMigrator extends Migrator
      */
     protected function stripMigrationPrefix(string $migration): string
     {
-        /** @var class-string<VersionKey> $keyClass */
-        $keyClass = config('snapshots.value_objects.version_key');
+        /** @var class-string<SnapshotKey> $keyClass */
+        $keyClass = config('snapshots.value_objects.snapshot_key');
 
         return $keyClass::strip($migration);
     }
 
-    protected function versionedFile(?string $file, ?Version $version = null): ?string
+    protected function snapshottedFile(?string $file, ?Snapshot $snapshot = null): ?string
     {
         if ($file === null) {
             return null;
         }
 
-        return $file.'@version:'.$version?->getKey();
+        return $file.'@snapshot:'.$snapshot?->getKey();
     }
 
-    protected function unversionedFile(string $file): string
+    protected function plainFile(string $file): string
     {
-        return (string) str()->before($file, '@version:');
+        return (string) str()->before($file, '@snapshot:');
     }
 
     /**

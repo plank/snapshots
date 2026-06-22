@@ -2,10 +2,10 @@
 
 namespace Plank\Snapshots\ValueObjects;
 
-use Plank\Snapshots\Contracts\VersionKey;
+use Plank\Snapshots\Contracts\SnapshotKey;
 use Throwable;
 
-class VersionNumber implements VersionKey
+class VersionNumber implements SnapshotKey
 {
     protected const DOT_REGEX = '/(v{0,1})(\d+)\.(\d+)\.(\d+)/i';
 
@@ -38,7 +38,7 @@ class VersionNumber implements VersionKey
 
             throw new \InvalidArgumentException;
         } catch (Throwable) {
-            throw new \InvalidArgumentException('Invalid version: '.$string);
+            throw new \InvalidArgumentException('Invalid snapshot: '.$string);
         }
     }
 
@@ -110,11 +110,11 @@ class VersionNumber implements VersionKey
             ->toString();
     }
 
-    protected static function isValidVersionString(string $version)
+    protected static function isValidSnapshotString(string $snapshot)
     {
-        return preg_match(static::DOT_REGEX, $version) === 1
-            || preg_match(static::SNAKE_REGEX, $version) === 1
-            || preg_match(static::KEBAB_REGEX, $version) === 1;
+        return preg_match(static::DOT_REGEX, $snapshot) === 1
+            || preg_match(static::SNAKE_REGEX, $snapshot) === 1
+            || preg_match(static::KEBAB_REGEX, $snapshot) === 1;
     }
 
     public function major(): int
@@ -147,48 +147,48 @@ class VersionNumber implements VersionKey
         return new static($this->major, $this->minor, $this->patch + 1);
     }
 
-    public function isGreaterThan(VersionKey|string $other): bool
+    public function isGreaterThan(SnapshotKey|string $other): bool
     {
         $other = static::wrap($other);
 
         return $this->compare($other) > 0;
     }
 
-    public function isGreaterThanOrEqualTo(VersionKey|string $other): bool
+    public function isGreaterThanOrEqualTo(SnapshotKey|string $other): bool
     {
         $other = static::wrap($other);
 
         return $this->compare($other) >= 0;
     }
 
-    public function isLessThan(VersionKey|string $other): bool
+    public function isLessThan(SnapshotKey|string $other): bool
     {
         $other = static::wrap($other);
 
         return $this->compare($other) < 0;
     }
 
-    public function isLessThanOrEqualTo(VersionKey|string $other): bool
+    public function isLessThanOrEqualTo(SnapshotKey|string $other): bool
     {
         $other = static::wrap($other);
 
         return $this->compare($other) <= 0;
     }
 
-    public function isEqualTo(VersionKey|string $other): bool
+    public function isEqualTo(SnapshotKey|string $other): bool
     {
         $other = static::wrap($other);
 
         return $this->compare($other) === 0;
     }
 
-    public static function wrap(string|VersionNumber $version): self
+    public static function wrap(string|VersionNumber $snapshot): self
     {
-        if ($version instanceof VersionNumber) {
-            return $version;
+        if ($snapshot instanceof VersionNumber) {
+            return $snapshot;
         }
 
-        return static::fromString($version);
+        return static::fromString($snapshot);
     }
 
     protected function compare(self $other): int

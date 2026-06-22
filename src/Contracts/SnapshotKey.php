@@ -4,7 +4,7 @@ namespace Plank\Snapshots\Contracts;
 
 use Stringable;
 
-interface VersionKey extends Stringable
+interface SnapshotKey extends Stringable
 {
     /**
      * Build an instance from any string
@@ -12,22 +12,22 @@ interface VersionKey extends Stringable
     public static function fromString(string $key): static;
 
     /**
-     * Get an identifying string representation of the version
+     * Get an identifying string representation of the snapshot
      */
     public function toString(): string;
 
     /**
-     * Prefix the version to the beginning of the string
+     * Prefix the snapshot to the beginning of the string
      */
     public function snake(): string;
 
     /**
-     * Strip any occurence of the version from the string
+     * Strip any occurence of the snapshot from the string
      */
     public function kebab(): string;
 
     /**
-     * Prefix the version to the beginning of the string
+     * Prefix the snapshot to the beginning of the string
      */
     public function prefix(string $string): string;
 
@@ -37,7 +37,7 @@ interface VersionKey extends Stringable
     public function isPrefixOf(string $string): bool;
 
     /**
-     * Strip any occurence of the version from the string
+     * Strip any occurence of the snapshot from the string
      */
     public static function strip(string $string): string;
 }

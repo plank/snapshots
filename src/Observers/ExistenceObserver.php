@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Plank\Snapshots\Contracts\Identifiable;
 use Plank\Snapshots\Contracts\Trackable;
-use Plank\Snapshots\Facades\Versions;
+use Plank\Snapshots\Facades\Snapshots;
 use Plank\Snapshots\Models\Existence;
 
 class ExistenceObserver
@@ -24,7 +24,7 @@ class ExistenceObserver
         /** @var class-string<Existence> $class */
         $class = config()->get('snapshots.models.existence');
 
-        $model->setRelation('existence', $class::createOrUpdateFor($model, Versions::active()));
+        $model->setRelation('existence', $class::createOrUpdateFor($model, Snapshots::active()));
     }
 
     public function updated(Model&Trackable $model)
@@ -70,7 +70,7 @@ class ExistenceObserver
         /** @var class-string<Existence> $class */
         $class = config()->get('snapshots.models.existence');
 
-        $model->setRelation('existence', $class::createOrUpdateFor($model, Versions::active()));
+        $model->setRelation('existence', $class::createOrUpdateFor($model, Snapshots::active()));
     }
 
     public function forceDeleting(Model&Trackable $model)
