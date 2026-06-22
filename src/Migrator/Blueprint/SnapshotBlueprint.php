@@ -18,7 +18,7 @@ class SnapshotBlueprint extends Blueprint
     {
         if ($this->grammar instanceof SQLiteGrammar) {
             foreach ($this->commands as $command) {
-                if ($command->name === 'dropUnversionedForeign') {
+                if ($command->name === 'dropPlainForeign') {
                     $command->name = 'dropForeign';
                 }
             }
@@ -30,10 +30,10 @@ class SnapshotBlueprint extends Blueprint
     /**
      * Create a foreign ID column for the given model.
      */
-    public function unversionedForeign($columns, $name = null): ForeignKeyDefinition
+    public function plainForeign($columns, $name = null): ForeignKeyDefinition
     {
         $command = new ForeignKeyDefinition(
-            $this->indexCommand('unversionedForeign', $columns, $name)->getAttributes()
+            $this->indexCommand('plainForeign', $columns, $name)->getAttributes()
         );
 
         $this->commands[count($this->commands) - 1] = $command;
@@ -44,7 +44,7 @@ class SnapshotBlueprint extends Blueprint
     /**
      * Create a foreign ID column for the given model.
      */
-    public function unversionedForeignIdFor($model, $column = null): ForeignKeyDefinition
+    public function plainForeignIdFor($model, $column = null): ForeignKeyDefinition
     {
         if (is_string($model)) {
             $model = new $model;
@@ -53,7 +53,7 @@ class SnapshotBlueprint extends Blueprint
         $column = $column ?: $model->getForeignKey();
 
         if ($model->getKeyType() === 'int') {
-            return $this->unversionedForeignId($column)
+            return $this->plainForeignId($column)
                 ->references($model->getKeyName())
                 ->on($model->getTable());
         }
@@ -61,12 +61,12 @@ class SnapshotBlueprint extends Blueprint
         $modelTraits = class_uses_recursive($model);
 
         if (in_array(HasUlids::class, $modelTraits, true)) {
-            return $this->unversionedForeignUlid($column, 26)
+            return $this->plainForeignUlid($column, 26)
                 ->references($model->getKeyName())
                 ->on($model->getTable());
         }
 
-        return $this->unversionedForeignUuid($column)
+        return $this->plainForeignUuid($column)
             ->references($model->getKeyName())
             ->on($model->getTable());
     }
@@ -74,9 +74,9 @@ class SnapshotBlueprint extends Blueprint
     /**
      * Create a new unsigned big integer (8-byte) column on the table.
      */
-    public function unversionedForeignId($column): UnversionedForeignIdColumnDefinition
+    public function plainForeignId($column): PlainForeignIdColumnDefinition
     {
-        return $this->addColumnDefinition(new UnversionedForeignIdColumnDefinition($this, [
+        return $this->addColumnDefinition(new PlainForeignIdColumnDefinition($this, [
             'type' => 'bigInteger',
             'name' => $column,
             'autoIncrement' => false,
@@ -87,9 +87,9 @@ class SnapshotBlueprint extends Blueprint
     /**
      * Create a new UUID column on the table with a foreign key constraint.
      */
-    public function unversionedForeignUuid($column): UnversionedForeignIdColumnDefinition
+    public function plainForeignUuid($column): PlainForeignIdColumnDefinition
     {
-        return $this->addColumnDefinition(new UnversionedForeignIdColumnDefinition($this, [
+        return $this->addColumnDefinition(new PlainForeignIdColumnDefinition($this, [
             'type' => 'uuid',
             'name' => $column,
         ]));
@@ -98,9 +98,9 @@ class SnapshotBlueprint extends Blueprint
     /**
      * Create a new ULID column on the table with a foreign key constraint.
      */
-    public function unversionedForeignUlid($column, $length = 26): UnversionedForeignIdColumnDefinition
+    public function plainForeignUlid($column, $length = 26): PlainForeignIdColumnDefinition
     {
-        return $this->addColumnDefinition(new UnversionedForeignIdColumnDefinition($this, [
+        return $this->addColumnDefinition(new PlainForeignIdColumnDefinition($this, [
             'type' => 'char',
             'name' => $column,
             'length' => $length,
@@ -108,65 +108,65 @@ class SnapshotBlueprint extends Blueprint
     }
 
     /**
-     * Indicate that the given unversioned foreign key should be dropped.
+     * Indicate that the given plain foreign key should be dropped.
      *
      * @param  Model|string  $model
      * @param  string|null  $column
      * @return Fluent
      */
-    public function dropConstrainedUnversionedForeignIdFor($model, $column = null)
+    public function dropConstrainedPlainForeignIdFor($model, $column = null)
     {
         if (is_string($model)) {
             $model = new $model;
         }
 
-        return $this->dropConstrainedUnversionedForeignId($column ?: $model->getForeignKey());
+        return $this->dropConstrainedPlainForeignId($column ?: $model->getForeignKey());
     }
 
     /**
-     * Indicate that the given column and unversioned foreign key should be dropped.
+     * Indicate that the given column and plain foreign key should be dropped.
      *
      * @param  string  $column
      * @return Fluent
      */
-    public function dropConstrainedUnversionedForeignId($column)
+    public function dropConstrainedPlainForeignId($column)
     {
-        $this->dropUnversionedForeign([$column]);
+        $this->dropPlainForeign([$column]);
 
         return $this->dropColumn($column);
     }
 
     /**
-     * Indicate that the given unversioned foreign key should be dropped.
+     * Indicate that the given plain foreign key should be dropped.
      *
      * @param  Model|string  $model
      * @param  string|null  $column
      * @return Fluent
      */
-    public function dropUnversionedForeignIdFor($model, $column = null)
+    public function dropPlainForeignIdFor($model, $column = null)
     {
         if (is_string($model)) {
             $model = new $model;
         }
 
-        return $this->dropUnversionedForeign([$column ?: $model->getForeignKey()]);
+        return $this->dropPlainForeign([$column ?: $model->getForeignKey()]);
     }
 
     /**
-     * Indicate that the given unversioned foreign key should be dropped.
+     * Indicate that the given plain foreign key should be dropped.
      *
      * @param  string|array  $index
      * @return Fluent
      */
-    public function dropUnversionedForeign($index)
+    public function dropPlainForeign($index)
     {
-        return $this->dropIndexCommand('dropUnversionedForeign', 'unversionedForeign', $index);
+        return $this->dropIndexCommand('dropPlainForeign', 'plainForeign', $index);
     }
 
     /**
      * {@inheritDoc}
      *
-     * Use getTablePrefix() directly so dynamically-set version prefixes are
+     * Use getTablePrefix() directly so dynamically-set snapshot prefixes are
      * reflected in auto-generated index names without needing prefix_indexes
      * to be set in the static connection config.
      */

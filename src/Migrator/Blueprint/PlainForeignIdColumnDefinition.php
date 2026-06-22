@@ -6,7 +6,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\ForeignIdColumnDefinition;
 use Illuminate\Database\Schema\ForeignKeyDefinition;
 
-class UnversionedForeignIdColumnDefinition extends ForeignIdColumnDefinition
+class PlainForeignIdColumnDefinition extends ForeignIdColumnDefinition
 {
     /**
      * The schema builder blueprint instance.
@@ -25,6 +25,6 @@ class UnversionedForeignIdColumnDefinition extends ForeignIdColumnDefinition
      */
     public function references($column, $indexName = null): ForeignKeyDefinition
     {
-        return $this->blueprint->unversionedForeign($this->name, $indexName)->references($column);
+        return $this->blueprint->plainForeign($this->name, $indexName)->references($column);
     }
 }

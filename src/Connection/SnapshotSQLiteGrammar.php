@@ -7,12 +7,12 @@ use Illuminate\Database\Schema\ForeignKeyDefinition;
 use Illuminate\Database\Schema\Grammars\SQLiteGrammar;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Fluent;
-use Plank\Snapshots\Concerns\HasUnversionedForeignKeys;
-use Plank\Snapshots\Contracts\VersionKey;
+use Plank\Snapshots\Concerns\HasPlainForeignKeys;
+use Plank\Snapshots\Contracts\SnapshotKey;
 
 class SnapshotSQLiteGrammar extends SQLiteGrammar
 {
-    use HasUnversionedForeignKeys;
+    use HasPlainForeignKeys;
 
     /**
      * Compile a create table command.
@@ -26,7 +26,7 @@ class SnapshotSQLiteGrammar extends SQLiteGrammar
             $this->wrapTable($blueprint),
             implode(', ', $this->getColumns($blueprint)),
             $this->addForeignKeys($this->getCommandsByName($blueprint, 'foreign')),
-            $this->addUnversionedForeignKeys($this->getCommandsByName($blueprint, 'unversionedForeign')),
+            $this->addPlainForeignKeys($this->getCommandsByName($blueprint, 'plainForeign')),
             $this->addPrimaryKeys($this->getCommandByName($blueprint, 'primary'))
         );
     }
@@ -36,7 +36,7 @@ class SnapshotSQLiteGrammar extends SQLiteGrammar
      *
      * @return string
      */
-    public function compileUnversionedForeign(Blueprint $blueprint, Fluent $command)
+    public function compilePlainForeign(Blueprint $blueprint, Fluent $command)
     {
         // Handled on table creation...
     }
@@ -47,13 +47,13 @@ class SnapshotSQLiteGrammar extends SQLiteGrammar
      * @param  ForeignKeyDefinition[]  $foreignKeys
      * @return string|null
      */
-    protected function addUnversionedForeignKeys($foreignKeys)
+    protected function addPlainForeignKeys($foreignKeys)
     {
         return (new Collection($foreignKeys))->reduce(function ($sql, ForeignKeyDefinition $foreign) {
             // Once we have all the foreign key commands for the table creation statement
             // we'll loop through each of them and add them to the create table SQL we
             // are building, since SQLite needs foreign keys on the tables creation.
-            return $sql.$this->getUnversionedForeignKey($foreign);
+            return $sql.$this->getPlainForeignKey($foreign);
         }, '');
     }
 
@@ -63,10 +63,10 @@ class SnapshotSQLiteGrammar extends SQLiteGrammar
      * @param  Fluent  $foreign
      * @return string
      */
-    protected function getUnversionedForeignKey($foreign)
+    protected function getPlainForeignKey($foreign)
     {
-        /** @var class-string<VersionKey> $keyClass */
-        $keyClass = config('snapshots.value_objects.version_key');
+        /** @var class-string<SnapshotKey> $keyClass */
+        $keyClass = config('snapshots.value_objects.snapshot_key');
 
         // We need to columnize the columns that the foreign key is being defined for
         // so that it is a properly formatted list. Once we have done this, we can

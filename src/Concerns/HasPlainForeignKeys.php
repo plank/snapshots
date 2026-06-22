@@ -4,19 +4,19 @@ namespace Plank\Snapshots\Concerns;
 
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Fluent;
-use Plank\Snapshots\Contracts\VersionKey;
+use Plank\Snapshots\Contracts\SnapshotKey;
 
-trait HasUnversionedForeignKeys
+trait HasPlainForeignKeys
 {
     /**
-     * Compile an unversioned foreign key command.
+     * Compile an plain foreign key command.
      *
      * @return string
      */
-    public function compileUnversionedForeign(Blueprint $blueprint, Fluent $command)
+    public function compilePlainForeign(Blueprint $blueprint, Fluent $command)
     {
-        /** @var class-string<VersionKey> $keyClass */
-        $keyClass = config('snapshots.value_objects.version_key');
+        /** @var class-string<SnapshotKey> $keyClass */
+        $keyClass = config('snapshots.value_objects.snapshot_key');
 
         // We need to prepare several of the elements of the foreign key definition
         // before we can create the SQL, such as wrapping the tables and convert
@@ -50,11 +50,11 @@ trait HasUnversionedForeignKeys
     }
 
     /**
-     * Compile a drop unversioned foreign key command.
+     * Compile a drop plain foreign key command.
      *
      * @return string
      */
-    public function compileDropUnversionedForeign(Blueprint $blueprint, Fluent $command)
+    public function compileDropPlainForeign(Blueprint $blueprint, Fluent $command)
     {
         return parent::compileDropForeign($blueprint, $command);
     }
