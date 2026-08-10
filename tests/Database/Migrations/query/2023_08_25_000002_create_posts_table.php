@@ -17,6 +17,7 @@ return new class extends SnapshotMigration
             $table->string('slug');
             $table->string('title');
             $table->string('body');
+            $table->json('meta')->nullable();
             $table->timestamps();
 
             $table->unversionedForeign('user_id')

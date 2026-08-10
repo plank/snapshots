@@ -21,6 +21,7 @@ use Plank\Snapshots\Contracts\Versioned;
  * @property int $id
  * @property string $title
  * @property string $body
+ * @property array|null $meta
  * @property int $user_id
  * @property Carbon $created_at
  * @property Carbon $updated_at
@@ -40,6 +41,10 @@ class Post extends Model implements Identifying, Trackable, Versioned
     protected $primaryKey = 'uuid';
 
     protected $guarded = [];
+
+    protected $casts = [
+        'meta' => 'array',
+    ];
 
     protected static array $identifyingRelationships = ['tags', 'related', 'videos'];
 

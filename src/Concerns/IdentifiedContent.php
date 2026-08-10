@@ -41,10 +41,22 @@ trait IdentifiedContent
 
     public function newHash(): string
     {
-        $identity = $this->modelHash();
+        // Read the persisted row through the write connection so the hash always
+        // reflects what is stored, immune to in-memory cast re-encoding, and so a
+        // read replica cannot hand us a stale/missing row mid-save.
+        $fresh = $this->setKeysForSelectQuery($this->newQueryWithoutScopes())
+            ->with(static::identifyingRelationships()->all())
+            ->useWritePdo()
+            ->first();
+
+        if ($fresh === null) {
+            return hash('sha256', 'null');
+        }
+
+        $identity = $fresh->modelHash();
 
         $identity .= static::identifyingRelationships()
-            ->implode(fn (string $relationship) => $this->relatedHash($relationship), '');
+            ->implode(fn (string $relationship) => $fresh->relatedHash($relationship), '');
 
         return hash('sha256', $identity);
     }
@@ -78,11 +90,17 @@ trait IdentifiedContent
 
     protected function relatedHash(string $relationship): string
     {
-        // We don't want to alter the state of which relations are eager loaded, to leave
-        // a minimal footprint on consuming applications
-        $related = $this->relationLoaded($relationship)
-            ? Collection::wrap($this->unsetRelation($relationship)->$relationship)
-            : $this->$relationship()->get();
+        $related = $this->$relationship;
+
+        if ($related === null) {
+            return hash('sha256', $relationship.': null');
+        }
+
+        if ($related instanceof Model) {
+            return $related instanceof Identifiable
+                ? $related->hash
+                : $this->identifyModel($related);
+        }
 
         if ($related->isEmpty()) {
             return hash('sha256', $relationship.': []');
