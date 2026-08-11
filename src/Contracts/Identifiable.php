@@ -16,9 +16,4 @@ interface Identifiable
      * Generate an identifying hash for this model including its identifying relationships
      */
     public function newHash(): string;
-
-    /**
-     * Generate an identifying hash for this model's attributes
-     */
-    public function modelhash(): string;
 }

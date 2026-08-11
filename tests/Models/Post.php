@@ -21,6 +21,7 @@ use Plank\Snapshots\Contracts\Versioned;
  * @property int $id
  * @property string $title
  * @property string $body
+ * @property array|null $meta
  * @property int $user_id
  * @property Carbon $created_at
  * @property Carbon $updated_at
@@ -41,6 +42,10 @@ class Post extends Model implements Identifying, Trackable, Versioned
 
     protected $guarded = [];
 
+    protected $casts = [
+        'meta' => 'array',
+    ];
+
     protected static array $identifyingRelationships = ['tags', 'related', 'videos'];
 
     protected static array $identifiesRelationships = ['associated'];
@@ -54,7 +59,9 @@ class Post extends Model implements Identifying, Trackable, Versioned
 
     public function related(): BelongsToMany
     {
-        return $this->belongsToMany(Post::class, 'post_post', 'post_id', 'related_id', 'uuid', 'uuid');
+        return $this->belongsToMany(Post::class, 'post_post', 'post_id', 'related_id', 'uuid', 'uuid')
+            ->withPivot('note', 'weight')
+            ->withIdentifyingPivot(['note']);
     }
 
     public function associated(): BelongsToMany
