@@ -14,6 +14,8 @@ return new class extends SnapshotMigration
         Schema::create('post_post', function (SnapshotBlueprint $table) {
             $table->foreignUuid('post_id')->constrained('posts', 'uuid')->cascadeOnDelete();
             $table->foreignUuid('related_id')->constrained('posts', 'uuid')->cascadeOnDelete();
+            $table->string('note')->nullable();
+            $table->unsignedInteger('weight')->nullable();
             $table->timestamps();
 
             $table->primary(['post_id', 'related_id']);
