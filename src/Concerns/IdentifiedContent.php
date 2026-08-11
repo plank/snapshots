@@ -2,6 +2,7 @@
 
 namespace Plank\Snapshots\Concerns;
 
+use Closure;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
@@ -41,10 +42,22 @@ trait IdentifiedContent
 
     public function newHash(): string
     {
-        $identity = $this->modelHash();
+        // Read the persisted row through the write connection so the hash always
+        // reflects what is stored, immune to in-memory cast re-encoding, and so a
+        // read replica cannot hand us a stale/missing row mid-save.
+        $fresh = $this->setKeysForSelectQuery($this->newQueryWithoutScopes())
+            ->with(static::identifyingRelationships()->all())
+            ->useWritePdo()
+            ->first();
+
+        if ($fresh === null) {
+            return hash('sha256', 'null');
+        }
+
+        $identity = $fresh->modelHash();
 
         $identity .= static::identifyingRelationships()
-            ->implode(fn (string $relationship) => $this->relatedHash($relationship), '');
+            ->implode(fn (string $relationship) => $fresh->relatedHash($relationship), '');
 
         return hash('sha256', $identity);
     }
@@ -78,23 +91,67 @@ trait IdentifiedContent
 
     protected function relatedHash(string $relationship): string
     {
-        // We don't want to alter the state of which relations are eager loaded, to leave
-        // a minimal footprint on consuming applications
-        $related = $this->relationLoaded($relationship)
-            ? Collection::wrap($this->unsetRelation($relationship)->$relationship)
-            : $this->$relationship()->get();
+        $related = $this->$relationship;
+
+        if ($related === null) {
+            return hash('sha256', $relationship.': null');
+        }
+
+        if ($related instanceof Model) {
+            return $related instanceof Identifiable
+                ? $related->hash
+                : $this->identifyModel($related);
+        }
 
         if ($related->isEmpty()) {
             return hash('sha256', $relationship.': []');
         }
 
-        return $related->implode(function (Model $model) {
-            if ($model instanceof Identifiable) {
-                return $model->hash;
+        $pivot = $this->identifyingPivotFor($relationship);
+
+        return $related->implode(function (Model $model) use ($pivot) {
+            $identity = $model instanceof Identifiable
+                ? $model->hash
+                : $this->identifyModel($model);
+
+            return $identity.$pivot($model);
+        });
+    }
+
+    /**
+     * Build a resolver that appends a relationship's declared identifying pivot
+     * values to each related model's identity. Returns an empty contribution
+     * when the relation declares no identifying pivot columns.
+     *
+     * @return Closure(Model): string
+     */
+    protected function identifyingPivotFor(string $relationship): Closure
+    {
+        $relation = $this->$relationship();
+
+        $columns = method_exists($relation, 'identifyingPivotColumns')
+            ? Collection::wrap($relation->identifyingPivotColumns())->sort()->values()
+            : Collection::make();
+
+        if ($columns->isEmpty()) {
+            return fn () => '';
+        }
+
+        $accessor = $relation->getPivotAccessor();
+
+        return function (Model $model) use ($columns, $accessor) {
+            $pivot = $model->relationLoaded($accessor)
+                ? $model->getRelation($accessor)
+                : $model->{$accessor};
+
+            if ($pivot === null) {
+                return '';
             }
 
-            return $this->identifyModel($model);
-        });
+            return $columns
+                ->map(fn (string $column) => $column.':'.json_encode($pivot->getAttribute($column)))
+                ->implode(', ');
+        };
     }
 
     protected function identifyModel(Model $model): string

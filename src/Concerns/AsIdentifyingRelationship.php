@@ -13,6 +13,13 @@ use Plank\Snapshots\Contracts\Identifiable;
 trait AsIdentifyingRelationship
 {
     /**
+     * Pivot columns that participate in the related models' identity.
+     *
+     * @var array<int, string>
+     */
+    protected array $identifyingPivot = [];
+
+    /**
      * Attach a model to the parent.
      *
      * @param  mixed  $id
@@ -40,6 +47,42 @@ trait AsIdentifyingRelationship
         $this->updateIdentities($ids);
 
         return $result;
+    }
+
+    /**
+     * Update an existing pivot record on the table.
+     *
+     * @param  mixed  $id
+     * @param  bool  $touch
+     * @return int
+     */
+    public function updateExistingPivot($id, array $attributes, $touch = true)
+    {
+        $result = parent::updateExistingPivot($id, $attributes, $touch);
+
+        $this->updateIdentities($id);
+
+        return $result;
+    }
+
+    /**
+     * Declare which pivot columns participate in the related models' identity.
+     *
+     * @param  array<int, string>  $columns
+     */
+    public function withIdentifyingPivot(array $columns): static
+    {
+        $this->identifyingPivot = array_values($columns);
+
+        return $this;
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    public function identifyingPivotColumns(): array
+    {
+        return $this->identifyingPivot;
     }
 
     protected function updateIdentities($ids)
