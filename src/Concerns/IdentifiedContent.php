@@ -2,6 +2,7 @@
 
 namespace Plank\Snapshots\Concerns;
 
+use Closure;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
@@ -106,13 +107,51 @@ trait IdentifiedContent
             return hash('sha256', $relationship.': []');
         }
 
-        return $related->implode(function (Model $model) {
-            if ($model instanceof Identifiable) {
-                return $model->hash;
+        $pivot = $this->identifyingPivotFor($relationship);
+
+        return $related->implode(function (Model $model) use ($pivot) {
+            $identity = $model instanceof Identifiable
+                ? $model->hash
+                : $this->identifyModel($model);
+
+            return $identity.$pivot($model);
+        });
+    }
+
+    /**
+     * Build a resolver that appends a relationship's declared identifying pivot
+     * values to each related model's identity. Returns an empty contribution
+     * when the relation declares no identifying pivot columns.
+     *
+     * @return Closure(Model): string
+     */
+    protected function identifyingPivotFor(string $relationship): Closure
+    {
+        $relation = $this->$relationship();
+
+        $columns = method_exists($relation, 'identifyingPivotColumns')
+            ? Collection::wrap($relation->identifyingPivotColumns())->sort()->values()
+            : Collection::make();
+
+        if ($columns->isEmpty()) {
+            return fn () => '';
+        }
+
+        $accessor = $relation->getPivotAccessor();
+
+        return function (Model $model) use ($columns, $accessor) {
+            $pivot = $model->relationLoaded($accessor)
+                ? $model->getRelation($accessor)
+                : $model->{$accessor};
+
+            if ($pivot === null) {
+                return '';
             }
 
-            return $this->identifyModel($model);
-        });
+            return $columns
+                ->map(fn (string $column) => $column.':'.json_encode($pivot->getAttribute($column)))
+                ->implode(', ');
+        };
     }
 
     protected function identifyModel(Model $model): string
