@@ -59,7 +59,9 @@ class Post extends Model implements Identifying, Trackable, Versioned
 
     public function related(): BelongsToMany
     {
-        return $this->belongsToMany(Post::class, 'post_post', 'post_id', 'related_id', 'uuid', 'uuid');
+        return $this->belongsToMany(Post::class, 'post_post', 'post_id', 'related_id', 'uuid', 'uuid')
+            ->withPivot('note', 'weight')
+            ->withIdentifyingPivot(['note']);
     }
 
     public function associated(): BelongsToMany
