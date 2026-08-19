@@ -109,13 +109,14 @@ trait IdentifiedContent
 
         $pivot = $this->identifyingPivotFor($relationship);
 
-        return $related->implode(function (Model $model) use ($pivot) {
-            $identity = $model instanceof Identifiable
-                ? $model->hash
-                : $this->identifyModel($model);
+        return $related->sortBy(fn (Model $model) => $model->getKey())
+            ->implode(function (Model $model) use ($pivot) {
+                $identity = $model instanceof Identifiable
+                    ? $model->hash
+                    : $this->identifyModel($model);
 
-            return $identity.$pivot($model);
-        });
+                return $identity.$pivot($model);
+            });
     }
 
     /**
