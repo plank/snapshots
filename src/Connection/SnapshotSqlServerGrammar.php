@@ -3,9 +3,9 @@
 namespace Plank\Snapshots\Connection;
 
 use Illuminate\Database\Schema\Grammars\SqlServerGrammar;
-use Plank\Snapshots\Concerns\HasUnversionedForeignKeys;
+use Plank\Snapshots\Concerns\HasPlainForeignKeys;
 
 class SnapshotSqlServerGrammar extends SqlServerGrammar
 {
-    use HasUnversionedForeignKeys;
+    use HasPlainForeignKeys;
 }

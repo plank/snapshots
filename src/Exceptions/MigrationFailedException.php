@@ -2,12 +2,12 @@
 
 namespace Plank\Snapshots\Exceptions;
 
-use Plank\Snapshots\Contracts\Version;
+use Plank\Snapshots\Contracts\Snapshot;
 
 class MigrationFailedException extends SnapshotsException
 {
-    public static function create(Version $version): self
+    public static function create(Snapshot $snapshot): self
     {
-        return new self("Migrations failed for Version {$version->key()}");
+        return new self("Migrations failed for Snapshot {$snapshot->key()}");
     }
 }

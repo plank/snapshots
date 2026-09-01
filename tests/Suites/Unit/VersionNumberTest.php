@@ -15,7 +15,7 @@ describe('VersionNumber creates, compares and transforms correctly', function ()
         VersionNumber::fromString('10000');
     })->throws(InvalidArgumentException::class);
 
-    it('can return the next major version', function () {
+    it('can return the next major snapshot', function () {
         $number = VersionNumber::fromString('1.0.0');
 
         $next = $number->nextMajor();
@@ -25,7 +25,7 @@ describe('VersionNumber creates, compares and transforms correctly', function ()
         expect($next->patch())->toEqual(0);
     });
 
-    it('can return the next minor version', function () {
+    it('can return the next minor snapshot', function () {
         $number = VersionNumber::fromString('1.0.0');
 
         $next = $number->nextMinor();
@@ -35,7 +35,7 @@ describe('VersionNumber creates, compares and transforms correctly', function ()
         expect($next->patch())->toEqual(0);
     });
 
-    it('can return the next patch version', function () {
+    it('can return the next patch snapshot', function () {
         $number = VersionNumber::fromString('1.0.0');
 
         $next = $number->nextPatch();
@@ -45,13 +45,13 @@ describe('VersionNumber creates, compares and transforms correctly', function ()
         expect($next->patch())->toEqual(1);
     });
 
-    it('can return a string key of the version', function () {
+    it('can return a string key of the snapshot', function () {
         $number = VersionNumber::fromString('1.0.0');
 
         expect($number->snake())->toEqual('1_0_0');
     });
 
-    it('can return a kebab cased string of the version', function () {
+    it('can return a kebab cased string of the snapshot', function () {
         $number = VersionNumber::fromString('1.0.0');
 
         expect($number->kebab())->toEqual('1-0-0');
@@ -69,7 +69,7 @@ describe('VersionNumber creates, compares and transforms correctly', function ()
         expect($number->prefix(''))->toEqual('v1_0_0_');
     });
 
-    it('can determine if another version number is greater than itself', function () {
+    it('can determine if another snapshot number is greater than itself', function () {
         $number = VersionNumber::fromString('1.0.0');
 
         expect($number->isGreaterThan(VersionNumber::fromString('0.9.9')))->toBeTrue();
@@ -77,7 +77,7 @@ describe('VersionNumber creates, compares and transforms correctly', function ()
         expect($number->isGreaterThan(VersionNumber::fromString('1.0.1')))->toBeFalse();
     });
 
-    it('can determine if another version number is greater than or equal to itself', function () {
+    it('can determine if another snapshot number is greater than or equal to itself', function () {
         $number = VersionNumber::fromString('1.0.0');
 
         expect($number->isGreaterThanOrEqualTo(VersionNumber::fromString('0.9.9')))->toBeTrue();
@@ -85,7 +85,7 @@ describe('VersionNumber creates, compares and transforms correctly', function ()
         expect($number->isGreaterThanOrEqualTo(VersionNumber::fromString('1.0.1')))->toBeFalse();
     });
 
-    it('can determine if another version number is less than itself', function () {
+    it('can determine if another snapshot number is less than itself', function () {
         $number = VersionNumber::fromString('1.0.0');
 
         expect($number->isLessThan(VersionNumber::fromString('1.0.1')))->toBeTrue();
@@ -93,7 +93,7 @@ describe('VersionNumber creates, compares and transforms correctly', function ()
         expect($number->isLessThan(VersionNumber::fromString('0.9.9')))->toBeFalse();
     });
 
-    it('can determine if another version number is less than or equal to itself', function () {
+    it('can determine if another snapshot number is less than or equal to itself', function () {
         $number = VersionNumber::fromString('1.0.0');
 
         expect($number->isLessThanOrEqualTo(VersionNumber::fromString('1.0.1')))->toBeTrue();
@@ -101,7 +101,7 @@ describe('VersionNumber creates, compares and transforms correctly', function ()
         expect($number->isLessThanOrEqualTo(VersionNumber::fromString('0.9.9')))->toBeFalse();
     });
 
-    it('can determine if another version number is equal to itself', function () {
+    it('can determine if another snapshot number is equal to itself', function () {
         $number = VersionNumber::fromString('1.0.0');
 
         expect($number->isEqualTo(VersionNumber::fromString('1.0.0')))->toBeTrue();

@@ -18,11 +18,11 @@ describe('The snapshot schema prefixes tables appropriately', function () {
         ])->run();
     });
 
-    it('migrates the declared table before the versions table has been migrated', function () {
+    it('migrates the declared table before the snapshots table has been migrated', function () {
         DB::table('migrations')->truncate();
 
         usingSnapshotSchema(function (SchemaBuilder $schema) {
-            $schema->drop('versions');
+            $schema->drop('snapshots');
             $schema->drop('documents');
             $schema->drop('flags');
         });
@@ -37,8 +37,8 @@ describe('The snapshot schema prefixes tables appropriately', function () {
         });
     });
 
-    it('uses the declared table name when no active version is set', function () {
-        versions()->clearActive();
+    it('uses the declared table name when no active snapshot is set', function () {
+        snapshots()->clearActive();
 
         usingSnapshotSchema(function (SchemaBuilder $schema) {
             $schema->create('files', function (SnapshotBlueprint $table) {
@@ -52,8 +52,8 @@ describe('The snapshot schema prefixes tables appropriately', function () {
         });
     });
 
-    it('creates versioned tables', function () {
-        createFirstVersion('schema/create');
+    it('creates snapshotted tables', function () {
+        createFirstSnapshot('schema/create');
 
         assertDatabaseHas('migrations', [
             'migration' => 'v1_0_0_create_documents_table',
@@ -62,7 +62,7 @@ describe('The snapshot schema prefixes tables appropriately', function () {
     });
 
     it('does not re-run snapshot migrations', function () {
-        createFirstVersion('schema/create');
+        createFirstSnapshot('schema/create');
 
         expect(DB::table('migrations')->count())->toBe(8);
 
@@ -74,15 +74,15 @@ describe('The snapshot schema prefixes tables appropriately', function () {
         expect(DB::table('migrations')->count())->toBe(8);
     });
 
-    it('creates new tables for new versions', function () {
-        createFirstVersion('schema/create');
+    it('creates new tables for new snapshots', function () {
+        createFirstSnapshot('schema/create');
 
         assertDatabaseHas('migrations', [
             'migration' => 'v1_0_0_create_documents_table',
             'batch' => 4,
         ]);
 
-        createMinorVersion('schema/create');
+        createMinorSnapshot('schema/create');
 
         assertDatabaseHas('migrations', [
             'migration' => 'v1_1_0_create_documents_table',
@@ -90,8 +90,8 @@ describe('The snapshot schema prefixes tables appropriately', function () {
         ]);
     });
 
-    it('creates new tables for models for new versions', function () {
-        createFirstVersion('schema/create');
+    it('creates new tables for models for new snapshots', function () {
+        createFirstSnapshot('schema/create');
 
         assertDatabaseHas('migrations', [
             'migration' => 'v1_0_0_create_documents_table',
@@ -102,7 +102,7 @@ describe('The snapshot schema prefixes tables appropriately', function () {
             expect($schema->hasTable('documents'))->toBeTrue();
         });
 
-        createMinorVersion('schema/create');
+        createMinorSnapshot('schema/create');
 
         assertDatabaseHas('migrations', [
             'migration' => 'v1_1_0_create_documents_table',
@@ -114,8 +114,8 @@ describe('The snapshot schema prefixes tables appropriately', function () {
         });
     });
 
-    it('drops versioned tables', function () {
-        createFirstVersion('schema/create');
+    it('drops snapshotted tables', function () {
+        createFirstSnapshot('schema/create');
 
         artisan('migrate', [
             '--path' => migrationPath('schema/drop'),
@@ -128,8 +128,8 @@ describe('The snapshot schema prefixes tables appropriately', function () {
         ]);
     });
 
-    it('drops versioned tables if they exist when they exist', function () {
-        createFirstVersion('schema/create');
+    it('drops snapshotted tables if they exist when they exist', function () {
+        createFirstSnapshot('schema/create');
 
         artisan('migrate', [
             '--path' => migrationPath('schema/drop_if_exists'),
@@ -142,8 +142,8 @@ describe('The snapshot schema prefixes tables appropriately', function () {
         ]);
     });
 
-    it('doesnt drop versioned tables when they dont exist', function () {
-        createFirstVersion('schema/create');
+    it('doesnt drop snapshotted tables when they dont exist', function () {
+        createFirstSnapshot('schema/create');
 
         artisan('migrate', [
             '--path' => migrationPath('schema/drop'),
@@ -161,15 +161,15 @@ describe('The snapshot schema prefixes tables appropriately', function () {
         ]);
     });
 
-    it('drops versioned tables for new versions', function () {
-        createFirstVersion('schema/create');
+    it('drops snapshotted tables for new snapshots', function () {
+        createFirstSnapshot('schema/create');
 
         assertDatabaseHas('migrations', [
             'migration' => 'v1_0_0_create_documents_table',
             'batch' => 4,
         ]);
 
-        versions()->setActive(createMajorVersion('schema/create'));
+        snapshots()->setActive(createMajorSnapshot('schema/create'));
 
         artisan('migrate', [
             '--path' => migrationPath('schema/drop'),
@@ -208,8 +208,8 @@ describe('The snapshot schema prefixes tables appropriately', function () {
         });
     });
 
-    it('drops columns on the versioned tables', function () {
-        versions()->setActive(createFirstVersion('schema/create'));
+    it('drops columns on the snapshotted tables', function () {
+        snapshots()->setActive(createFirstSnapshot('schema/create'));
 
         usingSnapshotSchema(function (SchemaBuilder $schema) {
             $schema->whenTableHasColumn('documents', 'released_at', function () use ($schema) {
@@ -258,13 +258,13 @@ describe('The snapshot schema prefixes tables appropriately', function () {
         });
     });
 
-    it('renames the versioned tables', function () {
+    it('renames the snapshotted tables', function () {
         usingSnapshotSchema(function (SchemaBuilder $schema) {
             expect($schema->hasTable('documents'))->toBeTrue();
             expect($schema->hasTable('files'))->toBeFalse();
         });
 
-        versions()->setActive(createFirstVersion('schema/create'));
+        snapshots()->setActive(createFirstSnapshot('schema/create'));
 
         usingSnapshotSchema(function (SchemaBuilder $schema) {
             expect($schema->hasTable('documents'))->toBeTrue();
@@ -290,8 +290,8 @@ describe('The snapshot schema prefixes tables appropriately', function () {
         });
     });
 
-    it('changes columns on versioned tables', function () {
-        versions()->setActive(createFirstVersion('schema/create'));
+    it('changes columns on snapshotted tables', function () {
+        snapshots()->setActive(createFirstSnapshot('schema/create'));
 
         usingSnapshotSchema(function (SchemaBuilder $schema) {
             expect($schema->getColumnType('documents', 'title'))->toBe(varcharColumn());
@@ -314,8 +314,8 @@ describe('The snapshot schema prefixes tables appropriately', function () {
         });
     });
 
-    it('reads the indexes of versioned tables correctly', function () {
-        versions()->setActive(createFirstVersion('schema/create'));
+    it('reads the indexes of snapshotted tables correctly', function () {
+        snapshots()->setActive(createFirstSnapshot('schema/create'));
 
         $indexes = usingSnapshotSchema(function (SchemaBuilder $schema) {
             return $schema->getIndexes('documents');
@@ -352,7 +352,7 @@ describe('The snapshot schema prefixes tables appropriately', function () {
         ]);
     });
 
-    it('reads the foreign keys of versioned tables correctly', function () {
+    it('reads the foreign keys of snapshotted tables correctly', function () {
         artisan('migrate', [
             '--path' => migrationPath('schema/fks'),
             '--realpath' => true,
@@ -363,7 +363,7 @@ describe('The snapshot schema prefixes tables appropriately', function () {
             'batch' => 4,
         ]);
 
-        versions()->setActive(createFirstVersion('schema/fks'));
+        snapshots()->setActive(createFirstSnapshot('schema/fks'));
 
         $fks = usingSnapshotSchema(function (SchemaBuilder $schema) {
             return $schema->getForeignKeys('signatures');
@@ -385,7 +385,7 @@ describe('The snapshot schema prefixes tables appropriately', function () {
     });
 
     it('forwards non-table schema builder methods to the frameworks schema builder', function () {
-        versions()->setActive(createFirstVersion('schema/create'));
+        snapshots()->setActive(createFirstSnapshot('schema/create'));
 
         usingSnapshotSchema(function (SchemaBuilder $schema) {
             expect($schema->hasTable('documents'))->toBeTrue();
@@ -411,6 +411,6 @@ describe('The snapshot schema prefixes tables appropriately', function () {
             $mock->shouldReceive('call')->andReturn(1);
         });
 
-        createFirstVersion('schema/create');
+        createFirstSnapshot('schema/create');
     })->throws(MigrationFailedException::class);
 });

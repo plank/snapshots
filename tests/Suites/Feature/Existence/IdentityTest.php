@@ -14,10 +14,10 @@ beforeEach(function () {
     config()->set('snapshots.observers.existence', ExistenceObserver::class);
 });
 
-describe('Identity is accurately tracked across versions and relationships', function () {
+describe('Identity is accurately tracked across snapshots and relationships', function () {
     /**
      * Create the following situation:
-     * Version | Operation     | Visible
+     * Snapshot | Operation     | Visible
      */
     beforeEach(function () {
         config()->set('snapshots.observers.existence', ExistenceObserver::class);
