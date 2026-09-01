@@ -7,13 +7,13 @@ use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Event;
-use Plank\Snapshots\Contracts\ManagesVersions;
-use Plank\Snapshots\Events\VersionCreated;
-use Plank\Snapshots\Events\VersionMigrated;
+use Plank\Snapshots\Contracts\ManagesSnapshots;
+use Plank\Snapshots\Events\SnapshotCreated;
+use Plank\Snapshots\Events\SnapshotMigrated;
 use Plank\Snapshots\Migrator\Blueprint\SnapshotBlueprint;
 use Plank\Snapshots\Migrator\SnapshotMigrationRepository;
 use Plank\Snapshots\Migrator\SnapshotMigrator;
-use Plank\Snapshots\Models\Version;
+use Plank\Snapshots\Models\Snapshot;
 use Spatie\LaravelPackageTools\Commands\InstallCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
@@ -30,7 +30,7 @@ class SnapshotServiceProvider extends PackageServiceProvider
         $package->name('snapshots')
             ->hasConfigFile()
             ->hasMigrations([
-                'create_versions_table',
+                'create_snapshots_table',
                 'create_existences_table',
             ])
             ->hasInstallCommand(function (InstallCommand $command) {
@@ -65,8 +65,8 @@ class SnapshotServiceProvider extends PackageServiceProvider
 
     protected function bindRepositories(): self
     {
-        $this->app->scopedIf(ManagesVersions::class, function (Application $app) {
-            $repo = $app['config']->get('snapshots.repositories.version');
+        $this->app->scopedIf(ManagesSnapshots::class, function (Application $app) {
+            $repo = $app['config']->get('snapshots.repositories.snapshot');
 
             return new $repo;
         });
@@ -81,7 +81,7 @@ class SnapshotServiceProvider extends PackageServiceProvider
 
             $table = is_array($migrations) ? ($migrations['table'] ?? null) : $migrations;
 
-            return new SnapshotMigrationRepository($app['db'], $table, $app[ManagesVersions::class]);
+            return new SnapshotMigrationRepository($app['db'], $table, $app[ManagesSnapshots::class]);
         });
 
         $this->app->bind(Blueprint::class, function (Application $app, array $arguments) {
@@ -103,17 +103,17 @@ class SnapshotServiceProvider extends PackageServiceProvider
 
     protected function listenToEvents(): self
     {
-        if ($observer = config()->get('snapshots.observers.version')) {
-            $versionModel = config()->get('snapshots.models.version', Version::class);
-            $versionModel::observe($observer);
+        if ($observer = config()->get('snapshots.observers.snapshot')) {
+            $snapshotModel = config()->get('snapshots.models.snapshot', Snapshot::class);
+            $snapshotModel::observe($observer);
         }
 
         if ($migrator = config()->get('snapshots.release.listener')) {
-            Event::listen(VersionCreated::class, $migrator);
+            Event::listen(SnapshotCreated::class, $migrator);
         }
 
         if ($copier = config()->get('snapshots.release.copy.listener')) {
-            Event::listen(VersionMigrated::class, $copier);
+            Event::listen(SnapshotMigrated::class, $copier);
         }
 
         return $this;

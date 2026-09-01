@@ -7,16 +7,16 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphPivot;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Plank\Snapshots\Contracts\Identifiable;
+use Plank\Snapshots\Contracts\Snapshotted;
 use Plank\Snapshots\Contracts\Trackable;
-use Plank\Snapshots\Contracts\Versioned;
 
 /**
  * @property string $trackable_type
  * @property string|int $trackable_id
- * @property string|int $version_id
+ * @property string|int $snapshot_id
  * @property ?string $hash
  * @property-read Model&Trackable $trackable
- * @property-read Version|null $version
+ * @property-read Snapshot|null $snapshot
  */
 class Existence extends MorphPivot
 {
@@ -33,14 +33,14 @@ class Existence extends MorphPivot
         return $this->morphTo();
     }
 
-    public function version(): BelongsTo
+    public function snapshot(): BelongsTo
     {
-        return $this->belongsTo(config()->get('snapshots.models.version'));
+        return $this->belongsTo(config()->get('snapshots.models.snapshot'));
     }
 
-    public static function createOrUpdateFor(Versioned&Model $model, (Version&Model)|null $version): self
+    public static function createOrUpdateFor(Snapshotted&Model $model, (Snapshot&Model)|null $snapshot): self
     {
-        if ($existence = $model->existences()->where(static::versionColumn(), $version?->getKey())->first()) {
+        if ($existence = $model->existences()->where(static::snapshotColumn(), $snapshot?->getKey())->first()) {
             if ($model instanceof Identifiable) {
                 $existence->hash = $model->newHash();
                 $existence->save();
@@ -52,23 +52,23 @@ class Existence extends MorphPivot
         return static::query()->create([
             'trackable_type' => $model::class,
             'trackable_id' => $model->getKey(),
-            'version_id' => $version?->getKey(),
-            'last_changed_in' => $version?->getKey(),
+            'snapshot_id' => $snapshot?->getKey(),
+            'last_changed_in' => $snapshot?->getKey(),
             'hash' => $model instanceof Identifiable ? $model->newHash() : null,
         ]);
     }
 
-    public static function copiedTo(Versioned&Model $model, Version&Model $version): self
+    public static function copiedTo(Snapshotted&Model $model, Snapshot&Model $snapshot): self
     {
         $existence = $model->existence->replicate();
-        $existence->version_id = $version->id;
+        $existence->snapshot_id = $snapshot->id;
         $existence->save();
 
         return $existence;
     }
 
-    public static function versionColumn(): string
+    public static function snapshotColumn(): string
     {
-        return 'version_id';
+        return 'snapshot_id';
     }
 }

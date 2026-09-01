@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Schema;
 /**
  * @mixin Model
  */
-trait AsVersion
+trait AsSnapshot
 {
     /**
      * {@inheritDoc}
@@ -31,6 +31,6 @@ trait AsVersion
      */
     public function previous()
     {
-        return $this->belongsTo(static::class, 'previous_version_id');
+        return $this->belongsTo(static::class, 'previous_snapshot_id');
     }
 }

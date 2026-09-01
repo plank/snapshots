@@ -6,13 +6,13 @@ use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Plank\Snapshots\Contracts\Identifiable;
 use Plank\Snapshots\Contracts\Identifying;
-use Plank\Snapshots\Contracts\Versioned;
-use Plank\Snapshots\Facades\Versions;
+use Plank\Snapshots\Contracts\Snapshotted;
+use Plank\Snapshots\Facades\Snapshots;
 
 /**
  * @mixin Model
  */
-trait InteractsWithVersionedContent
+trait InteractsWithSnapshottedContent
 {
     protected function newBelongsToMany(
         Builder $query,
@@ -24,7 +24,7 @@ trait InteractsWithVersionedContent
         $relatedKey,
         $relationName = null
     ) {
-        if (($this instanceof Versioned || $query->getModel() instanceof Versioned) && $active = Versions::active()) {
+        if (($this instanceof Snapshotted || $query->getModel() instanceof Snapshotted) && $active = Snapshots::active()) {
             $table = $active->key()->prefix($table);
         }
 
@@ -68,7 +68,7 @@ trait InteractsWithVersionedContent
         $relationName = null,
         $inverse = false
     ) {
-        if (($this instanceof Versioned || $query->getModel() instanceof Versioned) && $active = Versions::active()) {
+        if (($this instanceof Snapshotted || $query->getModel() instanceof Snapshotted) && $active = Snapshots::active()) {
             $table = $active->key()->prefix($table);
         }
 

@@ -20,7 +20,7 @@ class ModelRepository extends BaseModelRepository
     }
 
     /**
-     * Get an instance of the Model being used for versions.
+     * Get an instance of the Model being used for snapshots.
      *
      * @return class-string<Model>|null
      */

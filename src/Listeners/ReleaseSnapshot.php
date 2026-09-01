@@ -6,19 +6,19 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Event;
 use Plank\LaravelSchemaEvents\Events\TableCreated;
 use Plank\LaravelSchemaEvents\Facades\SchemaEvents;
-use Plank\Snapshots\Events\VersionCreated;
-use Plank\Snapshots\Events\VersionMigrated;
+use Plank\Snapshots\Events\SnapshotCreated;
+use Plank\Snapshots\Events\SnapshotMigrated;
 use Plank\Snapshots\Exceptions\MigrationFailedException;
 
-class ReleaseVersion
+class ReleaseSnapshot
 {
-    public function handle(VersionCreated $event)
+    public function handle(SnapshotCreated $event)
     {
         // Flush any previously recorded events
         SchemaEvents::flush();
 
         if (Artisan::call('migrate') !== 0) {
-            throw MigrationFailedException::create($event->version);
+            throw MigrationFailedException::create($event->snapshot);
         }
 
         $tables = SchemaEvents::get()
@@ -28,10 +28,10 @@ class ReleaseVersion
             })
             ->all();
 
-        $version = $event->version;
-        $version->migrated = true;
-        $version->save();
+        $snapshot = $event->snapshot;
+        $snapshot->migrated = true;
+        $snapshot->save();
 
-        Event::dispatch(new VersionMigrated($event->version, $tables, $event->user));
+        Event::dispatch(new SnapshotMigrated($event->snapshot, $tables, $event->user));
     }
 }

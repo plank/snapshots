@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
-use Plank\Snapshots\Facades\Versions;
+use Plank\Snapshots\Facades\Snapshots;
 use Plank\Snapshots\Models\Existence;
 
 /**
@@ -47,6 +47,6 @@ trait HasTrackedExistence
         $class = config()->get('snapshots.models.existence');
 
         return $this->morphOne(config()->get('snapshots.models.existence'), 'trackable')
-            ->where($class::versionColumn(), Versions::active()?->getKey());
+            ->where($class::snapshotColumn(), Snapshots::active()?->getKey());
     }
 }

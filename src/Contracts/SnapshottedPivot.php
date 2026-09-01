@@ -2,7 +2,7 @@
 
 namespace Plank\Snapshots\Contracts;
 
-interface VersionedPivot
+interface SnapshottedPivot
 {
     /**
      * Get the table associated with the model.

@@ -5,16 +5,16 @@ namespace Plank\Snapshots\Concerns;
 use Illuminate\Database\Eloquent\Model;
 use Plank\LaravelHush\Concerns\HushesHandlers;
 use Plank\Snapshots\Contracts\VersionKey;
-use Plank\Snapshots\Facades\Versions;
+use Plank\Snapshots\Facades\Snapshots;
 
 /**
  * @mixin Model
  */
-trait AsVersionedContent
+trait AsSnapshottedContent
 {
     use HasTrackedExistence;
     use HushesHandlers;
-    use InteractsWithVersionedContent;
+    use InteractsWithSnapshottedContent;
 
     /**
      * getTable() can be called so frequently that you can see up to a
@@ -23,9 +23,9 @@ trait AsVersionedContent
     protected array $resolvedTables = [];
 
     /**
-     * Retrieve the active version of the model.
+     * Retrieve the active snapshot of the model.
      */
-    public function activeVersion(): ?static
+    public function activeSnapshot(): ?static
     {
         return static::query()->find($this->getKey());
     }
@@ -33,11 +33,11 @@ trait AsVersionedContent
     public function getTable()
     {
         $table = parent::getTable();
-        $version = Versions::active();
+        $snapshot = Snapshots::active();
 
         $cacheKey = str_contains($table, 'laravel_reserved_')
             ? (preg_match('/laravel_reserved_[0-9]+/', $table, $m) ? $m[0] : $table)
-            : ($version?->key()->toString() ?? '__none__');
+            : ($snapshot?->key()->toString() ?? '__none__');
 
         if (isset($this->resolvedTables[$cacheKey])) {
             return $this->resolvedTables[$cacheKey];
@@ -50,8 +50,8 @@ trait AsVersionedContent
 
         if (str_contains($table, 'laravel_reserved_')) {
             $this->resolvedTables[$cacheKey] = $table;
-        } elseif ($version) {
-            $this->resolvedTables[$cacheKey] = $version->key()->prefix($table);
+        } elseif ($snapshot) {
+            $this->resolvedTables[$cacheKey] = $snapshot->key()->prefix($table);
         } else {
             $this->resolvedTables[$cacheKey] = $table;
         }
