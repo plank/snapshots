@@ -5,7 +5,7 @@
         "plank",
         "laravel",
         "snapshot",
-        "version",
+        "snapshots",
         "history"
     ],
     "homepage": "https://github.com/plank/snapshots",
