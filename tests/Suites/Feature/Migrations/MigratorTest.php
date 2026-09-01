@@ -9,20 +9,20 @@ use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\assertDatabaseMissing;
 use function Pest\Laravel\withoutMockingConsoleOutput;
 
-describe('SnapshotMigrations use versions to run up and down', function () {
+describe('SnapshotMigrations use snapshots to run up and down', function () {
     beforeEach(function () {
         artisan('migrate', [
             '--path' => migrationPath('schema/create'),
             '--realpath' => true,
         ])->run();
 
-        createFirstVersion('schema/create');
-        createMinorVersion('schema/create');
-        createPatchVersion('schema/create');
-        createMajorVersion('schema/create');
+        createFirstSnapshot('schema/create');
+        createMinorSnapshot('schema/create');
+        createPatchSnapshot('schema/create');
+        createMajorSnapshot('schema/create');
     });
 
-    it('runs snapshot migrations when new versions are created', function () {
+    it('runs snapshot migrations when new snapshots are created', function () {
         assertDatabaseHas('migrations', [
             'migration' => 'v1_0_0_create_documents_table',
             'batch' => 4,
@@ -52,14 +52,14 @@ describe('SnapshotMigrations use versions to run up and down', function () {
 
         $items = Item::factory()->count(3)->create();
 
-        versions()->setActive(createPatchVersion('schema/alter'));
+        snapshots()->setActive(createPatchSnapshot('schema/alter'));
 
         foreach ($items as $item) {
             expect(Item::query()->whereKey($item->id)->exists())->toBeTrue();
         }
     });
 
-    it('rolls back all versions of a snapshot migration when it is included in a rollback', function () {
+    it('rolls back all snapshots of a snapshot migration when it is included in a rollback', function () {
         artisan('migrate:rollback', [
             '--path' => migrationPath('schema/create'),
             '--realpath' => true,
@@ -92,7 +92,7 @@ describe('SnapshotMigrations use versions to run up and down', function () {
         expect(Schema::hasTable('v2_0_0_documents'))->toBeFalse();
     });
 
-    it('warns you when trying to rollback a versioned migration whose file no longer exists', function () {
+    it('warns you when trying to rollback a snapshotted migration whose file no longer exists', function () {
         app('migrator')->clearPaths();
 
         withoutMockingConsoleOutput();

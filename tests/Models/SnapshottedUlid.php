@@ -6,19 +6,19 @@ use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Plank\Snapshots\Concerns\AsVersionedContent;
-use Plank\Snapshots\Contracts\Versioned as VersionedContract;
+use Plank\Snapshots\Concerns\AsSnapshottedContent;
+use Plank\Snapshots\Contracts\Snapshotted;
 
-class Versioned extends Model implements VersionedContract
+class SnapshottedUlid extends Model implements Snapshotted
 {
-    use AsVersionedContent;
+    use AsSnapshottedContent;
     use HasFactory;
     use HasUlids;
 
     protected $guarded = [];
 
-    public function unversionedUuids(): HasMany
+    public function plainUuids(): HasMany
     {
-        return $this->hasMany(UnversionedUlid::class);
+        return $this->hasMany(PlainUlid::class);
     }
 }

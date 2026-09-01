@@ -3,18 +3,18 @@
 namespace Plank\Snapshots\Tests\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Plank\Snapshots\Models\Version;
+use Plank\Snapshots\Models\Snapshot;
 
-class VersionFactory extends Factory
+class SnapshotFactory extends Factory
 {
-    protected $model = Version::class;
+    protected $model = Snapshot::class;
 
     public function definition()
     {
         $next = '1.0.0';
 
-        if ($previousId = Version::query()->max('id')) {
-            $previous = Version::find($previousId);
+        if ($previousId = Snapshot::query()->max('id')) {
+            $previous = Snapshot::find($previousId);
 
             match (random_int(1, 3)) {
                 1 => $next = $previous->number->nextMajor(),
@@ -24,7 +24,7 @@ class VersionFactory extends Factory
         }
 
         return [
-            'previous_version_id' => $previousId,
+            'previous_snapshot_id' => $previousId,
             'number' => $next,
             'migrated' => false,
             'copied' => false,

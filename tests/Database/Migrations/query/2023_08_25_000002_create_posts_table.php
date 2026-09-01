@@ -20,7 +20,7 @@ return new class extends SnapshotMigration
             $table->json('meta')->nullable();
             $table->timestamps();
 
-            $table->unversionedForeign('user_id')
+            $table->plainForeign('user_id')
                 ->references('id')
                 ->on('users');
         });

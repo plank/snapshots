@@ -9,7 +9,7 @@ use Plank\Snapshots\Tests\Models\User;
 use function Pest\Laravel\artisan;
 use function Pest\Laravel\seed;
 
-describe('BelongsTo relationships use versioned tables when one of the models is versioned', function () {
+describe('BelongsTo relationships use snapshotted tables when one of the models is snapshotted', function () {
     beforeEach(function () {
         artisan('migrate', [
             '--path' => migrationPath('query'),
@@ -19,18 +19,18 @@ describe('BelongsTo relationships use versioned tables when one of the models is
         seed(PostSeeder::class);
     });
 
-    it('can make a versioned model belong to a non versioned model', function () {
+    it('can make a snapshotted model belong to a non snapshotted model', function () {
         $user = User::factory()->create();
         $post = Post::factory()->create(['user_id' => $user->id]);
 
         expect($post->user->id)->toBe($user->id);
 
-        versions()->setActive(createFirstVersion('query'));
+        snapshots()->setActive(createFirstSnapshot('query'));
 
-        expect($post->activeVersion()->user->id)->toBe($user->id);
+        expect($post->activeSnapshot()->user->id)->toBe($user->id);
     });
 
-    it('can update a belongs to relationship to a non versioned model from a versioned model', function () {
+    it('can update a belongs to relationship to a non snapshotted model from a snapshotted model', function () {
         $user = User::factory()->create();
         $post = Post::factory()->create();
 
@@ -40,24 +40,24 @@ describe('BelongsTo relationships use versioned tables when one of the models is
 
         expect($post->user->id)->toBe($user->id);
 
-        versions()->setActive(createFirstVersion('query'));
+        snapshots()->setActive(createFirstSnapshot('query'));
 
-        expect($post->activeVersion()->user->id)->toBe($user->id);
+        expect($post->activeSnapshot()->user->id)->toBe($user->id);
     });
 
-    it('can make a non versioned model belong to a versioned model', function () {
+    it('can make a non snapshotted model belong to a snapshotted model', function () {
         $post = Post::factory()->create();
         $like = Like::factory()->create(['post_id' => $post->uuid]);
 
         expect($like->post->uuid)->toBe($post->uuid);
 
-        versions()->setActive(createFirstVersion('query'));
+        snapshots()->setActive(createFirstSnapshot('query'));
 
         expect($like->post()->first()->title)->toBe($post->title);
-        expect($post->activeVersion()->likes->first()->id)->toBe($like->id);
+        expect($post->activeSnapshot()->likes->first()->id)->toBe($like->id);
     });
 
-    it('can update a belongs to relationship to a versioned model from a non versioned model', function () {
+    it('can update a belongs to relationship to a snapshotted model from a non snapshotted model', function () {
         $post = Post::factory()->create([
             'title' => 'Gets Likes',
         ]);
@@ -70,23 +70,23 @@ describe('BelongsTo relationships use versioned tables when one of the models is
 
         expect($like->post->uuid)->toBe($post->uuid);
 
-        versions()->setActive(createFirstVersion('query'));
+        snapshots()->setActive(createFirstSnapshot('query'));
 
         expect($like->post->title)->toBe('Gets Likes');
     });
 
-    it('can make a versioned model belong to a versioned model', function () {
+    it('can make a snapshotted model belong to a snapshotted model', function () {
         $post = Post::factory()->create();
         $seo = $post->seos()->create(Seo::factory()->make()->toArray());
 
         expect($seo->post->uuid)->toBe($post->uuid);
 
-        versions()->setActive(createFirstVersion('query'));
+        snapshots()->setActive(createFirstSnapshot('query'));
 
-        expect($seo->activeVersion()->post->title)->toBe($post->title);
+        expect($seo->activeSnapshot()->post->title)->toBe($post->title);
     });
 
-    it('can update a belongs to relationship to a versioned model from a versioned model', function () {
+    it('can update a belongs to relationship to a snapshotted model from a snapshotted model', function () {
         $post = Post::factory()->create([
             'title' => 'Gets Seo',
         ]);
@@ -99,7 +99,7 @@ describe('BelongsTo relationships use versioned tables when one of the models is
 
         expect($seo->post->uuid)->toBe($post->uuid);
 
-        versions()->setActive(createFirstVersion('query'));
+        snapshots()->setActive(createFirstSnapshot('query'));
 
         expect($seo->post->title)->toBe('Gets Seo');
     });

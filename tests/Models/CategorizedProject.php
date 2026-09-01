@@ -3,12 +3,12 @@
 namespace Plank\Snapshots\Tests\Models;
 
 use Illuminate\Database\Eloquent\Relations\Pivot;
-use Plank\Snapshots\Concerns\AsVersionedPivot;
-use Plank\Snapshots\Contracts\VersionedPivot;
+use Plank\Snapshots\Concerns\AsSnapshottedPivot;
+use Plank\Snapshots\Contracts\SnapshottedPivot;
 
-class CategorizedProject extends Pivot implements VersionedPivot
+class CategorizedProject extends Pivot implements SnapshottedPivot
 {
-    use AsVersionedPivot;
+    use AsSnapshottedPivot;
 
     protected $table = 'category_project';
 }

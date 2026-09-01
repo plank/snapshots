@@ -3,9 +3,9 @@
 use Illuminate\Support\Facades\Schema;
 use Plank\Snapshots\Migrator\Blueprint\SnapshotBlueprint;
 use Plank\Snapshots\Migrator\SnapshotMigration;
-use Plank\Snapshots\Tests\Models\UnversionedAlso;
-use Plank\Snapshots\Tests\Models\UnversionedUlidAlso;
-use Plank\Snapshots\Tests\Models\UnversionedUuidAlso;
+use Plank\Snapshots\Tests\Models\PlainAlso;
+use Plank\Snapshots\Tests\Models\PlainUlidAlso;
+use Plank\Snapshots\Tests\Models\PlainUuidAlso;
 
 return new class extends SnapshotMigration
 {
@@ -14,53 +14,53 @@ return new class extends SnapshotMigration
      */
     public function up(): void
     {
-        Schema::create('versioneds', function (SnapshotBlueprint $table) {
+        Schema::create('snapshotteds', function (SnapshotBlueprint $table) {
             $table->id();
-            $table->unversionedForeignId('unversioned_id')
+            $table->plainForeignId('plain_id')
                 ->references('id')
-                ->on('unversioneds')
+                ->on('plains')
                 ->cascadeOnDelete();
             $table->string('name');
             $table->timestamps();
         });
 
-        Schema::create('versioned_alsos', function (SnapshotBlueprint $table) {
+        Schema::create('snapshotted_alsos', function (SnapshotBlueprint $table) {
             $table->id();
-            $table->unversionedForeignIdFor(UnversionedAlso::class);
+            $table->plainForeignIdFor(PlainAlso::class);
             $table->string('name');
             $table->timestamps();
         });
 
-        Schema::create('versioned_ulids', function (SnapshotBlueprint $table) {
+        Schema::create('snapshotted_ulids', function (SnapshotBlueprint $table) {
             $table->ulid('ulid')->primary();
-            $table->unversionedForeignUlid('unversioned_ulid_id')
+            $table->plainForeignUlid('plain_ulid_id')
                 ->references('id')
-                ->on('unversioned_ulids')
+                ->on('plain_ulids')
                 ->cascadeOnDelete();
             $table->string('name');
             $table->timestamps();
         });
 
-        Schema::create('versioned_ulid_alsos', function (SnapshotBlueprint $table) {
+        Schema::create('snapshotted_ulid_alsos', function (SnapshotBlueprint $table) {
             $table->ulid('ulid')->primary();
-            $table->unversionedForeignIdFor(UnversionedUlidAlso::class);
+            $table->plainForeignIdFor(PlainUlidAlso::class);
             $table->string('name');
             $table->timestamps();
         });
 
-        Schema::create('versioned_uuids', function (SnapshotBlueprint $table) {
+        Schema::create('snapshotted_uuids', function (SnapshotBlueprint $table) {
             $table->ulid('ulid')->primary();
-            $table->unversionedForeignUuid('unversioned_uuid_id')
+            $table->plainForeignUuid('plain_uuid_id')
                 ->references('id')
-                ->on('unversioned_uuids')
+                ->on('plain_uuids')
                 ->cascadeOnDelete();
             $table->string('name');
             $table->timestamps();
         });
 
-        Schema::create('versioned_uuid_alsos', function (SnapshotBlueprint $table) {
+        Schema::create('snapshotted_uuid_alsos', function (SnapshotBlueprint $table) {
             $table->ulid('ulid')->primary();
-            $table->unversionedForeignIdFor(UnversionedUuidAlso::class);
+            $table->plainForeignIdFor(PlainUuidAlso::class);
             $table->string('name');
             $table->timestamps();
         });

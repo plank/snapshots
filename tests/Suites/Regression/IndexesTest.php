@@ -6,7 +6,7 @@ use Plank\Snapshots\Tests\Models\Document;
 
 use function Pest\Laravel\artisan;
 
-describe('SnapshotBlueprint uses versions for named indexes', function () {
+describe('SnapshotBlueprint uses snapshots for named indexes', function () {
     beforeEach(function () {
         artisan('migrate', [
             '--path' => migrationPath('schema/create'),
@@ -20,7 +20,7 @@ describe('SnapshotBlueprint uses versions for named indexes', function () {
         expect($indexes)->toHaveCount(2);
         expect($indexes->pluck('name'))->toContain('idx_title');
 
-        versions()->setActive(createFirstVersion('schema/create'));
+        snapshots()->setActive(createFirstSnapshot('schema/create'));
 
         $indexes = Collection::wrap(DB::select("PRAGMA index_list('v1_0_0_documents')"));
         expect($indexes)->toHaveCount(2);
@@ -41,7 +41,7 @@ describe('SnapshotBlueprint uses versions for named indexes', function () {
     });
 });
 
-describe('SnapshotBlueprint uses versions for computed indexes', function () {
+describe('SnapshotBlueprint uses snapshots for computed indexes', function () {
     beforeEach(function () {
         artisan('migrate', [
             '--path' => migrationPath('schema/create'),
@@ -63,7 +63,7 @@ describe('SnapshotBlueprint uses versions for computed indexes', function () {
         $indexes = Collection::wrap(DB::select("PRAGMA index_list('$tableName')"));
         expect($indexes)->toHaveCount(1);
 
-        versions()->setActive(createFirstVersion('schema/create'));
+        snapshots()->setActive(createFirstSnapshot('schema/create'));
 
         $tableName = (new Document)->getTable();
         $indexes = Collection::wrap(DB::select("PRAGMA index_list('$tableName')"));
